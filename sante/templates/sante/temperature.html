@@ -1,0 +1,618 @@
+{% extends "sante/base.html" %}
+{% load static %}
+{% block title %}
+Suivi de température - {{ enfant.prenom }}
+{% endblock %}
+
+{% block extra_css %}
+       <link rel="stylesheet"href="{% static 'sante/css/temperature.css' %}">
+    {% endblock %}
+
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- EN-TÊTE -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                🌡️ Suivi de température
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ enfant.prenom }} {{ enfant.nom }}
+            </p>
+
+        </div>
+
+        <a
+            href="javascript:history.back()"
+            class="btn btn-outline-secondary"
+        >
+            ← Retour
+        </a>
+
+    </div>
+
+
+    <!-- FORMULAIRE -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+                🌡️ Nouvelle température
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Température (°C)
+                    </label>
+
+                    {{ form.valeur }}
+
+                    {% if form.valeur.errors %}
+
+                        <div class="text-danger mt-1">
+                            {{ form.valeur.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Observation
+                    </label>
+
+                    {{ form.observation }}
+
+                </div>
+
+
+                <div class="alert alert-light border">
+
+                    <small class="text-muted">
+                        🕐 La date et l'heure seront enregistrées
+                        automatiquement.
+                    </small>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-success btn-lg w-100"
+                >
+                    🌡️ Enregistrer la température
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- DERNIÈRE TEMPÉRATURE -->
+    {% if temperatures %}
+
+        {% with derniere=temperatures.0 %}
+
+        <div
+            class="card border-0 shadow-sm mb-4
+            temperature-card
+            {% if derniere.valeur < 38 %}
+                temperature-verte
+            {% elif derniere.valeur < 39 %}
+                temperature-orange
+            {% else %}
+                temperature-rouge
+            {% endif %}"
+        >
+
+            <div class="card-body text-center">
+
+                <p class="text-muted mb-1">
+                    Dernière température
+                </p>
+
+                <div class="temperature-value">
+
+                    {{ derniere.valeur }} °C
+
+                </div>
+
+                <p class="mb-0">
+
+                    {{ derniere.date_prise|date:"d/m/Y à H:i" }}
+
+                </p>
+
+            </div>
+                  {% if derniere.categorie == "surveillance" %}
+
+            <div class="alert alert-warning mt-3 mb-0">
+
+                <strong>
+                  🟠 Surveillance
+                </strong>
+
+             <br>
+
+                {{ derniere.message_alerte }}
+
+            </div>
+
+                {% elif derniere.categorie == "elevee" %}
+
+            <div class="alert alert-danger mt-3 mb-0">
+
+                <strong>
+                   🔴 Attention
+                </strong>
+
+               <br>
+
+                 {{ derniere.message_alerte }}
+
+            </div>
+
+                {% else %}
+
+            <div class="alert alert-success mt-3 mb-0">
+
+                <strong>
+                   🟢 Température dans la zone normale
+                </strong>
+
+            </div>
+
+              {% endif %}
+
+        </div>
+
+        {% endwith %}
+
+    {% endif %}
+
+
+    <!-- GRAPHIQUE -->
+   <div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+            📈 Évolution de la température
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if temperatures %}
+
+            <div style="height: 350px;">
+
+                <canvas id="temperatureChart"></canvas>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center text-muted py-5">
+
+                <div style="font-size: 3rem;">
+                    🌡️
+                </div>
+
+                <p>
+                    Aucune température enregistrée.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="temperature-legend mt-3 mb-4">
+
+    <div class="legend-item">
+        <span
+            class="legend-dot"
+            style="background-color: #198754 !important;"
+        ></span>
+
+        <span>
+            Normal
+        </span>
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-dot"
+            style="background-color: #ffc107 !important;"
+        ></span>
+
+        <span>
+            Surveillance
+        </span>
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-dot"
+            style="background-color: #dc3545 !important;"
+        ></span>
+
+        <span>
+            Température élevée
+        </span>
+    </div>
+
+</div>
+
+
+    <!-- HISTORIQUE -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                📋 Historique des températures
+            </h5>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            {% if temperatures %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Température
+                                </th>
+
+                                <th>
+                                    Observation
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for temperature in temperatures %}
+
+                            <tr>
+
+                                <td>
+
+                                    {{ temperature.date_prise|date:"d/m/Y" }}
+
+                                    <br>
+
+                                    <small class="text-muted">
+
+                                        {{ temperature.date_prise|date:"H:i" }}
+
+                                    </small>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if temperature.valeur < 38 %}
+
+                                        <span class="badge bg-success">
+                                            🟢 {{ temperature.valeur }} °C
+                                        </span>
+
+                                    {% elif temperature.valeur < 39 %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            🟠 {{ temperature.valeur }} °C
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger">
+                                            🔴 {{ temperature.valeur }} °C
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ temperature.observation|default:"—" }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'sante:supprimer_temperature' temperature.id %}"
+                                        onsubmit="return confirm('Supprimer cette mesure ?');"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                        >
+                                            🗑️
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const temperatureData = [
+        {% for temperature in temperatures reversed %}
+        {
+            date: "{{ temperature.date_prise|date:'d/m H:i' }}",
+            valeur: Number("{{ temperature.valeur }}")
+        },
+        {% endfor %}
+    ];
+
+    const labels = temperatureData.map(item => item.date);
+    const valeurs = temperatureData.map(item => item.valeur);
+
+    /*
+    ==========================================
+    COULEUR DE CHAQUE TEMPÉRATURE
+    ==========================================
+    */
+
+    const couleurs = temperatureData.map(item => {
+
+        if (item.valeur < 38) {
+
+            return "#198754"; // 🟢 Normal
+
+        } else if (item.valeur < 39) {
+
+            return "#ffc107"; // 🟠 Surveillance
+
+        } else {
+
+            return "#dc3545"; // 🔴 Élevée
+
+        }
+
+    });
+
+
+    const ctx = document.getElementById("temperatureChart");
+
+
+    if (ctx && temperatureData.length > 0) {
+
+        new Chart(ctx, {
+
+            type: "line",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: "Température (°C)",
+
+                        data: valeurs,
+
+                        /*
+                        Ligne grise
+                        */
+                        borderColor: "#6c757d",
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        fill: false,
+
+                        /*
+                        ==================================
+                        COULEUR DES POINTS
+                        ==================================
+                        */
+
+                        pointBackgroundColor: couleurs,
+
+                        pointBorderColor: couleurs,
+
+                        pointHoverBackgroundColor: couleurs,
+
+                        pointHoverBorderColor: couleurs,
+
+                        pointRadius: 7,
+
+                        pointHoverRadius: 10,
+
+                        pointBorderWidth: 2
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+
+
+                scales: {
+
+                    y: {
+
+                        title: {
+                            display: true,
+                            text: "Température (°C)"
+                        },
+
+                        suggestedMin: 36,
+
+                        suggestedMax: 40
+
+                    },
+
+                    x: {
+
+                        title: {
+                            display: true,
+                            text: "Date et heure"
+                        }
+
+                    }
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+                        display: true
+                    },
+
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                const temperature =
+                                    temperatureData[
+                                        context.dataIndex
+                                    ];
+
+                                let categorie;
+
+
+                                if (temperature.valeur < 38) {
+
+                                    categorie = "🟢 Normal";
+
+                                }
+
+                                else if (temperature.valeur < 39) {
+
+                                    categorie = "🟠 Surveillance";
+
+                                }
+
+                                else {
+
+                                    categorie = "🔴 Température élevée";
+
+                                }
+
+
+                                return (
+                                    temperature.valeur +
+                                    " °C - " +
+                                    categorie
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+});
+</script>
+
+{% endblock %}

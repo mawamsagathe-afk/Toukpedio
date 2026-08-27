@@ -1,0 +1,688 @@
+{% extends "sante/base.html" %}
+
+{% load static %}
+
+{% block title %}
+Mes enfants - Toukpedio
+{% endblock %}
+
+
+{% block extra_css %}
+     <link rel="stylesheet"href="{% static 'sante/css/enfants.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="container children-page">
+
+
+    <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
+
+    <div class="children-header">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+
+                <h1>
+                    <i class="bi bi-people-fill me-2"></i>
+                    Mes enfants
+                </h1>
+
+                <p>
+                    Consultez et gérez les informations de santé
+                    de vos enfants.
+                </p>
+
+            </div>
+
+
+            <div class="col-md-4 text-md-end">
+
+                <div class="d-flex justify-content-md-end
+                            align-items-center gap-3">
+
+                    <div class="header-icon">
+
+                        <i class="bi bi-heart-pulse"></i>
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'sante:ajouter_enfant' %}"
+                        class="btn btn-add-child"
+                    >
+
+                        <i class="bi bi-plus-circle me-1"></i>
+
+                        Ajouter un enfant
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RECHERCHE
+    ====================================================== -->
+
+    {% if enfants %}
+
+        <div class="search-box">
+
+            <i class="bi bi-search search-icon"></i>
+
+            <input
+                type="text"
+                id="searchChild"
+                placeholder="Rechercher un enfant..."
+                autocomplete="off"
+            >
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         LISTE DES ENFANTS
+    ====================================================== -->
+
+    <div
+        class="row g-4"
+        id="childrenContainer"
+    >
+
+
+        {% for enfant in enfants %}
+
+            <div
+                class="col-md-6 col-xl-4 child-card-wrapper"
+                data-child-name="{{ enfant.prenom }} {{ enfant.nom }}"
+                style="animation-delay: {{ forloop.counter0 }}00ms;"
+            >
+
+                <div class="child-card">
+
+
+                    <!-- =====================================
+                         BANDEAU
+                    ====================================== -->
+
+                    <div class="child-card-top">
+
+                        <div class="child-photo-container">
+
+                            {% if enfant.photo %}
+
+                                <img
+                                    src="{{ enfant.photo.url }}"
+                                    alt="{{ enfant.prenom }}"
+                                    class="child-photo"
+                                >
+
+                            {% else %}
+
+                                <div class="avatar-placeholder">
+
+                                    <i class="bi bi-person-fill"></i>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =====================================
+                         CONTENU
+                    ====================================== -->
+
+                    <div class="child-card-body">
+
+
+                        <!-- NOM -->
+
+                        <h3 class="child-name">
+
+                            {{ enfant.prenom }}
+                            {{ enfant.nom }}
+
+                        </h3>
+
+
+                        <div class="child-status">
+
+                            <i class="bi bi-circle-fill me-1"></i>
+
+                            Profil actif
+
+                        </div>
+
+
+
+                        <!-- =================================
+                             SEXE
+                        ================================== -->
+
+                        <div class="child-info">
+
+                            <div class="info-icon">
+
+                                {% if enfant.sexe == "M" %}
+
+                                    <i class="bi bi-gender-male"></i>
+
+                                {% else %}
+
+                                    <i class="bi bi-gender-female"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="info-content">
+
+                                <small>Sexe</small>
+
+                                <strong>
+
+                                    {% if enfant.sexe == "M" %}
+
+                                        Garçon
+
+                                    {% else %}
+
+                                        Fille
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================
+                             DATE NAISSANCE
+                        ================================== -->
+
+                        <div class="child-info">
+
+                            <div class="info-icon">
+
+                                <i class="bi bi-calendar3"></i>
+
+                            </div>
+
+
+                            <div class="info-content">
+
+                                <small>
+                                    Date de naissance
+                                </small>
+
+                                <strong>
+
+                                    {{ enfant.date_naissance|date:"d/m/Y" }}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================
+                             GROUPE SANGUIN
+                        ================================== -->
+
+                        {% if enfant.groupe_sanguin %}
+
+                            <div class="child-info">
+
+                                <div class="info-icon">
+
+                                    <i class="bi bi-droplet-fill"></i>
+
+                                </div>
+
+
+                                <div class="info-content">
+
+                                    <small>
+                                        Groupe sanguin
+                                    </small>
+
+                                    <strong>
+
+                                        {{ enfant.groupe_sanguin }}
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- =================================
+                             ALLERGIES
+                        ================================== -->
+
+                        {% if enfant.allergies %}
+
+                            <div class="allergy-box">
+
+                                <i
+                                    class="bi bi-exclamation-triangle-fill me-1"
+                                ></i>
+
+                                <strong>Allergies :</strong>
+
+                                {{ enfant.allergies|truncatechars:80 }}
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- =================================
+                             ACTIONS
+                        ================================== -->
+
+                        <div class="child-actions">
+
+
+                            <!-- DETAIL -->
+
+                            <a
+                                href="{% url 'sante:detail_enfant' enfant.pk %}"
+                                class="child-action action-detail"
+                            >
+
+                                <i class="bi bi-person-vcard"></i>
+
+                                Détail
+
+                            </a>
+
+
+
+                            <!-- CROISSANCE -->
+
+                            <a
+                                href="{% url 'sante:croissance' enfant.id %}"
+                                class="child-action action-growth"
+                            >
+
+                                <i class="bi bi-graph-up-arrow"></i>
+
+                                Croissance
+
+                            </a>
+
+
+
+                            <!-- VACCINATION -->
+
+                            <a
+                                href="{% url 'sante:vaccination' enfant.id %}"
+                                class="child-action action-vaccine"
+                            >
+
+                                <i class="bi bi-shield-check"></i>
+
+                                Vaccination
+
+                            </a>
+
+
+
+                            <!-- RENDEZ-VOUS -->
+
+                            <a
+                                href="{% url 'sante:rendez_vous' enfant.id %}"
+                                class="child-action action-appointment"
+                            >
+
+                                <i class="bi bi-calendar-check"></i>
+
+                                Rendez-vous
+
+                            </a>
+
+
+
+                            <!-- CONSULTATION -->
+
+                            <a
+                                href="{% url 'sante:consultation' enfant.id %}"
+                                class="child-action action-consultation"
+                            >
+
+                                <i class="bi bi-clipboard2-pulse"></i>
+
+                                Consultation
+
+                            </a>
+
+
+
+                            <!-- BIEN-ETRE -->
+
+                            <a
+                                href="{% url 'sante:bien_etre' enfant.id %}"
+                                class="child-action action-wellbeing"
+                            >
+
+                                <i class="bi bi-heart-pulse"></i>
+
+                                Bien-être
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+
+            <!-- =============================================
+                 AUCUN ENFANT
+            ============================================== -->
+
+            <div class="col-12">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+
+                        <i class="bi bi-people"></i>
+
+                    </div>
+
+
+                    <h3 class="fw-bold">
+
+                        Aucun enfant enregistré
+
+                    </h3>
+
+
+                    <p class="text-muted">
+
+                        Vous n'avez pas encore ajouté d'enfant
+                        à votre compte.
+
+                    </p>
+
+
+                    <a
+                        href="{% url 'sante:ajouter_enfant' %}"
+                        class="btn btn-success px-4 py-2"
+                    >
+
+                        <i class="bi bi-plus-circle me-2"></i>
+
+                        Ajouter mon premier enfant
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        {% endfor %}
+
+
+        <!-- =================================================
+             CARTE AJOUTER
+        ================================================== -->
+
+        {% if enfants %}
+
+            <div
+                class="col-md-6 col-xl-4 child-card-wrapper"
+                style="animation-delay: 500ms;"
+            >
+
+                <a
+                    href="{% url 'sante:ajouter_enfant' %}"
+                    class="text-decoration-none"
+                >
+
+                    <div class="add-child-card">
+
+                        <div>
+
+                            <div class="add-child-icon">
+
+                                <i class="bi bi-plus-lg"></i>
+
+                            </div>
+
+
+                            <h4 class="fw-bold text-dark">
+
+                                Ajouter un enfant
+
+                            </h4>
+
+
+                            <p class="text-muted mb-0">
+
+                                Créer un nouveau profil enfant
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- =====================================================
+         MESSAGE RECHERCHE
+    ====================================================== -->
+
+    {% if enfants %}
+
+        <div
+            id="noSearchResult"
+            class="alert alert-info text-center mt-4 d-none"
+        >
+
+            <i class="bi bi-search me-2"></i>
+
+            Aucun enfant ne correspond à votre recherche.
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const searchInput =
+            document.getElementById("searchChild");
+
+        const children =
+            document.querySelectorAll(
+                ".child-card-wrapper[data-child-name]"
+            );
+
+        const noResult =
+            document.getElementById(
+                "noSearchResult"
+            );
+
+
+        if (!searchInput) {
+            return;
+        }
+
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+
+                const search =
+                    this.value
+                        .toLowerCase()
+                        .trim();
+
+                let visible =
+                    0;
+
+
+                children.forEach(
+                    function (child) {
+
+                        const name =
+                            child
+                                .dataset
+                                .childName
+                                .toLowerCase();
+
+
+                        if (
+                            name.includes(search)
+                        ) {
+
+                            child.style.display =
+                                "";
+
+                            visible++;
+
+                        } else {
+
+                            child.style.display =
+                                "none";
+
+                        }
+
+                    }
+                );
+
+
+                if (noResult) {
+
+                    if (
+                        visible === 0 &&
+                        search !== ""
+                    ) {
+
+                        noResult.classList.remove(
+                            "d-none"
+                        );
+
+                    } else {
+
+                        noResult.classList.add(
+                            "d-none"
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /*
+        =====================================================
+        ANIMATION AU SURVOL DES BOUTONS
+        =====================================================
+        */
+
+        const buttons =
+            document.querySelectorAll(
+                ".child-action"
+            );
+
+
+        buttons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "mouseenter",
+                    function () {
+
+                        this.style.transform =
+                            "translateY(-3px)";
+
+                    }
+                );
+
+
+                button.addEventListener(
+                    "mouseleave",
+                    function () {
+
+                        this.style.transform =
+                            "translateY(0)";
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

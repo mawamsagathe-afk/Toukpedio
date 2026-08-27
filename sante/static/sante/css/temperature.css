@@ -1,0 +1,77 @@
+.temperature-card {
+    border-left: 6px solid;
+    transition: all 0.3s ease;
+}
+
+.temperature-verte {
+    border-left-color: #198754;
+}
+
+.temperature-orange {
+    border-left-color: #ffc107;
+}
+
+.temperature-rouge {
+    border-left-color: #dc3545;
+}
+
+
+.temperature-value {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+
+.temperature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+
+@media (max-width: 576px) {
+
+    .temperature-value {
+        font-size: 2.4rem;
+    }
+
+}
+
+.temperature-alert {
+    animation: apparitionAlerte 0.5s ease-out;
+}
+
+@keyframes apparitionAlerte {
+
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+.temperature-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.legend-dot {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    border-radius: 50%;
+    display: inline-block;
+}

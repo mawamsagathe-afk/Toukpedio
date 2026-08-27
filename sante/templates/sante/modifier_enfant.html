@@ -1,0 +1,402 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Modifier {{ enfant.prenom }} - TOUKPEDIO
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- ============================================= -->
+    <!-- EN-TÊTE -->
+    <!-- ============================================= -->
+
+    <div class="mb-4">
+
+        <a href="{% url 'sante:detail_enfant' enfant.id %}"
+           class="btn btn-outline-success rounded-pill px-4 mb-3">
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Retour au dossier
+
+        </a>
+
+        <h1 class="fw-bold">
+
+            <i class="bi bi-pencil-square text-primary me-2"></i>
+
+            Modifier les informations
+
+        </h1>
+
+        <p class="text-muted">
+
+            Modifiez les informations de
+            <strong>{{ enfant.prenom }} {{ enfant.nom }}</strong>.
+
+        </p>
+
+    </div>
+
+
+    <!-- ============================================= -->
+    <!-- FORMULAIRE -->
+    <!-- ============================================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4 p-md-5">
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+
+                <!-- ================================= -->
+                <!-- IDENTITÉ -->
+                <!-- ================================= -->
+
+                <h4 class="fw-bold text-success mb-4">
+
+                    <i class="bi bi-person-vcard me-2"></i>
+
+                    Informations personnelles
+
+                </h4>
+
+
+                <div class="row g-3">
+
+                    <!-- NOM -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Nom
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="nom"
+                            class="form-control"
+                            value="{{ enfant.nom }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PRÉNOM -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Prénom
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="prenom"
+                            class="form-control"
+                            value="{{ enfant.prenom }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- DATE DE NAISSANCE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Date de naissance
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_naissance"
+                            class="form-control"
+                            value="{{ enfant.date_naissance|date:'Y-m-d' }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- SEXE -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Sexe
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <select
+                            name="sexe"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                Sélectionner
+                            </option>
+
+                            <option value="M"
+                                {% if enfant.sexe == "M" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Garçon
+                            </option>
+
+                            <option value="F"
+                                {% if enfant.sexe == "F" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Fille
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- PHOTO -->
+                    <!-- ================================= -->
+
+                    <div class="col-12">
+
+                        <label class="form-label fw-semibold">
+
+                            Photo de l'enfant
+
+                        </label>
+
+                        {% if enfant.photo %}
+
+                            <div class="mb-3">
+
+                                <img
+                                    src="{{ enfant.photo.url }}"
+                                    alt="{{ enfant.prenom }}"
+                                    class="rounded-circle shadow"
+                                    style="
+                                        width:120px;
+                                        height:120px;
+                                        object-fit:cover;
+                                    "
+                                >
+
+                            </div>
+
+                        {% endif %}
+
+                        <input
+                            type="file"
+                            name="photo"
+                            class="form-control"
+                            accept="image/*"
+                        >
+
+                        <small class="text-muted">
+
+                            Laissez vide pour conserver la photo actuelle.
+
+                        </small>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- GROUPE SANGUIN -->
+                    <!-- ================================= -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Groupe sanguin
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="groupe_sanguin"
+                            class="form-control"
+                            value="{{ enfant.groupe_sanguin|default:'' }}"
+                            placeholder="Exemple : O+"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- TÉLÉPHONE -->
+                    <!-- ================================= -->
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Téléphone du parent
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="telephone_parent"
+                            class="form-control"
+                            value="{{ enfant.telephone_parent|default:'' }}"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- ADRESSE -->
+                    <!-- ================================= -->
+
+                    <div class="col-12">
+
+                        <label class="form-label fw-semibold">
+
+                            Adresse
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="adresse"
+                            class="form-control"
+                            value="{{ enfant.adresse|default:'' }}"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- ALLERGIES -->
+                    <!-- ================================= -->
+
+                    <div class="col-12">
+
+                        <label class="form-label fw-semibold">
+
+                            Allergies
+
+                        </label>
+
+                        <textarea
+                            name="allergies"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Indiquez les allergies connues..."
+                        >{{ enfant.allergies|default:'' }}</textarea>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- ANTÉCÉDENTS -->
+                    <!-- ================================= -->
+
+                    <div class="col-12">
+
+                        <label class="form-label fw-semibold">
+
+                            Antécédents médicaux
+
+                        </label>
+
+                        <textarea
+                            name="antecedents"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Antécédents médicaux..."
+                        >{{ enfant.antecedents|default:'' }}</textarea>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- OBSERVATIONS -->
+                    <!-- ================================= -->
+
+                    <div class="col-12">
+
+                        <label class="form-label fw-semibold">
+
+                            Observations
+
+                        </label>
+
+                        <textarea
+                            name="observations"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Informations supplémentaires..."
+                        >{{ enfant.observations|default:'' }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- BOUTONS -->
+                <!-- ================================= -->
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+
+                    <button
+                        type="submit"
+                        class="btn btn-success rounded-pill px-4"
+                    >
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        Enregistrer les modifications
+
+                    </button>
+
+
+                    <a
+                        href="{% url 'sante:detail_enfant' enfant.id %}"
+                        class="btn btn-outline-secondary rounded-pill px-4"
+                    >
+
+                        <i class="bi bi-x-circle me-2"></i>
+
+                        Annuler
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

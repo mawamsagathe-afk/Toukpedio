@@ -1,0 +1,884 @@
+/* =========================================================
+   THÈME CLAIR TOUKPEDIO
+========================================================= */
+
+:root {
+
+    --bleu-horizon: #4ea8de;
+    --bleu-horizon-fonce: #287da9;
+
+    --vert-menthe: #63c7a5;
+    --vert-menthe-fonce: #3ca987;
+
+    --blanc-casse: #f8faf8;
+    --blanc: #ffffff;
+
+    --bleu-nuit: #101d35;
+    --bleu-nuit-2: #172944;
+    --bleu-nuit-3: #203653;
+
+    --mandarine: #ff9f43;
+
+    --texte: #24364b;
+    --texte-secondaire: #718096;
+
+    --bordure: #e5ebef;
+
+    --ombre:
+        0 15px 45px rgba(16, 29, 53, .08);
+}
+
+
+/* =========================================================
+   TRANSITION GÉNÉRALE
+========================================================= */
+
+html,
+body,
+section,
+nav,
+header,
+footer,
+.card,
+.service-card,
+.hero-card,
+.about-box,
+input,
+select,
+textarea,
+button {
+
+    transition:
+        background-color .8s ease,
+        color .8s ease,
+        border-color .8s ease,
+        box-shadow .8s ease;
+
+}
+
+
+/* =========================================================
+   MODE NUIT
+========================================================= */
+
+html.dark-mode {
+
+    --blanc-casse: #101d35;
+
+    --blanc: #172944;
+
+    --bleu-nuit: #f4f8fb;
+
+    --bleu-nuit-2: #203653;
+
+    --bleu-nuit-3: #2b4666;
+
+    --texte: #eef5fa;
+
+    --texte-secondaire: #b8c7d8;
+
+    --bordure:
+        rgba(255, 255, 255, .08);
+
+    --ombre:
+        0 15px 45px rgba(0, 0, 0, .30);
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+body {
+
+    background:
+        var(--blanc-casse);
+
+    color:
+        var(--texte);
+
+}
+
+
+/* =========================================================
+   MODE NUIT : TEXTES
+========================================================= */
+
+html.dark-mode body {
+
+    background:
+        var(--bleu-nuit);
+
+    color:
+        var(--texte);
+
+}
+
+
+html.dark-mode .text-muted {
+
+    color:
+        var(--texte-secondaire) !important;
+
+}
+
+
+html.dark-mode p {
+
+    color:
+        var(--texte-secondaire);
+
+}
+
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6 {
+
+    color:
+        #ffffff;
+
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+html.dark-mode .navbar {
+
+    background:
+        var(--bleu-nuit-2) !important;
+
+    border-bottom:
+        1px solid var(--bordure);
+
+}
+
+
+html.dark-mode .navbar-brand,
+html.dark-mode .nav-link {
+
+    color:
+        #ffffff !important;
+
+}
+
+
+html.dark-mode .nav-link:hover {
+
+    color:
+        var(--vert-menthe) !important;
+
+}
+
+
+/* =========================================================
+   CARTES BOOTSTRAP
+========================================================= */
+
+html.dark-mode .card {
+
+    background:
+        var(--bleu-nuit-2);
+
+    color:
+        #ffffff;
+
+    border-color:
+        var(--bordure);
+
+    box-shadow:
+        var(--ombre);
+
+}
+
+
+/* =========================================================
+   CARTES TOUKPEDIO
+========================================================= */
+
+html.dark-mode .service-card,
+html.dark-mode .hero-card {
+
+    background:
+        var(--bleu-nuit-2);
+
+    border-color:
+        var(--bordure);
+
+    box-shadow:
+        var(--ombre);
+
+}
+
+
+html.dark-mode .service-card h4,
+html.dark-mode .hero-card h3 {
+
+    color:
+        #ffffff;
+
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+html.dark-mode .services-section {
+
+    background:
+        var(--bleu-nuit);
+
+}
+
+
+html.dark-mode .about-section {
+
+    background:
+        var(--bleu-nuit);
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+html.dark-mode .hero {
+
+    background:
+        linear-gradient(
+            135deg,
+            #101d35,
+            #172944
+        );
+
+}
+
+
+html.dark-mode .hero-title {
+
+    color:
+        #ffffff;
+
+}
+
+
+html.dark-mode .hero-text {
+
+    color:
+        #b8c7d8;
+
+}
+
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+html.dark-mode .badge-sante {
+
+    background:
+        rgba(99, 199, 165, .15);
+
+    color:
+        var(--vert-menthe);
+
+}
+
+
+/* =========================================================
+   BOUTON SECONDAIRE
+========================================================= */
+
+html.dark-mode .btn-secondaire {
+
+    background:
+        var(--bleu-nuit-2);
+
+    color:
+        #ffffff;
+
+    border-color:
+        var(--bleu-horizon);
+
+}
+
+
+html.dark-mode .btn-secondaire:hover {
+
+    background:
+        var(--bleu-horizon);
+
+    color:
+        #ffffff;
+
+}
+
+
+/* =========================================================
+   ABOUT BOX
+========================================================= */
+
+html.dark-mode .about-box {
+
+    background:
+        var(--bleu-nuit-2);
+
+}
+
+
+html.dark-mode .about-box h5 {
+
+    color:
+        #ffffff;
+
+}
+
+
+/* =========================================================
+   FORMULAIRES
+========================================================= */
+
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea {
+
+    background:
+        var(--bleu-nuit-2);
+
+    color:
+        #ffffff;
+
+    border-color:
+        var(--bordure);
+
+}
+
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+
+    color:
+        #8ea2b8;
+
+}
+
+
+html.dark-mode input:focus,
+html.dark-mode select:focus,
+html.dark-mode textarea:focus {
+
+    background:
+        var(--bleu-nuit-2);
+
+    color:
+        #ffffff;
+
+    border-color:
+        var(--bleu-horizon);
+
+}
+
+
+/* =========================================================
+   TABLEAUX
+========================================================= */
+
+html.dark-mode table {
+
+    color:
+        #ffffff;
+
+}
+
+
+html.dark-mode .table {
+
+    --bs-table-bg:
+        var(--bleu-nuit-2);
+
+    --bs-table-color:
+        #ffffff;
+
+    --bs-table-border-color:
+        var(--bordure);
+
+}
+
+
+html.dark-mode .table-light {
+
+    --bs-table-bg:
+        var(--bleu-nuit-3);
+
+    --bs-table-color:
+        #ffffff;
+
+}
+
+
+/* =========================================================
+   DROPDOWN
+========================================================= */
+
+html.dark-mode .dropdown-menu {
+
+    background:
+        var(--bleu-nuit-2);
+
+    border-color:
+        var(--bordure);
+
+}
+
+
+html.dark-mode .dropdown-item {
+
+    color:
+        #ffffff;
+
+}
+
+
+html.dark-mode .dropdown-item:hover {
+
+    background:
+        var(--bleu-nuit-3);
+
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+html.dark-mode .modal-content {
+
+    background:
+        var(--bleu-nuit-2);
+
+    color:
+        #ffffff;
+
+    border-color:
+        var(--bordure);
+
+}
+
+
+html.dark-mode .modal-header,
+html.dark-mode .modal-footer {
+
+    border-color:
+        var(--bordure);
+
+}
+
+
+/* =========================================================
+   ALERTES
+========================================================= */
+
+.alert-mandarine {
+
+    background:
+        rgba(255, 159, 67, .12);
+
+    color:
+        var(--mandarine);
+
+    border:
+        1px solid rgba(255, 159, 67, .3);
+
+}
+
+
+html.dark-mode .alert-mandarine {
+
+    background:
+        rgba(255, 159, 67, .15);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+html.dark-mode footer {
+
+    background:
+        #0b1528 !important;
+
+    color:
+        #ffffff;
+
+}
+
+
+html.dark-mode footer a {
+
+    color:
+        #b8c7d8;
+
+}
+
+
+html.dark-mode footer a:hover {
+
+    color:
+        var(--vert-menthe);
+
+}
+/* =========================================================
+   MODE NUIT TOUKPEDIO
+========================================================= */
+
+html.dark-mode body {
+    background: #071a2b;
+    color: #ffffff;
+    transition:
+        background-color 0.5s ease,
+        color 0.5s ease;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+html.dark-mode .navbar {
+    background: #061525 !important;
+}
+
+
+/* =========================================================
+   CARTES
+========================================================= */
+
+html.dark-mode .card {
+    background: #0d263d;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   HEADER TABLEAU DE BORD
+========================================================= */
+
+html.dark-mode .dashboard-header {
+    background: #0d263d;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   TEXTES
+========================================================= */
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6 {
+    color: #ffffff;
+}
+
+html.dark-mode p {
+    color: #d8e5ee;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+html.dark-mode footer {
+    background: #030b14 !important;
+}
+
+
+/* =========================================================
+   CHAMPS DE FORMULAIRE
+========================================================= */
+
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea {
+    background-color: #102b42;
+    color: #ffffff;
+    border-color: #31536b;
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+    color: #9db2c2;
+}
+
+
+/* =========================================================
+   PROFIL ENFANT
+========================================================= */
+
+.child-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 18px;
+
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    transition:
+        background 0.5s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+/* Effet au survol */
+
+.child-profile:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.10);
+}
+
+
+/* =========================================================
+   PHOTO ENFANT
+========================================================= */
+
+.child-photo {
+    width: 75px;
+    height: 75px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 3px solid #20c997;
+}
+
+
+/* =========================================================
+   AVATAR SANS PHOTO
+========================================================= */
+
+.avatar-placeholder {
+    width: 75px;
+    height: 75px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #d1e7dd;
+
+    color: #198754;
+
+    font-size: 2rem;
+}
+
+
+/* =========================================================
+   NOM DE L'ENFANT
+========================================================= */
+
+.child-name {
+    margin: 0;
+
+    font-size: 1.25rem;
+
+    font-weight: 700;
+
+    color: #198754;
+}
+
+
+/* =========================================================
+   MODE NUIT : NOM BLANC
+========================================================= */
+
+html.dark-mode .child-name {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   INDICATEUR PROFIL ACTIF
+========================================================= */
+
+.active-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-left: 6px;
+
+    color: #63e6be;
+
+    font-size: 0.9rem;
+
+    animation: activePulse 2s infinite;
+}
+
+
+/* =========================================================
+   TEXTE "PROFIL ACTIF"
+========================================================= */
+
+.active-label {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6c757d;
+
+    font-size: 0.85rem;
+}
+
+
+html.dark-mode .active-label {
+    color: #a9c1d2;
+}
+
+
+/* =========================================================
+   ANIMATION ICÔNE VERTE
+========================================================= */
+
+@keyframes activePulse {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+}
+/* ===================================================== */
+/* PROFIL ENFANT */
+/* ===================================================== */
+
+.child-profile {
+    display: flex;
+    align-items: center;
+}
+
+.child-name {
+    color: #212529;
+    font-weight: 700;
+}
+
+.active-status {
+    color: #20c997;
+    margin-left: 5px;
+    font-size: 1rem;
+}
+
+.active-label {
+    color: #198754;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+
+/* ===================================================== */
+/* MODE NUIT - BLEU MINUIT */
+/* ===================================================== */
+
+html.dark-mode body {
+    background: #071a2b;
+    color: #f8f9fa;
+}
+
+
+/* En-tête */
+
+html.dark-mode .dashboard-header {
+    background: #0b2438;
+    color: #ffffff;
+}
+
+
+/* Cartes */
+
+html.dark-mode .card {
+    background: #0d2940;
+    color: #ffffff;
+}
+
+
+/* Nom enfant */
+
+html.dark-mode .child-name {
+    color: #ffffff;
+}
+
+
+/* Icône profil actif */
+
+html.dark-mode .active-status {
+    color: #20c997;
+}
+
+
+/* Texte profil actif */
+
+html.dark-mode .active-label {
+    color: #20c997;
+}
+
+
+/* Textes secondaires */
+
+html.dark-mode .text-muted {
+    color: #aebdcc !important;
+}
+
+
+/* Séparateurs */
+
+html.dark-mode hr {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+/* Tableau */
+
+html.dark-mode .table {
+    color: #ffffff;
+}
+
+html.dark-mode .table-light {
+    --bs-table-bg: #102f47;
+    --bs-table-color: #ffffff;
+}
+
+html.dark-mode .table-hover > tbody > tr:hover {
+    --bs-table-hover-bg: #163b55;
+    --bs-table-hover-color: #ffffff;
+}

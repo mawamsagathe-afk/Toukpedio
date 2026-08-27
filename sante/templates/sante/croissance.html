@@ -1,0 +1,274 @@
+
+{% extends "sante/base.html" %}
+
+{% block title %}Croissance - {{ enfant.prenom }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+   <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <!-- BOUTON RETOUR -->
+        <a href="{% url 'sante:detail_enfant' enfant.id %}"
+           class="btn btn-outline-success rounded-pill px-4 mb-3">
+
+            <i class="bi bi-arrow-left me-2"></i>
+            Retour au dossier de {{ enfant.prenom }}
+
+        </a>
+
+        <h1 class="fw-bold mt-2">
+            <i class="bi bi-graph-up-arrow text-success me-2"></i>
+            Suivi de croissance
+        </h1>
+
+        <p class="text-muted">
+            Évolution de la croissance de {{ enfant.prenom }}.
+        </p>
+
+    </div>
+
+    <button class="btn btn-success rounded-pill px-4"
+            data-bs-toggle="collapse"
+            data-bs-target="#formCroissance">
+
+        <i class="bi bi-plus-circle me-2"></i>
+        Nouvelle mesure
+
+    </button>
+
+</div>
+
+    <!-- FORMULAIRE -->
+
+    <div class="collapse mb-4" id="formCroissance">
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold text-success mb-4">
+                    <i class="bi bi-rulers me-2"></i>
+                    Enregistrer une mesure
+                </h5>
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Date
+                            </label>
+
+                            <input type="date"
+                                   name="date_mesure"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Poids (kg)
+                            </label>
+
+                            <input type="number"
+                                   name="poids"
+                                   step="0.01"
+                                   min="0"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Taille (cm)
+                            </label>
+
+                            <input type="number"
+                                   name="taille"
+                                   step="0.01"
+                                   min="0"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Périmètre crânien (cm)
+                            </label>
+
+                            <input type="number"
+                                   name="perimetre_cranien"
+                                   step="0.01"
+                                   min="0"
+                                   class="form-control">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">
+                                Observations
+                            </label>
+
+                            <textarea name="observations"
+                                      rows="3"
+                                      class="form-control"></textarea>
+                        </div>
+
+                    </div>
+
+                    <button class="btn btn-success mt-3 rounded-pill px-4">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Enregistrer
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DERNIÈRE MESURE -->
+
+    {% if croissances %}
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Dernier poids
+                    </small>
+
+                    <h2 class="fw-bold text-success">
+                        {{ croissances.0.poids }} kg
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Dernière taille
+                    </small>
+
+                    <h2 class="fw-bold text-primary">
+                        {{ croissances.0.taille }} cm
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Dernière mesure
+                    </small>
+
+                    <h2 class="fw-bold">
+                        {{ croissances.0.date_mesure|date:"d/m/Y" }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- HISTORIQUE -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2"></i>
+                Historique de croissance
+            </h5>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Poids</th>
+                        <th>Taille</th>
+                        <th>Périmètre crânien</th>
+                        <th>Observations</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for croissance in croissances %}
+
+                    <tr>
+
+                        <td>
+                            {{ croissance.date_mesure|date:"d/m/Y" }}
+                        </td>
+
+                        <td>
+                            <strong>{{ croissance.poids }}</strong> kg
+                        </td>
+
+                        <td>
+                            <strong>{{ croissance.taille }}</strong> cm
+                        </td>
+
+                        <td>
+                            {% if croissance.perimetre_cranien %}
+                                {{ croissance.perimetre_cranien }} cm
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ croissance.observations|default:"—"|truncatechars:60 }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info text-center p-5">
+
+        <i class="bi bi-graph-up fs-1"></i>
+
+        <h4 class="mt-3">
+            Aucune mesure enregistrée
+        </h4>
+
+        <p class="mb-0">
+            Ajoutez la première mesure de croissance de {{ enfant.prenom }}.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+```

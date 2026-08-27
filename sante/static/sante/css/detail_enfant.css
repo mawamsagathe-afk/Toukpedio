@@ -1,0 +1,34 @@
+    /* ==========================================
+       BOUTON AJOUTER UN SYMPTÔME
+       Clignotement doux
+    ========================================== */
+
+    .btn-symptome {
+        animation: clignotementDoux 2.5s ease-in-out infinite;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-symptome:hover {
+        animation-play-state: paused;
+        transform: scale(1.05);
+    }
+
+    @keyframes clignotementDoux {
+
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.72;
+            transform: scale(1.02);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    }
+

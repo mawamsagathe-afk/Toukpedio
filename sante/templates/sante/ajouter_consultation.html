@@ -1,0 +1,61 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Ajouter une consultation
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-clipboard2-pulse me-2"></i>
+                Nouvelle consultation
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                <strong>Enfant :</strong>
+                {{ enfant.prenom }} {{ enfant.nom }}
+            </div>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a
+                        href="{% url 'sante:liste_consultations' enfant.id %}"
+                        class="btn btn-secondary"
+                    >
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Retour
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Enregistrer la consultation
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

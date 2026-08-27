@@ -1,0 +1,168 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Ajouter un traitement
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            💊 Ajouter un traitement
+        </h2>
+
+        <p class="text-muted">
+            {{ enfant.prenom }} {{ enfant.nom }}
+        </p>
+
+         <a
+            href="javascript:history.back()"
+            class="btn btn-outline-secondary"
+        >
+            ← Retour
+        </a>
+
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+                💊 Planification du traitement
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Nom du médicament
+                    </label>
+
+                    {{ form.medicament }}
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Dose
+                    </label>
+
+                    {{ form.dose }}
+
+                    <small class="text-muted">
+                        Exemple : 1 pipette de 5 ml
+                    </small>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Fréquence
+                    </label>
+
+                    {{ form.frequence }}
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Intervalle minimal entre les prises
+                    </label>
+
+                    {{ form.intervalle_heures }}
+
+                    <small class="text-muted">
+                        Exemple : 6 heures.
+                        À renseigner selon la prescription
+                        ou les recommandations du professionnel
+                        de santé.
+                    </small>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Première prise
+                    </label>
+
+                    {{ form.premiere_prise }}
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-bold">
+                        Date de fin
+                    </label>
+
+                    {{ form.date_fin }}
+
+                </div>
+
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-bold">
+                        Notes
+                    </label>
+
+                    {{ form.notes }}
+
+                </div>
+
+
+                <div class="alert alert-warning">
+
+                    🛡️ <strong>Sécurité</strong>
+
+                    <br>
+
+                    Le compte à rebours indique le temps restant
+                    avant la prochaine prise planifiée.
+                    Il ne remplace pas une prescription médicale.
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-success btn-lg w-100"
+                >
+
+                    💾 Enregistrer le traitement
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

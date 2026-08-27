@@ -1,0 +1,689 @@
+/* =========================================================
+   PAGE ENFANTS
+========================================================= */
+
+.children-page {
+    padding-top: 30px;
+    padding-bottom: 60px;
+}
+
+
+/* =========================================================
+   EN-TÊTE
+========================================================= */
+
+.children-header {
+    background: linear-gradient(
+        135deg,
+        #198754,
+        #20c997
+    );
+
+    color: white;
+
+    border-radius: 24px;
+
+    padding: 30px;
+
+    margin-bottom: 30px;
+
+    box-shadow:
+        0 12px 35px rgba(25, 135, 84, 0.20);
+
+    animation: headerAppear 0.7s ease;
+}
+
+
+.children-header h1 {
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+
+.children-header p {
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+
+.header-icon {
+    width: 75px;
+    height: 75px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.18);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 35px;
+
+    animation: floating 3s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   BOUTON AJOUTER
+========================================================= */
+
+.btn-add-child {
+    border: none;
+
+    background: white;
+
+    color: #198754;
+
+    font-weight: 700;
+
+    padding: 12px 20px;
+
+    border-radius: 14px;
+
+    transition: all 0.3s ease;
+}
+
+
+.btn-add-child:hover {
+    transform: translateY(-3px);
+
+    background: #f8f9fa;
+
+    color: #146c43;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.15);
+}
+
+
+/* =========================================================
+   BARRE DE RECHERCHE
+========================================================= */
+
+.search-box {
+    position: relative;
+
+    margin-bottom: 30px;
+}
+
+
+.search-box input {
+    width: 100%;
+
+    border: none;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 15px 20px 15px 48px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.07);
+
+    outline: none;
+
+    transition: all 0.3s ease;
+}
+
+
+.search-box input:focus {
+    box-shadow:
+        0 0 0 3px rgba(25,135,84,0.15),
+        0 8px 25px rgba(0,0,0,0.08);
+}
+
+
+.search-icon {
+    position: absolute;
+
+    left: 18px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #198754;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   CARTE ENFANT
+========================================================= */
+
+.child-card-wrapper {
+    animation: cardAppear 0.7s ease both;
+}
+
+
+.child-card {
+    background: white;
+
+    border: none;
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    height: 100%;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.07);
+
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
+
+.child-card:hover {
+    transform: translateY(-8px);
+
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.13);
+}
+
+
+/* =========================================================
+   PARTIE SUPERIEURE
+========================================================= */
+
+.child-card-top {
+    height: 95px;
+
+    background: linear-gradient(
+        135deg,
+        #198754,
+        #20c997
+    );
+
+    position: relative;
+}
+
+
+/* =========================================================
+   PHOTO
+========================================================= */
+
+.child-photo-container {
+    position: absolute;
+
+    left: 50%;
+
+    bottom: -45px;
+
+    transform: translateX(-50%);
+
+    width: 90px;
+
+    height: 90px;
+}
+
+
+.child-photo {
+    width: 90px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 5px solid white;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.15);
+}
+
+
+.avatar-placeholder {
+    width: 90px;
+
+    height: 90px;
+
+    border-radius: 50%;
+
+    border: 5px solid white;
+
+    background: #e9f7ef;
+
+    color: #198754;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 38px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.15);
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.child-card-body {
+    padding: 55px 22px 22px;
+}
+
+
+.child-name {
+    text-align: center;
+
+    font-weight: 800;
+
+    font-size: 23px;
+
+    margin-bottom: 4px;
+}
+
+
+.child-status {
+    text-align: center;
+
+    font-size: 13px;
+
+    color: #198754;
+
+    margin-bottom: 20px;
+}
+
+
+.child-status i {
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.child-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid #f0f0f0;
+}
+
+
+.child-info:last-child {
+    border-bottom: none;
+}
+
+
+.info-icon {
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #e9f7ef;
+
+    color: #198754;
+
+    flex-shrink: 0;
+}
+
+
+.info-content small {
+    display: block;
+
+    color: #8a8f98;
+
+    font-size: 12px;
+}
+
+
+.info-content strong {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ALLERGIES
+========================================================= */
+
+.allergy-box {
+    background: #fff5f5;
+
+    border-radius: 12px;
+
+    padding: 10px 12px;
+
+    color: #dc3545;
+
+    font-size: 13px;
+
+    margin-top: 12px;
+}
+
+
+/* =========================================================
+   BOUTONS
+========================================================= */
+
+.child-actions {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 8px;
+
+    margin-top: 20px;
+}
+
+
+.child-action {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 10px 8px;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition: all 0.3s ease;
+}
+
+
+.child-action:hover {
+    transform: translateY(-2px);
+}
+
+
+/* DETAIL */
+
+.action-detail {
+    background: #e9f7ef;
+
+    color: #198754;
+}
+
+
+.action-detail:hover {
+    background: #198754;
+
+    color: white;
+}
+
+
+/* CROISSANCE */
+
+.action-growth {
+    background: #eef5ff;
+
+    color: #0d6efd;
+}
+
+
+.action-growth:hover {
+    background: #0d6efd;
+
+    color: white;
+}
+
+
+/* VACCINATION */
+
+.action-vaccine {
+    background: #fff8df;
+
+    color: #997404;
+}
+
+
+.action-vaccine:hover {
+    background: #ffc107;
+
+    color: #212529;
+}
+
+
+/* RENDEZ-VOUS */
+
+.action-appointment {
+    background: #fff0f1;
+
+    color: #dc3545;
+}
+
+
+.action-appointment:hover {
+    background: #dc3545;
+
+    color: white;
+}
+
+
+/* CONSULTATION */
+
+.action-consultation {
+    background: #edf7ff;
+
+    color: #087990;
+}
+
+
+.action-consultation:hover {
+    background: #0dcaf0;
+
+    color: #212529;
+}
+
+
+/* BIEN-ETRE */
+
+.action-wellbeing {
+    background: #f5edff;
+
+    color: #6f42c1;
+}
+
+
+.action-wellbeing:hover {
+    background: #6f42c1;
+
+    color: white;
+}
+
+
+/* =========================================================
+   AJOUTER ENFANT
+========================================================= */
+
+.add-child-card {
+    border: 2px dashed #b7dfc8;
+
+    background: #f8fffb;
+
+    border-radius: 22px;
+
+    min-height: 350px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    transition: all 0.3s ease;
+}
+
+
+.add-child-card:hover {
+    border-color: #198754;
+
+    background: #f1fff6;
+
+    transform: translateY(-5px);
+}
+
+
+.add-child-icon {
+    width: 75px;
+
+    height: 75px;
+
+    margin: auto;
+
+    border-radius: 50%;
+
+    background: #d1e7dd;
+
+    color: #198754;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 32px;
+
+    margin-bottom: 15px;
+}
+
+
+/* =========================================================
+   AUCUN ENFANT
+========================================================= */
+
+.empty-state {
+    background: white;
+
+    border-radius: 24px;
+
+    padding: 60px 20px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.06);
+
+    animation: cardAppear 0.7s ease;
+}
+
+
+.empty-icon {
+    font-size: 65px;
+
+    color: #198754;
+
+    margin-bottom: 20px;
+
+    animation: floating 3s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes headerAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(-25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+@keyframes cardAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+@keyframes floating {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .children-header {
+        padding: 22px;
+    }
+
+    .children-header .header-icon {
+        display: none;
+    }
+
+    .children-header .btn-add-child {
+        margin-top: 20px;
+
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .child-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .children-page {
+        padding-top: 15px;
+    }
+
+}

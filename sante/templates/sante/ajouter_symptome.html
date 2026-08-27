@@ -1,0 +1,504 @@
+{% extends "sante/base.html" %}
+{% load static %}
+
+{% block title %}
+Journal des symptômes - {{ enfant.prenom }}
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+.symptome-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.symptome-card:hover {
+    transform: translateY(-4px);
+}
+
+.symptome-card.active {
+    border-color: #198754;
+    background: #eaf7ef;
+    transform: scale(1.03);
+}
+
+.symptome-icon {
+    font-size: 3rem;
+}
+
+.symptome-name {
+    font-weight: 600;
+}
+
+.photo-zone {
+    border: 2px dashed #198754;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    background: #f8fff9;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- EN-TÊTE -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                📖 Journal de suivi
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                {{ enfant.prenom }}
+                {{ enfant.nom }}
+
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'sante:detail_enfant' enfant.id %}"
+            class="btn btn-outline-secondary"
+        >
+
+            ← Retour
+
+        </a>
+
+    </div>
+
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        {% csrf_token %}
+
+
+        <!-- ============================= -->
+        <!-- TEMPERATURE -->
+        <!-- ============================= -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header bg-success text-white">
+
+                <h5 class="mb-0">
+                    🌡️ Prise de température
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <label class="form-label fw-bold">
+
+                    Température (°C)
+
+                </label>
+
+
+                {{ form.temperature }}
+
+
+                <small class="text-muted">
+
+                    La température sera enregistrée
+                    avec le suivi.
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- SYMPTOMES -->
+        <!-- ============================= -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    🩺 Quel symptôme observez-vous ?
+
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <input
+                    type="hidden"
+                    name="symptome"
+                    id="symptomeInput"
+                >
+
+
+                <div class="row g-3">
+
+
+                    <!-- VOMISSEMENT -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="vomissement"
+                        >
+
+                            <div class="symptome-icon">
+                                🤮
+                            </div>
+
+                            <div class="symptome-name">
+                                Vomissement
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SELLES -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="selles"
+                        >
+
+                            <div class="symptome-icon">
+                                💩
+                            </div>
+
+                            <div class="symptome-name">
+                                Selles
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DOULEUR -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="douleur"
+                        >
+
+                            <div class="symptome-icon">
+                                😣
+                            </div>
+
+                            <div class="symptome-name">
+                                Douleur
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SOMMEIL -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="sommeil"
+                        >
+
+                            <div class="symptome-icon">
+                                😴
+                            </div>
+
+                            <div class="symptome-name">
+                                Sommeil
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- HUMEUR -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="humeur"
+                        >
+
+                            <div class="symptome-icon">
+                                🙂
+                            </div>
+
+                            <div class="symptome-name">
+                                Humeur
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ERUPTION -->
+
+                    <div class="col-6 col-md-4 col-lg-3">
+
+                        <div
+                            class="card symptome-card h-100 text-center p-3"
+                            data-symptome="eruption"
+                        >
+
+                            <div class="symptome-icon">
+                                🧴
+                            </div>
+
+                            <div class="symptome-name">
+                                Éruption cutanée
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- INTENSITE -->
+        <!-- ============================= -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <label class="form-label fw-bold">
+
+                    Intensité
+
+                </label>
+
+                {{ form.intensite }}
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- NOTES -->
+        <!-- ============================= -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    📝 Notes et observations
+
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <label class="form-label fw-bold">
+
+                    Décrivez ce que vous observez
+
+                </label>
+
+                {{ form.description }}
+
+
+                <div class="mt-3">
+
+                    <label class="form-label fw-bold">
+
+                        Autres observations
+
+                    </label>
+
+                    {{ form.observations }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- PHOTO -->
+        <!-- ============================= -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    📷 Photo / évolution
+
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="photo-zone">
+
+                    <div style="font-size: 3rem;">
+                        📷
+                    </div>
+
+                    <h5>
+
+                        Ajouter une photo
+
+                    </h5>
+
+                    <p class="text-muted">
+
+                        Utile notamment pour suivre
+                        l'évolution d'une éruption cutanée.
+
+                    </p>
+
+
+                    <input
+                        type="file"
+                        name="photo"
+                        class="form-control"
+                        accept="image/*"
+                        capture="environment"
+                    >
+
+
+                    <div class="mt-3">
+
+                        <input
+                            type="text"
+                            name="photo_description"
+                            class="form-control"
+                            placeholder="Description de la photo"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- BOUTON -->
+        <!-- ============================= -->
+
+        <button
+            type="submit"
+            class="btn btn-success btn-lg w-100"
+        >
+
+            💾 Enregistrer le suivi
+
+        </button>
+
+    </form>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const cards =
+            document.querySelectorAll(
+                ".symptome-card"
+            );
+
+        const input =
+            document.getElementById(
+                "symptomeInput"
+            );
+
+
+        cards.forEach(
+            function (card) {
+
+                card.addEventListener(
+                    "click",
+                    function () {
+
+                        cards.forEach(
+                            function (item) {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        card.classList.add(
+                            "active"
+                        );
+
+
+                        input.value =
+                            card.dataset.symptome;
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

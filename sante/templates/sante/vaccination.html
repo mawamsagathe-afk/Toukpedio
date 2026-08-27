@@ -1,0 +1,271 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Vaccinations de {{ enfant.prenom }} - TOUKPEDIO
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .vaccination-header {
+        background: linear-gradient(
+            135deg,
+            #198754,
+            #20c997
+        );
+
+        color: white;
+        border-radius: 20px;
+    }
+
+    .vaccination-card {
+        border: none;
+        border-radius: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .vaccination-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.10);
+    }
+
+    .vaccination-icon {
+        width: 55px;
+        height: 55px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background-color: #d1e7dd;
+        color: #198754;
+
+        font-size: 1.5rem;
+    }
+
+    .btn-vaccin {
+        background-color: #F28C28;
+        border-color: #F28C28;
+        color: white;
+        font-weight: 600;
+    }
+
+    .btn-vaccin:hover {
+        background-color: #D96F0B;
+        border-color: #D96F0B;
+        color: white;
+        transform: scale(1.03);
+    }
+
+    .empty-vaccination {
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+    .empty-vaccination i {
+        font-size: 4rem;
+        color: #198754;
+        opacity: 0.5;
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
+
+    <div class="vaccination-header shadow-sm p-4 mb-4">
+
+        <div class="d-flex flex-column flex-md-row
+                    justify-content-between
+                    align-items-md-center">
+
+            <div>
+
+                <h1 class="fw-bold mb-2">
+
+                    <i class="bi bi-shield-plus me-2"></i>
+
+                    Vaccinations
+
+                </h1>
+
+                <p class="mb-0">
+
+                    Carnet de vaccination de
+                    <strong>
+                        {{ enfant.prenom }} {{ enfant.nom }}
+                    </strong>
+
+                </p>
+
+            </div>
+
+
+            <div class="mt-3 mt-md-0">
+
+                <a
+                    href="{% url 'sante:detail_enfant' enfant.id %}"
+                    class="btn btn-light rounded-pill"
+                >
+
+                    <i class="bi bi-arrow-left me-1"></i>
+
+                    Retour au dossier
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BOUTON AJOUTER
+    ====================================================== -->
+
+    <div class="d-flex justify-content-end mb-4">
+
+        <a
+            href="#"
+            class="btn btn-vaccin rounded-pill"
+        >
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Ajouter une vaccination
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         LISTE DES VACCINATIONS
+    ====================================================== -->
+
+    {% if vaccinations %}
+
+        <div class="row g-4">
+
+            {% for vaccination in vaccinations %}
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card vaccination-card shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <div class="d-flex align-items-center mb-3">
+
+                                <div class="vaccination-icon me-3">
+
+                                    <i class="bi bi-shield-check"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-0">
+
+                                        {{ vaccination.nom }}
+
+                                    </h5>
+
+                                </div>
+
+                            </div>
+
+
+                            {% if vaccination.date %}
+
+                                <p class="text-muted mb-2">
+
+                                    <i class="bi bi-calendar3 me-2"></i>
+
+                                    {{ vaccination.date }}
+
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if vaccination.description %}
+
+                                <p class="text-muted">
+
+                                    {{ vaccination.description }}
+
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- =================================================
+             AUCUNE VACCINATION
+        ================================================== -->
+
+        <div class="card vaccination-card shadow-sm">
+
+            <div class="card-body empty-vaccination">
+
+                <i class="bi bi-shield-check"></i>
+
+                <h3 class="fw-bold mt-3">
+
+                    Aucune vaccination enregistrée
+
+                </h3>
+
+                <p class="text-muted">
+
+                    Le carnet de vaccination de
+                    {{ enfant.prenom }}
+                    est encore vide.
+
+                </p>
+
+                <a
+                    href="#"
+                    class="btn btn-vaccin rounded-pill mt-2"
+                >
+
+                    <i class="bi bi-plus-circle me-2"></i>
+
+                    Ajouter la première vaccination
+
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

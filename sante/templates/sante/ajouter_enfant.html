@@ -1,0 +1,234 @@
+{% extends "sante/base.html" %}
+
+{% block title %}Ajouter un enfant - TOUKPEDIO{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-success text-white p-4">
+                    <h3 class="mb-1">
+                        <i class="bi bi-person-plus-fill me-2"></i>
+                        Ajouter un enfant
+                    </h3>
+
+                    <p class="mb-0">
+                        Créez le dossier médical de votre enfant.
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <h5 class="fw-bold text-success mb-3">
+                            <i class="bi bi-person-vcard me-2"></i>
+                            Identité
+                        </h5>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Nom</label>
+                                <input type="text"
+                                       name="nom"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Prénom</label>
+                                <input type="text"
+                                       name="prenom"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Date de naissance
+                                </label>
+
+                                <input type="date"
+                                       name="date_naissance"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Sexe</label>
+
+                                <select name="sexe"
+                                        class="form-select"
+                                        required>
+                                    <option value="">
+                                        Sélectionner
+                                    </option>
+                                    <option value="M">
+                                        Masculin
+                                    </option>
+                                    <option value="F">
+                                        Féminin
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    Photo
+                                </label>
+
+                                <input type="file"
+                                       name="photo"
+                                       class="form-control"
+                                       accept="image/*">
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold text-success mb-3">
+                            <i class="bi bi-heart-pulse me-2"></i>
+                            Informations de santé
+                        </h5>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Groupe sanguin
+                                </label>
+
+                                <input type="text"
+                                       name="groupe_sanguin"
+                                       class="form-control"
+                                       placeholder="Ex : O+">
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label">
+                                    Allergies
+                                </label>
+
+                                <textarea name="allergies"
+                                          class="form-control"
+                                          rows="2"
+                                          placeholder="Allergies connues..."></textarea>
+                            </div>
+                            <div class="col-12">
+    <label class="form-label">
+        <i class="bi bi-capsule me-1"></i>
+        Traitement en cours
+    </label>
+
+    <textarea name="traitement"
+              class="form-control"
+              rows="3"
+              placeholder="Indiquez les traitements, médicaments, doses et durée..."></textarea>
+
+    <small class="text-muted">
+        Exemple : Paracétamol 500 mg, 1 comprimé matin et soir pendant 5 jours.
+    </small>
+</div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    Antécédents médicaux
+                                </label>
+
+                                <textarea name="antecedents"
+                                          class="form-control"
+                                          rows="3"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    Observations
+                                </label>
+
+                                <textarea name="observations"
+                                          class="form-control"
+                                          rows="3"></textarea>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold text-success mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Coordonnées du parent
+                        </h5>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Téléphone
+                                </label>
+
+                                <input type="text"
+                                       name="telephone_parent"
+                                       class="form-control">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Adresse
+                                </label>
+
+                                <input type="text"
+                                       name="adresse"
+                                       class="form-control">
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a href="{% url 'sante:enfant' %}"
+                               class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Annuler
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-success rounded-pill px-4">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Enregistrer l'enfant
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+```

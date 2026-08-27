@@ -1,0 +1,429 @@
+   /* =====================================================
+           STRUCTURE 100VH
+        ===================================================== */
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        nav {
+            flex-shrink: 0;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        /* =====================================================
+           CONTENU
+        ===================================================== */
+
+        main > .container {
+            width: 100%;
+        }
+
+        /* =====================================================
+           ICÔNE
+        ===================================================== */
+
+        .icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        /* =====================================================
+   CONFIGURATION GÉNÉRALE
+===================================================== */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f4f8f5;
+}
+
+
+/* =====================================================
+   MAIN - 100VH
+===================================================== */
+
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+
+/* =====================================================
+   CONTENEUR
+===================================================== */
+
+main .container {
+    width: 100%;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+
+/* =====================================================
+   CARTE DE CONNEXION
+===================================================== */
+
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    margin: auto;
+
+    border: none;
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.10);
+
+    overflow: hidden;
+
+    transition: all 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.14);
+}
+
+
+/* =====================================================
+   CORPS DE LA CARTE
+===================================================== */
+
+.login-card .card-body {
+    padding: 22px !important;
+}
+
+
+/* =====================================================
+   ICÔNE
+===================================================== */
+
+.icon-box {
+    width: 52px !important;
+    height: 52px !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto;
+
+    border-radius: 50%;
+
+    font-size: 1.4rem !important;
+
+    transition: all 0.3s ease;
+}
+
+.icon-box:hover {
+    transform: scale(1.08) rotate(3deg);
+}
+
+
+/* =====================================================
+   TITRE
+===================================================== */
+
+.login-card h2,
+.login-card h4 {
+    font-size: 1.35rem;
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+}
+
+
+/* =====================================================
+   TEXTE SOUS LE TITRE
+===================================================== */
+
+.login-card p {
+    font-size: 0.85rem;
+    margin-bottom: 15px !important;
+}
+
+
+/* =====================================================
+   LABELS
+===================================================== */
+
+.login-card .form-label {
+    font-size: 0.82rem;
+    margin-bottom: 4px !important;
+}
+
+
+/* =====================================================
+   CHAMPS
+===================================================== */
+
+.login-card .form-control {
+    height: 38px;
+
+    font-size: 0.85rem;
+
+    border-left: none;
+
+    transition: all 0.3s ease;
+}
+
+.login-card .form-control:focus {
+    box-shadow: none;
+
+    border-color: #198754;
+}
+
+
+/* =====================================================
+   ICÔNES DES CHAMPS
+===================================================== */
+
+.login-card .input-group-text {
+    width: 40px;
+
+    justify-content: center;
+
+    background: #f8f9fa;
+
+    border-right: none;
+
+    color: #198754;
+
+    font-size: 0.85rem;
+}
+
+
+/* =====================================================
+   ESPACEMENT DES CHAMPS
+===================================================== */
+
+.login-card .mb-3 {
+    margin-bottom: 12px !important;
+}
+
+.login-card .mb-4 {
+    margin-bottom: 14px !important;
+}
+
+
+/* =====================================================
+   BOUTON CONNEXION
+===================================================== */
+
+.login-card .btn-success {
+    height: 38px;
+
+    font-size: 0.85rem;
+
+    font-weight: 600;
+
+    border-radius: 7px;
+
+    transition: all 0.3s ease;
+}
+
+.login-card .btn-success:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(25, 135, 84, 0.25);
+}
+
+
+/* =====================================================
+   LIEN RETOUR
+===================================================== */
+
+.login-card a {
+    font-size: 0.8rem;
+
+    transition: all 0.3s ease;
+}
+
+.login-card a:hover {
+    color: #146c43 !important;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+    flex-shrink: 0;
+
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLETTE
+===================================================== */
+
+@media (max-width: 768px) {
+
+    main {
+        padding: 10px;
+    }
+
+    .login-card {
+        max-width: 360px;
+    }
+
+    .login-card .card-body {
+        padding: 20px !important;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE - TÉLÉPHONE
+===================================================== */
+
+@media (max-width: 576px) {
+
+    main {
+        padding: 8px;
+    }
+
+    .login-card {
+        max-width: 330px;
+        border-radius: 13px;
+    }
+
+    .login-card .card-body {
+        padding: 18px !important;
+    }
+
+    .icon-box {
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .login-card h2,
+    .login-card h4 {
+        font-size: 1.2rem;
+    }
+
+    .login-card .form-control {
+        height: 36px;
+        font-size: 0.8rem;
+    }
+
+    .login-card .input-group-text {
+        width: 36px;
+    }
+
+    .login-card .btn-success {
+        height: 36px;
+        font-size: 0.8rem;
+    }
+}
+
+
+/* =====================================================
+   PETITS ÉCRANS EN HAUTEUR
+===================================================== */
+
+@media (max-height: 650px) {
+
+    main {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .login-card .card-body {
+        padding: 14px !important;
+    }
+
+    .icon-box {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 1.1rem !important;
+    }
+
+    .login-card h2,
+    .login-card h4 {
+        font-size: 1.15rem;
+    }
+
+    .login-card p {
+        margin-bottom: 8px !important;
+    }
+
+    .login-card .mb-3 {
+        margin-bottom: 8px !important;
+    }
+
+    .login-card .mb-4 {
+        margin-bottom: 10px !important;
+    }
+}

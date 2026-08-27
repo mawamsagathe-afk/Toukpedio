@@ -1,0 +1,411 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Toukpedio{% endblock %}</title>
+     <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    {% block extra_css %}
+        <link rel="stylesheet"href="{% static 'sante/css/inscription.css' %}">
+    {% endblock %}
+
+    {% block extra_js %}
+        <script src="{% static 'sante/js/inscription.js' %}"></script>
+    {% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-75 bg-light" style="gap: 35px;">
+
+   <!-- ===================================================== -->
+<!-- NAVBAR -->
+<!-- ===================================================== -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand"
+            href="{% url 'sante:accueil' %}"
+        >
+
+            <i class="bi bi-heart-pulse-fill me-2"></i>
+
+            Toukpedio
+
+        </a>
+
+
+        <!-- Bouton mobile -->
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu"
+            aria-expanded="false"
+            aria-label="Ouvrir le menu"
+        >
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+
+        <div
+            class="collapse navbar-collapse"
+            id="navbarMenu"
+        >
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+
+                <!-- Accueil -->
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'sante:accueil' %}"
+                    >
+
+                        <i class="bi bi-house me-1"></i>
+
+                        Accueil
+
+                    </a>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     FORMULAIRE INSCRIPTION
+===================================================== -->
+
+<div class="container inscription-container mt-4 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-sm-10 col-md-7 col-lg-5">
+                      
+
+            <div class="inscription-card">
+
+                <!-- EN-TÊTE -->
+
+                <div class="inscription-header text-center">
+
+                    <div class="inscription-icon">
+
+                        <i class="fa-solid fa-user-plus"></i>
+
+                    </div>
+
+                    <h3>
+                        Créer un compte
+                    </h3>
+
+                    <p>
+                        Rejoignez TOUKPEDIO et prenez soin
+                        de la santé de vos enfants.
+                    </p>
+
+                </div>
+
+
+                <!-- FORMULAIRE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'sante:inscription' %}"
+                >
+
+                    {% csrf_token %}
+
+
+                    <div class="row g-3">
+
+                       
+                                <!-- NOM UTILISATEUR -->
+
+                                <div class="md-6">
+
+                                    <label for="username"
+                                           class="form-label fw-semibold">
+
+                                        Nom d'utilisateur
+
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           id="username"
+                                           name="username"
+                                           placeholder="Entrez votre nom d'utilisateur"
+                                           required>
+
+                                </div>
+
+                        <!-- EMAIL -->
+
+                        <div class="col-12">
+
+                            <label
+                                for="email"
+                                class="form-label"
+                            >
+                                <i class="fa-solid fa-envelope"></i>
+                                Adresse email
+                            </label>
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                name="email"
+                                placeholder="nom@exemple.com"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- TÉLÉPHONE -->
+
+                        <div class="col-12">
+
+                            <label
+                                for="telephone"
+                                class="form-label"
+                            >
+                                <i class="fa-solid fa-phone"></i>
+                                Numéro de téléphone
+                            </label>
+
+                            <input
+                                type="tel"
+                                class="form-control"
+                                id="telephone"
+                                name="telephone"
+                                placeholder="+237 6XX XXX XXX"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- ADRESSE -->
+
+                        <div class="col-12">
+
+                            <label
+                                for="adresse"
+                                class="form-label"
+                            >
+                                <i class="fa-solid fa-location-dot"></i>
+                                Adresse complète
+                            </label>
+
+                            <textarea
+                                class="form-control"
+                                id="adresse"
+                                name="adresse"
+                                rows="2"
+                                placeholder="Votre quartier / adresse"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- MOT DE PASSE -->
+
+                        <div class="col-12">
+
+                            <label
+                                for="password"
+                                class="form-label"
+                            >
+                                <i class="fa-solid fa-lock"></i>
+                                Mot de passe
+                            </label>
+
+                            <div class="password-wrapper">
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Entrez votre mot de passe"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword()"
+                                >
+
+                                    <i
+                                        class="fa-solid fa-eye"
+                                        id="passwordIcon"
+                                    ></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BOUTON -->
+
+                    <div class="d-grid mt-4">
+
+                        <button
+                            type="submit"
+                            class="btn btn-inscription"
+                        >
+
+                            <i class="fa-solid fa-user-plus me-2"></i>
+
+                            Créer mon compte
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <!-- CONNEXION -->
+
+                <div class="connexion-link">
+
+                    <p>
+
+                        Vous avez déjà un compte ?
+
+                        <a
+                            href="{% url 'sante:connexion' %}"
+                        >
+
+                            Se connecter
+
+                            <i class="fa-solid fa-arrow-right ms-1"></i>
+
+                        </a>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+     
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer class="bg-dark text-white py-4">
+
+    <div class="container">
+
+        <div class="row">
+
+
+            <!-- Présentation -->
+
+            <div class="col-md-6">
+
+                <h5>
+
+                    <i class="bi bi-heart-pulse-fill me-2"></i>
+
+                    Toukpedio
+
+                </h5>
+
+                <p class="text-white-50 mb-0">
+
+                    Plateforme de suivi de la santé et du bien-être
+                    des enfants.
+
+                </p>
+
+            </div>
+
+
+            <!-- Copyright -->
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                <p class="text-white-50 mb-0">
+
+                    &copy; {% now "Y" %} Toukpedio.
+
+                    Tous droits réservés.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ===================================================== -->
+<!-- BOOTSTRAP JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT DU THÈME -->
+<!-- ===================================================== -->
+
+<script src="{% static 'sante/js/theme.js' %}"></script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT SPÉCIFIQUE À LA PAGE -->
+<!-- ===================================================== -->   
+
+
+</body>
+</html>

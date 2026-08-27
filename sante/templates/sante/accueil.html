@@ -1,0 +1,846 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Icommerce{% endblock %}</title>
+     <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    {% block extra_css %}
+       <link rel="stylesheet"href="{% static 'sante/css/accueil.css' %}">
+    {% endblock %}
+
+    {% block extra_js %}
+        <script src="{% static 'sante/js/accueil.js' %}"></script>
+    {% endblock %}
+
+
+</head>
+<body class="d-flex flex-column min-vh-75 bg-light" style="gap: 35px;">
+
+   <!-- ===================================================== -->
+<!-- NAVBAR -->
+<!-- ===================================================== -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand"
+            href="{% url 'sante:accueil' %}"
+        >
+
+            <i class="bi bi-heart-pulse-fill me-2"></i>
+
+            Toukpedio
+
+        </a>
+
+
+        <!-- Bouton mobile -->
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarMenu"
+            aria-controls="navbarMenu"
+            aria-expanded="false"
+            aria-label="Ouvrir le menu"
+        >
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+
+        <div
+            class="collapse navbar-collapse"
+            id="navbarMenu"
+        >
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+
+                <!-- Accueil -->
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'sante:accueil' %}"
+                    >
+
+                        <i class="bi bi-house me-1"></i>
+
+                        Accueil
+
+                    </a>
+
+                </li>
+
+
+                <!-- ================================================= -->
+                    <!-- Inscription-->
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="{% url 'sante:inscription' %}"
+                        >
+
+                            <i class="bi bi-speedometer2 me-1"></i>
+
+                            Inscription
+
+                        </a>
+
+                    </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section
+    class="hero"
+    id="accueil"
+>
+
+    <div class="hero-decoration hero-decoration-1"></div>
+    <div class="hero-decoration hero-decoration-2"></div>
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <!-- TEXTE -->
+
+            <div class="col-lg-6">
+
+                <span
+                    class="badge badge-sante px-3 py-2 mb-3"
+                >
+
+                    <i class="fa-solid fa-heart me-1"></i>
+
+                    Santé et bien-être des enfants
+
+                </span>
+
+
+                <h1 class="hero-title mb-4">
+
+                    Prenez soin de la santé
+                    de vos <span>enfants</span>.
+
+                </h1>
+
+
+                <p class="hero-text mb-4">
+
+                    TOUKPEDIO vous permet de suivre facilement
+                    la santé, la croissance, les vaccinations,
+                    le bien-être et les rendez-vous médicaux
+                    de vos enfants depuis une seule plateforme.
+
+                </p>
+
+
+                <div class="d-flex flex-wrap gap-3">
+
+                    {% if user.is_authenticated %}
+                        <a
+                            href="{% url 'sante:connexion' %}"
+                            class="btn btn-principal"
+                        >
+
+                            <i class="fa-solid fa-gauge-high me-2"></i>
+
+                            Ma page de connexion
+
+                        </a>
+
+                    {% else %}
+
+                        <a
+                            href="{% url 'sante:connexion' %}"
+                            class="btn btn-principal"
+                        >
+
+                            <i class="fa-solid fa-user-plus me-2"></i>
+
+                            Commencer maintenant
+
+                        </a>
+
+                    {% endif %}
+
+
+                    <a
+                        href="#services"
+                        class="btn btn-secondaire"
+                    >
+
+                        Découvrir TOUKPEDIO
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ILLUSTRATION -->
+
+            <div class="col-lg-6">
+
+                <div class="hero-card">
+
+                    <div class="hero-icon-container">
+
+                        <i
+                            class="fa-solid fa-child-reaching hero-icon"
+                        ></i>
+
+                    </div>
+
+
+                    <h3 class="fw-bold mt-4">
+
+                        Le suivi de votre enfant,
+                        simplement.
+
+                    </h3>
+
+
+                    <p class="hero-card-text">
+
+                        Toutes les informations importantes
+                        réunies au même endroit.
+
+                    </p>
+
+
+                    <div class="hero-mini-info">
+
+                        <div>
+                            <i class="fa-solid fa-shield-heart"></i>
+                            <span>Suivi sécurisé</span>
+                        </div>
+
+                        <div>
+                            <i class="fa-solid fa-heart-pulse"></i>
+                            <span>Bien-être</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SERVICES
+===================================================== -->
+
+<section
+    class="section services-section"
+    id="services"
+>
+
+    <div class="container">
+
+        <div class="text-center mb-5 reveal">
+
+            <span class="section-label">
+
+                <i class="fa-solid fa-sparkles"></i>
+
+                NOS SERVICES
+
+            </span>
+
+            <h2 class="section-title">
+
+                Tout pour suivre votre enfant
+
+            </h2>
+
+            <p class="section-subtitle mt-3">
+
+                Une plateforme conçue pour aider les parents
+                à organiser et suivre les principales informations
+                concernant leurs enfants.
+
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <!-- ENFANTS -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-blue">
+
+                        <i class="fa-solid fa-child"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Mes enfants
+                    </h4>
+
+                    <p>
+
+                        Enregistrez et consultez les informations
+                        importantes de chaque enfant : identité,
+                        date de naissance, sexe et photo.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONSULTATIONS -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-green">
+
+                        <i class="fa-solid fa-stethoscope"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Consultations
+                    </h4>
+
+                    <p>
+
+                        Gardez l'historique des consultations,
+                        des symptômes, diagnostics, traitements
+                        et recommandations.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- VACCINATIONS -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-orange">
+
+                        <i class="fa-solid fa-syringe"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Vaccinations
+                    </h4>
+
+                    <p>
+
+                        Suivez les vaccins effectués,
+                        les doses et les prochaines vaccinations
+                        prévues.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- CROISSANCE -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-menthe">
+
+                        <i class="fa-solid fa-chart-line"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Suivi de croissance
+                    </h4>
+
+                    <p>
+
+                        Suivez l'évolution du poids,
+                        de la taille et du périmètre crânien
+                        de votre enfant.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- BIEN-ÊTRE -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-mandarine">
+
+                        <i class="fa-solid fa-face-smile"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Bien-être
+                    </h4>
+
+                    <p>
+
+                        Suivez l'humeur, le sommeil,
+                        l'alimentation, l'hydratation,
+                        l'activité physique et le temps d'écran.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- RENDEZ-VOUS -->
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="service-card reveal">
+
+                    <div class="service-icon icon-orange">
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Rendez-vous
+                    </h4>
+
+                    <p>
+
+                        Planifiez et suivez les rendez-vous
+                        médicaux de vos enfants ainsi que
+                        leur statut.
+
+                    </p>
+
+                    <span class="card-arrow">
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     STATISTIQUES
+===================================================== -->
+
+<section class="section stats">
+
+    <div class="stats-decoration"></div>
+
+    <div class="container">
+
+        <div class="row text-center g-4">
+
+            <div class="col-md-4 stat-item reveal">
+
+                <i class="fa-solid fa-children"></i>
+
+                <div class="stat-number">
+                    1
+                </div>
+
+                <p>
+                    Plateforme pour toute la famille
+                </p>
+
+            </div>
+
+
+            <div class="col-md-4 stat-item reveal">
+
+                <i class="fa-solid fa-notes-medical"></i>
+
+                <div class="stat-number">
+                    6
+                </div>
+
+                <p>
+                    Domaines de suivi
+                </p>
+
+            </div>
+
+
+            <div class="col-md-4 stat-item reveal">
+
+                <i class="fa-solid fa-shield-heart"></i>
+
+                <div class="stat-number">
+                    100%
+                </div>
+
+                <p>
+                    Pensé pour simplifier le suivi
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     À PROPOS
+===================================================== -->
+
+<section
+    class="section about-section"
+    id="apropos"
+>
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6 reveal">
+
+                <span class="section-label">
+
+                    À PROPOS
+
+                </span>
+
+
+                <h2 class="section-title text-start">
+
+                    Une vision simple du
+                    suivi de l'enfant
+
+                </h2>
+
+
+                <p class="about-text mt-4">
+
+                    TOUKPEDIO centralise les informations
+                    liées au suivi de vos enfants afin de
+                    vous permettre de les retrouver facilement.
+
+                </p>
+
+
+                <p class="about-text">
+
+                    De la vaccination au suivi de croissance,
+                    en passant par les consultations,
+                    le bien-être et les rendez-vous,
+                    chaque élément peut être organisé
+                    dans un espace unique.
+
+                </p>
+
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="about-grid">
+
+
+                    <div class="about-box about-blue reveal">
+
+                        <i class="fa-solid fa-heart-pulse"></i>
+
+                        <h5>
+                            Santé
+                        </h5>
+
+                    </div>
+
+
+                    <div class="about-box about-green reveal">
+
+                        <i class="fa-solid fa-seedling"></i>
+
+                        <h5>
+                            Croissance
+                        </h5>
+
+                    </div>
+
+
+                    <div class="about-box about-orange reveal">
+
+                        <i class="fa-solid fa-syringe"></i>
+
+                        <h5>
+                            Vaccins
+                        </h5>
+
+                    </div>
+
+
+                    <div class="about-box about-mint reveal">
+
+                        <i class="fa-solid fa-calendar-days"></i>
+
+                        <h5>
+                            Rendez-vous
+                        </h5>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CTA
+===================================================== -->
+
+<section class="section">
+
+    <div class="container">
+
+        <div class="cta reveal">
+
+            <div class="cta-circle"></div>
+
+            <i class="fa-solid fa-heart cta-heart"></i>
+
+            <h2 class="fw-bold">
+
+                Commencez à suivre la santé
+                de votre enfant
+
+            </h2>
+
+            <p>
+
+                Créez votre compte et profitez
+                d'un espace dédié au suivi de vos enfants.
+
+            </p>
+
+
+            {% if user.is_authenticated %}
+
+                <a
+                    href="{% url 'sante:connexion' %}"
+                    class="btn btn-light btn-lg rounded-pill px-5"
+                >
+
+                    <i class="fa-solid fa-gauge-high me-2"></i>
+
+                    Accéder à ma page de connexion
+
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{% url 'sante:connexion' %}"
+                    class="btn btn-light btn-lg rounded-pill px-5"
+                >
+
+                    <i class="fa-solid fa-right-to-bracket me-2"></i>
+
+                    Se connecter
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+     
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer class="bg-dark text-white py-4">
+
+    <div class="container">
+
+        <div class="row">
+
+
+            <!-- Présentation -->
+
+            <div class="col-md-6">
+
+                <h5>
+
+                    <i class="bi bi-heart-pulse-fill me-2"></i>
+
+                    Toukpedio
+
+                </h5>
+
+                <p class="text-white-50 mb-0">
+
+                    Plateforme de suivi de la santé et du bien-être
+                    des enfants.
+
+                </p>
+
+            </div>
+
+
+            <!-- Copyright -->
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                <p class="text-white-50 mb-0">
+
+                    &copy; {% now "Y" %} Toukpedio.
+
+                    Tous droits réservés.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ===================================================== -->
+<!-- BOOTSTRAP JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT DU THÈME -->
+<!-- ===================================================== -->
+
+<script src="{% static 'sante/js/theme.js' %}"></script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT SPÉCIFIQUE À LA PAGE -->
+<!-- ===================================================== -->   
+
+
+</body>
+</html>

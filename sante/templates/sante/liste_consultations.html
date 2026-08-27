@@ -1,0 +1,182 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Consultations de {{ enfant.prenom }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-clipboard2-pulse text-success me-2"></i>
+                Consultations
+            </h2>
+
+            <p class="text-muted mb-0">
+                Dossier médical de
+                <strong>
+                    {{ enfant.prenom }} {{ enfant.nom }}
+                </strong>
+            </p>
+
+            <a
+            href="javascript:history.back()"
+            class="btn btn-outline-secondary"
+        >
+            ← Retour
+        </a>
+        </div>
+
+        <a
+            href="{% url 'sante:ajouter_consultation' enfant.id %}"
+            class="btn btn-success"
+        >
+            <i class="bi bi-plus-circle me-1"></i>
+            Ajouter une consultation
+        </a>
+
+    </div>
+
+
+    <!-- Liste -->
+    {% if consultations %}
+
+        <div class="row g-4">
+
+            {% for consultation in consultations %}
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-success text-white">
+
+                            <div class="d-flex justify-content-between">
+
+                                <span>
+                                    <i class="bi bi-calendar3 me-1"></i>
+
+                                    {{ consultation.date_consultation|date:"d/m/Y" }}
+                                </span>
+
+                                <span>
+                                    <i class="bi bi-heart-pulse"></i>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold">
+                                {{ consultation.motif }}
+                            </h5>
+
+                            {% if consultation.diagnostic %}
+
+                                <p>
+                                    <strong>
+                                        <i class="bi bi-search me-1"></i>
+                                        Diagnostic :
+                                    </strong>
+                                    <br>
+
+                                    {{ consultation.diagnostic }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if consultation.traitement %}
+
+                                <p>
+                                    <strong>
+                                        <i class="bi bi-capsule me-1"></i>
+                                        Traitement :
+                                    </strong>
+                                    <br>
+
+                                    {{ consultation.traitement }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if consultation.observations %}
+
+                                <p>
+                                    <strong>
+                                        <i class="bi bi-journal-text me-1"></i>
+                                        Observations :
+                                    </strong>
+                                    <br>
+
+                                    {{ consultation.observations }}
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="card-footer bg-white border-0">
+
+                            <a
+                                href="#"
+                                class="btn btn-outline-success btn-sm"
+                            >
+                                <i class="bi bi-eye me-1"></i>
+                                Voir détails
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- Aucune consultation -->
+        <div class="text-center py-5">
+
+            <div class="mb-3">
+                <i
+                    class="bi bi-clipboard-x text-muted"
+                    style="font-size: 4rem;"
+                ></i>
+            </div>
+
+            <h4>
+                Aucune consultation
+            </h4>
+
+            <p class="text-muted">
+                Aucune consultation n'a encore été enregistrée
+                pour {{ enfant.prenom }}.
+            </p>
+
+            <a
+                href="{% url 'sante:ajouter_consultation' enfant.id %}"
+                class="btn btn-success"
+            >
+                <i class="bi bi-plus-circle me-1"></i>
+                Ajouter la première consultation
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
