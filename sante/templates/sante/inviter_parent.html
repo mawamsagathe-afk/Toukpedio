@@ -1,0 +1,135 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Partager {{ enfant.prenom }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+        <a href="{% url 'sante:detail_enfant' enfant.pk %}"
+           class="text-success text-decoration-none">
+
+            <i class="bi bi-arrow-left me-2"></i>
+            Retour au dossier
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body p-4 p-md-5">
+
+            <h2 class="fw-bold text-success mb-2">
+                <i class="bi bi-people-fill me-2"></i>
+                Partage parental
+            </h2>
+
+            <p class="text-muted mb-4">
+                Partagez le dossier de
+                <strong>{{ enfant.prenom }}</strong>
+                avec l'autre parent.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Adresse e-mail de l'autre parent
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control form-control-lg"
+                        placeholder="parent@example.com"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-success btn-lg w-100"
+                >
+                    <i class="bi bi-person-plus-fill me-2"></i>
+                    Inviter le parent
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    {% if partages %}
+
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold mb-3">
+                Parents associés
+            </h4>
+
+            {% for partage in partages %}
+
+                <div class="d-flex justify-content-between
+                            align-items-center
+                            border-bottom py-3">
+
+                    <div>
+
+                        <strong>
+                            {{ partage.parent.get_full_name|default:partage.parent.username }}
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+                            {{ partage.parent.email }}
+                        </small>
+
+                    </div>
+
+                    {% if partage.accepte %}
+
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Accès accepté
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-clock me-1"></i>
+                            En attente
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

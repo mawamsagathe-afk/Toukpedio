@@ -23,46 +23,16 @@ Mes enfants - Toukpedio
     ====================================================== -->
     
     
-    {% for enfant in enfants %}
+    <div class="d-flex justify-content-md-end
+              align-items-center gap-3 pb-3">
+            <a href="{% url 'sante:inviter_parent' enfant.pk %}"
+                class="btn btn-outline-success">
 
-<div class="card mb-4">
-
-    <div class="card-body">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <div>
-                <h4 class="fw-bold mb-1">
-                    {{ enfant.prenom }} {{ enfant.nom }}
-                </h4>
-
-                <p class="text-muted mb-0">
-                    Né(e) le {{ enfant.date_naissance|date:"d/m/Y" }}
-                </p>
-            </div>
-
-            <a href="{% url 'sante:inviter_parent' enfant.id %}"
-               class="btn btn-outline-success">
-
-                <i class="bi bi-people-fill me-2"></i>
-
-                Partager avec l'autre parent
+                 <i class="bi bi-people-fill me-2"></i>
+                 Partager avec l'autre parent
 
             </a>
-
-        </div>
-
     </div>
-
-</div>
-
-{% empty %}
-
-<div class="alert alert-info">
-    Aucun enfant enregistré pour le moment.
-</div>
-
-{% endfor %}
     <div class="children-header">
 
         <div class="row align-items-center">
@@ -105,11 +75,21 @@ Mes enfants - Toukpedio
                         Ajouter un enfant
 
                     </a>
+                
+
                 </div>
+               
+
             </div>
+           
+
         </div>
+          
+
     </div>
     
+
+
 
     <!-- =====================================================
          RECHERCHE
@@ -184,6 +164,7 @@ Mes enfants - Toukpedio
                         </div>
 
                     </div>
+
 
 
                     <!-- =====================================
@@ -356,7 +337,7 @@ Mes enfants - Toukpedio
                             <!-- DETAIL -->
 
                             <a
-                                href="{% url 'sante:detail_enfant' enfant.pk %}"
+                                href="{% url 'sante:detail_enfant' enfant.id %}"
                                 class="child-action action-detail"
                             >
 

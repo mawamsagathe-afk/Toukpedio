@@ -282,3 +282,89 @@ class PriseTraitementForm(forms.ModelForm):
                 }
             ),
         }
+        
+
+from .models import ModeGarde
+
+class ModeGardeForm(forms.ModelForm):
+
+    class Meta:
+
+        model = ModeGarde
+
+        fields = [
+            "nom_gardien",
+            "telephone_gardien",
+            "type_gardien",
+            "date_debut",
+            "date_fin",
+
+            "partager_allergies",
+            "partager_traitement",
+            "partager_alimentation",
+            "partager_sommeil",
+            "partager_hydratation",
+            "partager_antecedents",
+            "partager_vaccinations",
+            "partager_consultations",
+            "partager_temperature",
+            "partager_contact_parent",
+
+            "consignes",
+            "contact_urgence",
+        ]
+
+        widgets = {
+
+            "nom_gardien": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Ex : Marie Dupont"
+                }
+            ),
+
+            "telephone_gardien": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "+237 6XX XXX XXX"
+                }
+            ),
+
+            "type_gardien": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "date_debut": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }
+            ),
+
+            "date_fin": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }
+            ),
+
+            "consignes": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": (
+                        "Ex : Donner le repas à 12h, "
+                        "sieste à 14h..."
+                    )
+                }
+            ),
+
+            "contact_urgence": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "+237 6XX XXX XXX"
+                }
+            ),
+        }

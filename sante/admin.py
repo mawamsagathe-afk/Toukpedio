@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import PartageEnfant
 
 from .models import (
     Enfant,
@@ -274,4 +275,25 @@ class RendezVousAdmin(admin.ModelAdmin):
     autocomplete_fields = (
         "enfant",
         "professionnel",
+    )
+
+@admin.register(PartageEnfant)
+class PartageEnfantAdmin(admin.ModelAdmin):
+    list_display = (
+        "enfant",
+        "parent",
+        "accepte",
+        "date_invitation",
+    )
+
+    list_filter = (
+        "accepte",
+        "date_invitation",
+    )
+
+    search_fields = (
+        "enfant__prenom",
+        "enfant__nom",
+        "parent__username",
+        "parent__email",
     )

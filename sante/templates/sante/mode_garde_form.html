@@ -1,0 +1,251 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Mode garde - {{ enfant.prenom }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+
+        <a
+            href="{% url 'sante:detail_enfant' enfant.id %}"
+            class="text-success text-decoration-none"
+        >
+            <i class="bi bi-arrow-left me-2"></i>
+            Retour au dossier
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <h2 class="fw-bold text-success mb-2">
+                🛡️ Mode garde
+            </h2>
+
+            <p class="text-muted">
+                Préparez une fiche simplifiée pour la personne
+                qui garde {{ enfant.prenom }}.
+            </p>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <h5 class="fw-bold mt-4">
+                    👤 Personne qui garde l'enfant
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Nom
+                        </label>
+
+                        {{ form.nom_gardien }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Téléphone
+                        </label>
+
+                        {{ form.telephone_gardien }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Type
+                        </label>
+
+                        {{ form.type_gardien }}
+
+                    </div>
+
+                </div>
+
+
+                <h5 class="fw-bold mt-4">
+                    📅 Durée de la garde
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Date de début
+                        </label>
+
+                        {{ form.date_debut }}
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Date de fin
+                        </label>
+
+                        {{ form.date_fin }}
+
+                    </div>
+
+                </div>
+
+
+                <h5 class="fw-bold mt-4">
+                    🔐 Informations à partager
+                </h5>
+
+                <div class="card bg-light border-0 p-3">
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_allergies }}
+
+                        <label class="form-check-label">
+                            ⚠️ Allergies
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_traitement }}
+
+                        <label class="form-check-label">
+                            💊 Traitement
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_alimentation }}
+
+                        <label class="form-check-label">
+                            🍽️ Alimentation
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_sommeil }}
+
+                        <label class="form-check-label">
+                            😴 Sommeil
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_antecedents }}
+
+                        <label class="form-check-label">
+                            Antécédents médicaux
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_vaccinations }}
+
+                        <label class="form-check-label">
+                            💉 Vaccinations
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check mb-3">
+
+                        {{ form.partager_consultations }}
+
+                        <label class="form-check-label">
+                            🩺 Consultations
+                        </label>
+
+                    </div>
+
+
+                    <div class="form-check">
+
+                        {{ form.partager_contact_parent }}
+
+                        <label class="form-check-label">
+                            📞 Téléphone du parent
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <h5 class="fw-bold mt-4">
+                    📝 Consignes
+                </h5>
+
+                <div class="mb-3">
+
+                    {{ form.consignes }}
+
+                </div>
+
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        📞 Contact d'urgence
+                    </label>
+
+                    {{ form.contact_urgence }}
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-success btn-lg w-100"
+                >
+
+                    <i class="bi bi-shield-check me-2"></i>
+
+                    Créer la fiche de garde
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

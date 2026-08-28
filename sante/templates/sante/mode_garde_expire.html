@@ -1,0 +1,40 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Fiche de garde expirée
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card shadow-sm border-0 text-center">
+
+        <div class="card-body p-5">
+
+            <div style="font-size: 70px;">
+                🔒
+            </div>
+
+            <h2 class="fw-bold text-danger mt-3">
+                Fiche de garde expirée
+            </h2>
+
+            <p class="text-muted mt-3">
+
+                Cette fiche de garde n'est plus disponible.
+
+                <br>
+
+                Veuillez contacter le parent
+                pour obtenir une nouvelle fiche.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

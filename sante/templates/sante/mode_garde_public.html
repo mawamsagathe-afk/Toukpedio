@@ -1,0 +1,186 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Fiche de garde - {{ enfant.prenom }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="text-center mb-4">
+
+        <div style="font-size: 60px;">
+            👶
+        </div>
+
+        <h1 class="fw-bold text-success">
+            Fiche de garde
+        </h1>
+
+        <h3>
+            {{ enfant.prenom }}
+        </h3>
+
+        <p class="text-muted">
+            Fiche temporaire TOUKPEDIO
+        </p>
+
+    </div>
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+
+            <div class="alert alert-success">
+
+                <strong>
+                    Personne responsable :
+                </strong>
+
+                {{ mode_garde.nom_gardien }}
+
+                <br>
+
+                <strong>
+                    Téléphone :
+                </strong>
+
+                {{ mode_garde.telephone_gardien }}
+
+                <br>
+
+                <strong>
+                    Valable du :
+                </strong>
+
+                {{ mode_garde.date_debut|date:"d/m/Y" }}
+
+                au
+
+                {{ mode_garde.date_fin|date:"d/m/Y" }}
+
+            </div>
+
+
+            {% if mode_garde.partager_allergies %}
+
+            <div class="mb-4">
+
+                <h5>
+                    ⚠️ Allergies
+                </h5>
+
+                <p>
+                    {{ enfant.allergies|default:"Aucune information" }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if mode_garde.partager_traitement %}
+
+            <div class="mb-4">
+
+                <h5>
+                    💊 Traitement
+                </h5>
+
+                <p>
+                    {{ enfant.traitement|default:"Aucun traitement indiqué" }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if mode_garde.partager_antecedents %}
+
+            <div class="mb-4">
+
+                <h5>
+                    Antécédents
+                </h5>
+
+                <p>
+                    {{ enfant.antecedents|default:"Aucune information" }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if mode_garde.partager_contact_parent %}
+
+            <div class="mb-4">
+
+                <h5>
+                    📞 Contact parent
+                </h5>
+
+                <p>
+                    {{ enfant.telephone_parent|default:"Non renseigné" }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if mode_garde.contact_urgence %}
+
+            <div class="alert alert-warning">
+
+                🚨
+
+                <strong>
+                    Urgence :
+                </strong>
+
+                {{ mode_garde.contact_urgence }}
+
+            </div>
+
+            {% endif %}
+
+
+            {% if mode_garde.consignes %}
+
+            <div class="mb-4">
+
+                <h5>
+                    📝 Consignes
+                </h5>
+
+                <p style="white-space: pre-line;">
+                    {{ mode_garde.consignes }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            <hr>
+
+            <div class="text-center text-muted">
+
+                <small>
+                    Fiche générée par TOUKPEDIO
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

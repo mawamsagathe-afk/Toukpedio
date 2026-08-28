@@ -1,7 +1,10 @@
+import uuid
+
 from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Enfant(models.Model):
@@ -109,7 +112,7 @@ class JournalSymptome(models.Model):
         related_name="journaux_symptomes"
     )
 
-    date = models.DateField()
+    date = models.DateField(default=timezone.localdate)
 
     symptome = models.CharField(
         max_length=200
@@ -154,7 +157,8 @@ class JournalSymptome(models.Model):
     )
 
     def __str__(self):
-        return f"{self.enfant.prenom} - {self.symptome} - {self.date}"        
+        return f"{self.enfant.prenom} - {self.symptome} - {self.date}" 
+           
 class Parent(models.Model):
 
     user = models.OneToOneField(
@@ -669,4 +673,186 @@ class PriseTraitement(models.Model):
         ordering = ["-date_heure_prevue"]
         verbose_name = "Prise de traitement"
         verbose_name_plural = "Prises de traitement"
+        
+class PartageEnfant(models.Model):
+    enfant = models.ForeignKey(
+        Enfant,
+        on_delete=models.CASCADE,
+        related_name="partages"
+    )
+
+    parent = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="enfants_partages"
+    )
+
+    date_invitation = models.DateTimeField(auto_now_add=True)
+
+    accepte = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("enfant", "parent")
+
+    def __str__(self):
+        statut = "Acceptée" if self.accepte else "En attente"
+        return f"{self.parent.username} → {self.enfant.prenom} ({statut})"
     
+import uuid
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
+from .models import Enfant
+
+
+class ModeGarde(models.Model):
+
+    TYPE_GARDIEN_CHOICES = [
+        ("baby_sitter", "Baby-sitter"),
+        ("grand_parent", "Grand-parent"),
+        ("autre", "Autre"),
+    ]
+
+    # =====================================================
+    # ENFANT ET PARENT
+    # =====================================================
+
+    enfant = models.ForeignKey(
+        Enfant,
+        on_delete=models.CASCADE,
+        related_name="modes_garde"
+    )
+
+    parent = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="modes_garde_crees"
+    )
+
+    # =====================================================
+    # PERSONNE QUI GARDE L'ENFANT
+    # =====================================================
+
+    nom_gardien = models.CharField(
+        max_length=150
+    )
+
+    telephone_gardien = models.CharField(
+        max_length=30
+    )
+
+    type_gardien = models.CharField(
+        max_length=30,
+        choices=TYPE_GARDIEN_CHOICES
+    )
+
+    # =====================================================
+    # DURÉE DE LA GARDE
+    # =====================================================
+
+    date_debut = models.DateField()
+
+    date_fin = models.DateField()
+
+    # =====================================================
+    # INFORMATIONS À PARTAGER
+    # =====================================================
+
+    partager_allergies = models.BooleanField(
+        default=True
+    )
+
+    partager_traitement = models.BooleanField(
+        default=True
+    )
+
+    partager_alimentation = models.BooleanField(
+        default=True
+    )
+
+    partager_sommeil = models.BooleanField(
+        default=True
+    )
+
+    partager_hydratation = models.BooleanField(
+        default=False
+    )
+
+    partager_antecedents = models.BooleanField(
+        default=False
+    )
+
+    partager_vaccinations = models.BooleanField(
+        default=False
+    )
+
+    partager_consultations = models.BooleanField(
+        default=False
+    )
+
+    partager_temperature = models.BooleanField(
+        default=False
+    )
+
+    partager_contact_parent = models.BooleanField(
+        default=True
+    )
+
+    # =====================================================
+    # CONSIGNES
+    # =====================================================
+    consignes = models.TextField(
+    blank=True,
+    null=True
+    )
+    contact_urgence = models.CharField(
+    max_length=30,
+    blank=True,
+    null=True
+    )
+
+    # =====================================================
+    # SÉCURITÉ
+    # =====================================================
+
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False
+    )
+
+    actif = models.BooleanField(
+        default=True
+    )
+
+    date_creation = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    # =====================================================
+    # AFFICHAGE
+    # =====================================================
+
+    def __str__(self):
+
+        return (
+            f"Mode garde - "
+            f"{self.enfant.prenom} - "
+            f"{self.nom_gardien}"
+        )
+
+    # =====================================================
+    # VÉRIFIER SI LA FICHE EST ENCORE VALIDE
+    # =====================================================
+
+    @property
+    def est_valide(self):
+
+        aujourd_hui = timezone.localdate()
+
+        return (
+            self.actif
+            and self.date_debut <= aujourd_hui <= self.date_fin
+        )

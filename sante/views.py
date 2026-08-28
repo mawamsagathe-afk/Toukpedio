@@ -1,7 +1,6 @@
 from datetime import date
-
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -22,6 +21,7 @@ from .models import (
     Consultation,
     JournalSymptome,
     Parent,
+    PartageEnfant,
     PriseTraitement,
     Temperature,
     Traitement,
@@ -47,6 +47,10 @@ def accueil(request):
         request,
         "sante/accueil.html"
     )
+    
+def logout_view(request):
+    logout(request)
+    return redirect("sante:connexion")
 
 
 # =========================================================
@@ -643,47 +647,52 @@ def ajouter_symptome(request, enfant_id):
 
     if request.method == "POST":
 
-        form = JournalSymptomeForm(
-            request.POST
-        )
+        # ==========================================
+        # FORMULAIRE DU JOURNAL
+        # ==========================================
 
-        photo_form = PhotoSymptomeForm(
-            request.POST,
-            request.FILES
-        )
+        form = JournalSymptomeForm(request.POST)
 
         if form.is_valid():
 
-            journal = form.save(
-                commit=False
-            )
+            # Création du journal sans enregistrer immédiatement
+            journal = form.save(commit=False)
 
+            # Association à l'enfant
             journal.enfant = enfant
 
+            # Date automatique
+            journal.date = timezone.localdate()
+
+            # Enregistrement du symptôme
             journal.save()
 
-            # =========================
-            # ENREGISTREMENT DE LA PHOTO
-            # =========================
+            # ==========================================
+            # PHOTO
+            # ==========================================
 
-            if (
-                request.FILES.get("photo")
-            ):
+            fichier_photo = request.FILES.get("photo")
 
-                photo = PhotoSymptome.objects.create(
+            description_photo = request.POST.get(
+                "photo_description",
+                ""
+            ).strip()
 
+            # Si une photo a été sélectionnée
+            if fichier_photo:
+
+                PhotoSymptome.objects.create(
                     journal=journal,
-
-                    photo=request.FILES["photo"],
-
-                    description=request.POST.get(
-                        "photo_description",
-                        ""
-                    )
+                    photo=fichier_photo,
+                    description=description_photo
                 )
 
+            # ==========================================
+            # REDIRECTION
+            # ==========================================
+
             return redirect(
-                "sante:dossier_enfant",
+                "sante:detail_enfant",
                 enfant_id=enfant.id
             )
 
@@ -691,8 +700,9 @@ def ajouter_symptome(request, enfant_id):
 
         form = JournalSymptomeForm()
 
-        photo_form = PhotoSymptomeForm()
-
+    # ==========================================
+    # AFFICHAGE
+    # ==========================================
 
     return render(
         request,
@@ -700,9 +710,9 @@ def ajouter_symptome(request, enfant_id):
         {
             "enfant": enfant,
             "form": form,
-            "photo_form": photo_form,
         }
     )
+
 
 
 # =========================================================
@@ -881,64 +891,31 @@ def detail_enfant(request, enfant_id):
 
     enfant = get_object_or_404(
         Enfant,
-        id=enfant_id,
-        parent=request.user
+        id=enfant_id
     )
 
-    consultations = (
-        Consultation.objects
-        .filter(enfant=enfant)
-        .order_by(
-            "-date_consultation"
-        )[:5]
+    acces_principal = (
+        enfant.parent == request.user
     )
 
-    vaccinations = (
-        Vaccination.objects
-        .filter(enfant=enfant)
-        .order_by(
-            "-date_prevue"
-        )[:5]
-    )
+    acces_partage = PartageEnfant.objects.filter(
+        enfant=enfant,
+        parent=request.user,
+        accepte=True
+    ).exists()
 
-    croissances = (
-        SuiviCroissance.objects
-        .filter(enfant=enfant)
-        .order_by(
-            "-date_mesure"
-        )[:5]
-    )
-
-    suivis_bien_etre = (
-        BienEtre.objects
-        .filter(enfant=enfant)
-        .order_by(
-            "-date_suivi"
-        )[:5]
-    )
-
-    rendez_vous = (
-        RendezVous.objects
-        .filter(enfant=enfant)
-        .select_related(
-            "professionnel"
+    if not acces_principal and not acces_partage:
+        messages.error(
+            request,
+            "Vous n'avez pas accès à ce dossier."
         )
-        .order_by(
-            "date_rendez_vous",
-            "heure"
-        )[:5]
-    )
+        return redirect("sante:tableau_bord_parent")
 
     return render(
         request,
         "sante/detail_enfant.html",
         {
-            "enfant": enfant,
-            "consultations": consultations,
-            "vaccinations": vaccinations,
-            "croissances": croissances,
-            "suivis_bien_etre": suivis_bien_etre,
-            "rendez_vous": rendez_vous,
+            "enfant": enfant
         }
     )
 
@@ -1856,4 +1833,1221 @@ def enregistrer_prise(request, traitement_id):
     return redirect(
         "sante:traitements",
         enfant_id=traitement.enfant.id
+    )
+
+@login_required
+def inviter_parent(request, enfant_id):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id,
+        parent=request.user
+    )
+
+    if request.method == "POST":
+
+        email = request.POST.get("email", "").strip()
+
+        if not email:
+            messages.error(
+                request,
+                "Veuillez saisir l'adresse e-mail du parent."
+            )
+            return redirect(
+                "sante:inviter_parent",
+                enfant_id=enfant.id
+            )
+
+        try:
+            parent = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(
+                request,
+                "Aucun compte ne correspond à cette adresse e-mail."
+            )
+            return redirect(
+                "sante:inviter_parent",
+                enfant_id=enfant.id
+            )
+
+        if parent == request.user:
+            messages.error(
+                request,
+                "Vous ne pouvez pas vous inviter vous-même."
+            )
+            return redirect(
+                "sante:inviter_parent",
+                enfant_id=enfant.id
+            )
+
+        partage, created = PartageEnfant.objects.get_or_create(
+            enfant=enfant,
+            parent=parent
+        )
+
+        if not created and partage.accepte:
+            messages.info(
+                request,
+                "Ce parent a déjà accès à cet enfant."
+            )
+        else:
+            partage.accepte = False
+            partage.save()
+
+            messages.success(
+                request,
+                f"Invitation envoyée à {parent.email}."
+            )
+
+        return redirect(
+            "sante:inviter_parent",
+            enfant_id=enfant.id
+        )
+
+    partages = PartageEnfant.objects.filter(
+        enfant=enfant
+    ).select_related("parent")
+
+    return render(
+        request,
+        "sante/inviter_parent.html",
+        {
+            "enfant": enfant,
+            "partages": partages,
+        }
+    )
+    
+@login_required
+def accepter_partage(request, partage_id):
+
+    partage = get_object_or_404(
+        PartageEnfant,
+        id=partage_id,
+        parent=request.user
+    )
+
+    partage.accepte = True
+    partage.save()
+
+    messages.success(
+        request,
+        f"Vous avez maintenant accès au dossier de {partage.enfant.prenom}."
+    )
+
+    return redirect("sante:tableau_bord_parent")
+
+# =========================================================
+# MODE GARDE
+# =========================================================
+
+from io import BytesIO
+from urllib.parse import quote
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.urls import reverse
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
+from PIL import Image, ImageDraw, ImageFont
+
+from .models import (
+    Enfant,
+    ModeGarde,
+    BienEtre,
+    Vaccination,
+    Consultation,
+)
+
+from .forms import ModeGardeForm
+
+# =========================================================
+# CREER UN MODE GARDE
+# =========================================================
+
+@login_required
+def creer_mode_garde(request, enfant_id):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id,
+        parent=request.user
+    )
+
+    if request.method == "POST":
+
+        form = ModeGardeForm(request.POST)
+
+        if form.is_valid():
+
+            mode_garde = form.save(
+                commit=False
+            )
+
+            mode_garde.enfant = enfant
+            mode_garde.parent = request.user
+
+            mode_garde.save()
+
+            messages.success(
+                request,
+                f"Le mode garde de {enfant.prenom} "
+                f"a été créé avec succès."
+            )
+
+            return redirect(
+                "sante:mode_garde_detail",
+                enfant_id=enfant.id,
+                mode_garde_id=mode_garde.id
+            )
+
+    else:
+
+        form = ModeGardeForm(
+            initial={
+                "date_debut": timezone.localdate(),
+
+                "partager_allergies": True,
+                "partager_traitement": True,
+                "partager_alimentation": True,
+                "partager_sommeil": True,
+
+                "partager_antecedents": False,
+                "partager_vaccinations": False,
+                "partager_consultations": False,
+
+                "partager_contact_parent": True,
+            }
+        )
+
+    return render(
+        request,
+        "sante/mode_garde_form.html",
+        {
+            "enfant": enfant,
+            "form": form,
+        }
+    )
+    
+@login_required
+def desactiver_mode_garde(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    mode_garde.actif = False
+    mode_garde.save()
+
+    return redirect(
+        "sante:detail_enfant",
+        enfant_id=enfant_id
+    )
+    
+# =========================================================
+# CONSULTATION PUBLIQUE DU MODE GARDE
+# =========================================================
+
+def consulter_mode_garde(request, token):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        token=token,
+        actif=True
+    )
+
+    aujourd_hui = timezone.localdate()
+
+    if not (
+        mode_garde.date_debut
+        <= aujourd_hui
+        <= mode_garde.date_fin
+    ):
+
+        return render(
+            request,
+            "sante/mode_garde_expire.html"
+        )
+
+    enfant = mode_garde.enfant
+
+    dernier_bien_etre = (
+        BienEtre.objects
+        .filter(enfant=enfant)
+        .order_by("-date_suivi")
+        .first()
+    )
+
+    vaccinations = (
+        Vaccination.objects
+        .filter(enfant=enfant)
+        .order_by("date_prevue")
+    )
+
+    consultations = (
+        Consultation.objects
+        .filter(enfant=enfant)
+        .order_by("-date_consultation")
+    )
+
+    return render(
+        request,
+        "sante/mode_garde_public.html",
+        {
+            "mode_garde": mode_garde,
+            "enfant": enfant,
+            "dernier_bien_etre": dernier_bien_etre,
+            "vaccinations": vaccinations,
+            "consultations": consultations,
+        }
+    )
+    # =========================================================
+# DETAIL DU MODE GARDE
+# =========================================================
+
+@login_required
+def mode_garde_detail(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    enfant = mode_garde.enfant
+
+    # -----------------------------------------------------
+    # DERNIER SUIVI DU BIEN-ÊTRE
+    # -----------------------------------------------------
+
+    dernier_bien_etre = (
+        BienEtre.objects
+        .filter(enfant=enfant)
+        .order_by("-date_suivi")
+        .first()
+    )
+
+    # -----------------------------------------------------
+    # VACCINATIONS
+    # -----------------------------------------------------
+
+    vaccinations = (
+        Vaccination.objects
+        .filter(enfant=enfant)
+        .order_by("date_prevue")
+    )
+
+    # -----------------------------------------------------
+    # CONSULTATIONS
+    # -----------------------------------------------------
+
+    consultations = (
+        Consultation.objects
+        .filter(enfant=enfant)
+        .order_by("-date_consultation")
+    )
+
+    # -----------------------------------------------------
+    # CONTEXTE
+    # -----------------------------------------------------
+
+    context = {
+        "mode_garde": mode_garde,
+        "enfant": enfant,
+        "dernier_bien_etre": dernier_bien_etre,
+        "vaccinations": vaccinations,
+        "consultations": consultations,
+    }
+
+    return render(
+        request,
+        "sante/mode_garde_detail.html",
+        context
+    )
+    
+# =========================================================
+# GENERER PDF MODE GARDE
+# =========================================================
+
+@login_required
+def mode_garde_pdf(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    enfant = mode_garde.enfant
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="mode_garde_'
+        f'{enfant.prenom}.pdf"'
+    )
+
+    pdf = canvas.Canvas(
+        response,
+        pagesize=A4
+    )
+
+    largeur, hauteur = A4
+
+    y = hauteur - 55
+
+    # -----------------------------------------------------
+    # TITRE
+    # -----------------------------------------------------
+
+    pdf.setFont(
+        "Helvetica-Bold",
+        22
+    )
+
+    pdf.drawString(
+        50,
+        y,
+        "FICHE DE GARDE"
+    )
+
+    y -= 40
+
+    pdf.setFont(
+        "Helvetica-Bold",
+        16
+    )
+
+    pdf.drawString(
+        50,
+        y,
+        f"Enfant : {enfant.prenom} {enfant.nom}"
+    )
+
+    y -= 30
+
+    # -----------------------------------------------------
+    # INFORMATIONS GARDIEN
+    # -----------------------------------------------------
+
+    pdf.setFont(
+        "Helvetica",
+        11
+    )
+
+    informations = [
+        f"Responsable : {mode_garde.nom_gardien}",
+        f"Type : {mode_garde.get_type_gardien_display()}",
+        f"Téléphone : {mode_garde.telephone_gardien}",
+        (
+            f"Valable du "
+            f"{mode_garde.date_debut.strftime('%d/%m/%Y')} "
+            f"au "
+            f"{mode_garde.date_fin.strftime('%d/%m/%Y')}"
+        ),
+    ]
+
+    for ligne in informations:
+
+        pdf.drawString(
+            50,
+            y,
+            ligne
+        )
+
+        y -= 20
+
+    y -= 15
+
+    # -----------------------------------------------------
+    # INFORMATIONS IMPORTANTES
+    # -----------------------------------------------------
+
+    pdf.setFont(
+        "Helvetica-Bold",
+        14
+    )
+
+    pdf.drawString(
+        50,
+        y,
+        "Informations importantes"
+    )
+
+    y -= 25
+
+    pdf.setFont(
+        "Helvetica",
+        10
+    )
+
+    # -----------------------------------------------------
+    # ALLERGIES
+    # -----------------------------------------------------
+
+    if mode_garde.partager_allergies:
+
+        pdf.drawString(
+            50,
+            y,
+            "Allergies :"
+        )
+
+        y -= 17
+
+        pdf.drawString(
+            70,
+            y,
+            enfant.allergies or "Aucune information"
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # TRAITEMENT
+    # -----------------------------------------------------
+
+    if mode_garde.partager_traitement:
+
+        pdf.drawString(
+            50,
+            y,
+            "Traitement :"
+        )
+
+        y -= 17
+
+        pdf.drawString(
+            70,
+            y,
+            enfant.traitement or "Aucun traitement indiqué"
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # ALIMENTATION
+    # -----------------------------------------------------
+
+    if mode_garde.partager_alimentation:
+
+        dernier_bien_etre = (
+            BienEtre.objects
+            .filter(enfant=enfant)
+            .order_by("-date_suivi")
+            .first()
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            "Alimentation :"
+        )
+
+        y -= 17
+
+        alimentation = (
+            dernier_bien_etre.alimentation
+            if dernier_bien_etre
+            and dernier_bien_etre.alimentation
+            else "Aucune information"
+        )
+
+        pdf.drawString(
+            70,
+            y,
+            alimentation[:100]
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # SOMMEIL
+    # -----------------------------------------------------
+
+    if mode_garde.partager_sommeil:
+
+        dernier_bien_etre = (
+            BienEtre.objects
+            .filter(enfant=enfant)
+            .order_by("-date_suivi")
+            .first()
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            "Sommeil :"
+        )
+
+        y -= 17
+
+        sommeil = (
+            dernier_bien_etre.get_sommeil_display()
+            if dernier_bien_etre
+            else "Aucune information"
+        )
+
+        pdf.drawString(
+            70,
+            y,
+            sommeil
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # ANTECEDENTS
+    # -----------------------------------------------------
+
+    if mode_garde.partager_antecedents:
+
+        pdf.drawString(
+            50,
+            y,
+            "Antécédents :"
+        )
+
+        y -= 17
+
+        pdf.drawString(
+            70,
+            y,
+            enfant.antecedents or "Aucune information"
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # CONTACT PARENT
+    # -----------------------------------------------------
+
+    if mode_garde.partager_contact_parent:
+
+        pdf.drawString(
+            50,
+            y,
+            f"Parent : "
+            f"{enfant.telephone_parent or 'Non renseigné'}"
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # CONTACT URGENCE
+    # -----------------------------------------------------
+
+    if mode_garde.contact_urgence:
+
+        pdf.setFont(
+            "Helvetica-Bold",
+            11
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            f"Urgence : {mode_garde.contact_urgence}"
+        )
+
+        pdf.setFont(
+            "Helvetica",
+            10
+        )
+
+        y -= 25
+
+    # -----------------------------------------------------
+    # VACCINATIONS
+    # -----------------------------------------------------
+
+    if mode_garde.partager_vaccinations:
+
+        pdf.setFont(
+            "Helvetica-Bold",
+            13
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            "Vaccinations"
+        )
+
+        y -= 22
+
+        pdf.setFont(
+            "Helvetica",
+            10
+        )
+
+        vaccinations = (
+            Vaccination.objects
+            .filter(enfant=enfant)
+            .order_by("date_prevue")[:8]
+        )
+
+        for vaccination in vaccinations:
+
+            texte = (
+                f"{vaccination.nom_vaccin} - "
+                f"{vaccination.date_prevue.strftime('%d/%m/%Y')}"
+            )
+
+            pdf.drawString(
+                70,
+                y,
+                texte
+            )
+
+            y -= 17
+
+            if y < 80:
+
+                pdf.showPage()
+
+                y = hauteur - 60
+
+                pdf.setFont(
+                    "Helvetica",
+                    10
+                )
+
+        y -= 10
+
+    # -----------------------------------------------------
+    # CONSULTATIONS
+    # -----------------------------------------------------
+
+    if mode_garde.partager_consultations:
+
+        pdf.setFont(
+            "Helvetica-Bold",
+            13
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            "Dernières consultations"
+        )
+
+        y -= 22
+
+        pdf.setFont(
+            "Helvetica",
+            10
+        )
+
+        consultations = (
+            Consultation.objects
+            .filter(enfant=enfant)
+            .order_by("-date_consultation")[:5]
+        )
+
+        for consultation in consultations:
+
+            date_consultation = (
+                consultation.date_consultation
+                .strftime("%d/%m/%Y")
+            )
+
+            texte = (
+                f"{date_consultation} - "
+                f"{consultation.motif[:80]}"
+            )
+
+            pdf.drawString(
+                70,
+                y,
+                texte
+            )
+
+            y -= 17
+
+            if y < 80:
+
+                pdf.showPage()
+
+                y = hauteur - 60
+
+                pdf.setFont(
+                    "Helvetica",
+                    10
+                )
+
+        y -= 10
+
+    # -----------------------------------------------------
+    # CONSIGNES
+    # -----------------------------------------------------
+
+    if mode_garde.consignes:
+
+        pdf.setFont(
+            "Helvetica-Bold",
+            13
+        )
+
+        pdf.drawString(
+            50,
+            y,
+            "Consignes particulières"
+        )
+
+        y -= 22
+
+        pdf.setFont(
+            "Helvetica",
+            10
+        )
+
+        mots = mode_garde.consignes.split()
+
+        ligne = ""
+
+        for mot in mots:
+
+            if len(ligne) + len(mot) > 90:
+
+                pdf.drawString(
+                    60,
+                    y,
+                    ligne
+                )
+
+                y -= 17
+
+                ligne = ""
+
+                if y < 70:
+
+                    pdf.showPage()
+
+                    y = hauteur - 60
+
+                    pdf.setFont(
+                        "Helvetica",
+                        10
+                    )
+
+            ligne += mot + " "
+
+        if ligne:
+
+            pdf.drawString(
+                60,
+                y,
+                ligne
+            )
+
+            y -= 25
+
+    # -----------------------------------------------------
+    # PIED DE PAGE
+    # -----------------------------------------------------
+
+    pdf.setFont(
+        "Helvetica-Oblique",
+        8
+    )
+
+    pdf.drawString(
+        50,
+        35,
+        "Document généré par TOUKPEDIO"
+    )
+
+    pdf.showPage()
+    pdf.save()
+
+    return response
+
+
+@login_required
+def mode_garde_image(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    largeur = 1200
+    hauteur = 1600
+
+    image = Image.new(
+        "RGB",
+        (largeur, hauteur),
+        "white"
+    )
+
+    draw = ImageDraw.Draw(image)
+
+    try:
+
+        font_titre = ImageFont.truetype(
+            "arial.ttf",
+            55
+        )
+
+        font_sous_titre = ImageFont.truetype(
+            "arial.ttf",
+            38
+        )
+
+        font = ImageFont.truetype(
+            "arial.ttf",
+            30
+        )
+
+    except:
+
+        font_titre = ImageFont.load_default()
+        font_sous_titre = ImageFont.load_default()
+        font = ImageFont.load_default()
+
+    y = 70
+
+    draw.text(
+        (60, y),
+        "FICHE DE GARDE",
+        font=font_titre,
+        fill="black"
+    )
+
+    y += 100
+
+    enfant = mode_garde.enfant
+
+    draw.text(
+        (60, y),
+        f"👧 {enfant.prenom}",
+        font=font_sous_titre,
+        fill="black"
+    )
+
+    y += 70
+
+    draw.text(
+        (60, y),
+        f"Gardien : {mode_garde.nom_gardien}",
+        font=font,
+        fill="black"
+    )
+
+    y += 50
+
+    draw.text(
+        (60, y),
+        f"Téléphone : {mode_garde.telephone_gardien}",
+        font=font,
+        fill="black"
+    )
+
+    y += 50
+
+    draw.text(
+        (60, y),
+        (
+            f"Valable du "
+            f"{mode_garde.date_debut.strftime('%d/%m/%Y')} "
+            f"au "
+            f"{mode_garde.date_fin.strftime('%d/%m/%Y')}"
+        ),
+        font=font,
+        fill="black"
+    )
+
+    y += 90
+
+    if mode_garde.partager_allergies:
+
+        draw.text(
+            (60, y),
+            "⚠ Allergies :",
+            font=font_sous_titre,
+            fill="black"
+        )
+
+        y += 50
+
+        draw.text(
+            (80, y),
+            enfant.allergies or "Aucune information",
+            font=font,
+            fill="black"
+        )
+
+        y += 70
+
+    if mode_garde.partager_traitement:
+
+        draw.text(
+            (60, y),
+            "💊 Traitement :",
+            font=font_sous_titre,
+            fill="black"
+        )
+
+        y += 50
+
+        draw.text(
+            (80, y),
+            enfant.traitement or "Aucun traitement indiqué",
+            font=font,
+            fill="black"
+        )
+
+        y += 70
+
+    if mode_garde.partager_antecedents:
+
+        draw.text(
+            (60, y),
+            "Antécédents :",
+            font=font_sous_titre,
+            fill="black"
+        )
+
+        y += 50
+
+        draw.text(
+            (80, y),
+            enfant.antecedents or "Aucune information",
+            font=font,
+            fill="black"
+        )
+
+        y += 70
+
+    if mode_garde.partager_contact_parent:
+
+        draw.text(
+            (60, y),
+            (
+                f"Parent : "
+                f"{enfant.telephone_parent or 'Non renseigné'}"
+            ),
+            font=font,
+            fill="black"
+        )
+
+        y += 60
+
+    if mode_garde.contact_urgence:
+
+        draw.text(
+            (60, y),
+            (
+                f"Urgence : "
+                f"{mode_garde.contact_urgence}"
+            ),
+            font=font,
+            fill="black"
+        )
+
+        y += 70
+
+    if mode_garde.consignes:
+
+        draw.text(
+            (60, y),
+            "Consignes :",
+            font=font_sous_titre,
+            fill="black"
+        )
+
+        y += 55
+
+        mots = mode_garde.consignes.split()
+
+        ligne = ""
+
+        for mot in mots:
+
+            if len(ligne) > 55:
+
+                draw.text(
+                    (80, y),
+                    ligne,
+                    font=font,
+                    fill="black"
+                )
+
+                y += 45
+
+                ligne = ""
+
+            ligne += mot + " "
+
+        if ligne:
+
+            draw.text(
+                (80, y),
+                ligne,
+                font=font,
+                fill="black"
+            )
+
+    y = hauteur - 80
+
+    draw.text(
+        (60, y),
+        "TOUKPEDIO",
+        font=font,
+        fill="black"
+    )
+
+    buffer = BytesIO()
+
+    image.save(
+        buffer,
+        format="PNG"
+    )
+
+    buffer.seek(0)
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type="image/png"
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        f'attachment; filename="mode_garde_'
+        f'{enfant.prenom}.png"'
+    )
+
+    return response
+
+# =========================================================
+# WHATSAPP
+# =========================================================
+
+@login_required
+def mode_garde_whatsapp(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    lien = request.build_absolute_uri(
+        reverse(
+            "sante:consulter_mode_garde",
+            kwargs={
+                "token": mode_garde.token
+            }
+        )
+    )
+
+    message = (
+        f"Bonjour {mode_garde.nom_gardien},\n\n"
+        f"Voici la fiche de garde de "
+        f"{mode_garde.enfant.prenom}.\n\n"
+        f"Elle est valable du "
+        f"{mode_garde.date_debut.strftime('%d/%m/%Y')} "
+        f"au "
+        f"{mode_garde.date_fin.strftime('%d/%m/%Y')}.\n\n"
+        f"Consulter la fiche :\n"
+        f"{lien}\n\n"
+        f"TOUKPEDIO"
+    )
+
+    telephone = (
+        mode_garde.telephone_gardien
+        .replace(" ", "")
+        .replace("-", "")
+        .replace("+", "")
+    )
+
+    whatsapp_url = (
+        f"https://wa.me/{telephone}"
+        f"?text={quote(message)}"
+    )
+
+    return redirect(
+        whatsapp_url
+    )
+    
+# =========================================================
+# SMS
+# =========================================================
+
+@login_required
+def mode_garde_sms(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    lien = request.build_absolute_uri(
+        reverse(
+            "sante:consulter_mode_garde",
+            kwargs={
+                "token": mode_garde.token
+            }
+        )
+    )
+
+    message = (
+        f"Fiche de garde de "
+        f"{mode_garde.enfant.prenom}. "
+        f"Valable du "
+        f"{mode_garde.date_debut.strftime('%d/%m/%Y')} "
+        f"au "
+        f"{mode_garde.date_fin.strftime('%d/%m/%Y')}. "
+        f"Consulter : {lien}"
+    )
+
+    telephone = (
+        mode_garde.telephone_gardien
+        .replace(" ", "")
+        .replace("-", "")
+    )
+
+    return redirect(
+        f"sms:{telephone}?body={quote(message)}"
     )

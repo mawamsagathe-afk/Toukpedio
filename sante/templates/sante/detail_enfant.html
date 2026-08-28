@@ -3,12 +3,13 @@
 {% block title %}
 Dossier de {{ enfant.prenom }} - TOUKPEDIO
 {% endblock %}
+
 {% block extra_css %}
 
 <style>
-       /* ==========================================
+
+    /* ==========================================
        BOUTON AJOUTER UN SYMPTÔME
-       Clignotement doux
     ========================================== */
 
     .btn-symptome {
@@ -20,20 +21,21 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
         animation-play-state: paused;
         transform: scale(1.05);
     }
-    .btn-mandarine {
-    background-color: #F28C28;
-    border-color: #F28C28;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
 
-.btn-mandarine:hover {
-    background-color: #D96F0B;
-    border-color: #D96F0B;
-    color: white;
-    transform: scale(1.05);
-}
+    .btn-mandarine {
+        background-color: #F28C28;
+        border-color: #F28C28;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-mandarine:hover {
+        background-color: #D96F0B;
+        border-color: #D96F0B;
+        color: white;
+        transform: scale(1.05);
+    }
 
     @keyframes clignotementDoux {
 
@@ -54,423 +56,106 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
     }
 
+    /* ==========================================
+       CARTES DU DOSSIER
+    ========================================== */
+
+    .dossier-card {
+        transition: all 0.3s ease;
+    }
+
+    .dossier-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10) !important;
+    }
+
+    /* ==========================================
+       PHOTOS DES SYMPTÔMES
+    ========================================== */
+
+    .photo-suivi {
+        height: 180px;
+        width: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-suivi:hover {
+        transform: scale(1.03);
+    }
+
 </style>
 
 {% endblock %}
+
+
 {% block content %}
 
 <div class="container py-5">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div>
+    <!-- ===================================================== -->
+    <!-- EN-TÊTE -->
+    <!-- ===================================================== -->
 
-        <!-- Retour vers la liste des enfants -->
-        <a href="{% url 'sante:enfant' %}"
-           class="btn btn-outline-success rounded-pill px-4 mb-3">
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
 
-            <i class="bi bi-arrow-left me-2"></i>
-            Mes enfants
+        <div>
 
-        </a>
-
-        <h1 class="fw-bold mt-2">
-            Dossier de {{ enfant.prenom }}
-        </h1>
-
-    </div>
-
-
-    <!-- Modifier -->
-    <a href="{% url 'sante:modifier_enfant' enfant.id %}"
-       class="btn btn-outline-primary rounded-pill px-4">
-
-        <i class="bi bi-pencil-square me-2"></i>
-        Modifier
-
-    </a>
-
-    <!-- Ajouter -->
-    <a href="{% url 'sante:ajouter_enfant' %}"
-       class="btn btn-success rounded-pill px-4">
-
-        <i class="bi bi-person-plus-fill me-2"></i>
-        Ajouter un enfant
-
-    </a>
-
-</div>
-
-</div>
-
-    <div class="row g-4">
-
-        <div class="col-lg-4">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body text-center p-4">
-
-                    {% if enfant.photo %}
-
-                        <img src="{{ enfant.photo.url }}"
-                             class="rounded-circle shadow mb-3"
-                             style="width:150px;height:150px;object-fit:cover;">
-
-                    {% else %}
-
-                        <div class="rounded-circle bg-success-subtle
-                                    text-success d-flex align-items-center
-                                    justify-content-center mx-auto mb-3"
-                             style="width:150px;height:150px;">
-
-                            <i class="bi bi-person-fill fs-1"></i>
-
-                        </div>
-
-                    {% endif %}
-
-                    <h3 class="fw-bold">
-                        {{ enfant.prenom }} {{ enfant.nom }}
-                    </h3>
-
-                    <p class="text-muted">
-                        {% if enfant.sexe == "M" %}
-                            Garçon
-                        {% else %}
-                            Fille
-                        {% endif %}
-                    </p>
-
-                    <hr>
-
-                    <div class="text-start">
-
-                        <p>
-                            <strong>Date de naissance :</strong><br>
-                            {{ enfant.date_naissance|date:"d/m/Y" }}
-                        </p>
-
-                        <p>
-                            <strong>Groupe sanguin :</strong><br>
-                            {{ enfant.groupe_sanguin|default:"Non renseigné" }}
-                        </p>
-
-                        <p>
-                            <strong>Allergies :</strong><br>
-                            {{ enfant.allergies|default:"Aucune information" }}
-                        </p>
-
-                        <p>
-                            <strong>Antécédents :</strong><br>
-                            {{ enfant.antecedents|default:"Aucun renseignement" }}
-                        </p>
-
-                        <p>
-                            <strong>Observations :</strong><br>
-                            {{ enfant.observations|default:"Aucune observation" }}
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-8">
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-                    <a href="{% url 'sante:croissance' enfant.id %}"
-                       class="text-decoration-none">
-
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body p-4">
-                                <i class="bi bi-graph-up-arrow fs-2 text-success"></i>
-                                <h5 class="fw-bold mt-3">
-                                    Croissance
-                                </h5>
-                                <p class="text-muted">
-                                    Suivez le poids, la taille et le
-                                    périmètre crânien.
-                                </p>
-                            </div>
-                        </div>
-
-                    </a>
-                </div>
-
-                      <div class="col-md-6">
-
-    <a
-        href="{% url 'sante:traitements' enfant.id %}"
-        class="text-decoration-none"
-    >
-
-        <div class="card border-0 shadow-sm h-100">
-
-            <div class="card-body p-4">
-
-                <i class="bi bi-capsule fs-2 text-success"></i>
-
-                <h5 class="fw-bold mt-3">
-                    Traitements
-                </h5>
-
-                <p class="text-muted mb-0">
-                    Planifiez les médicaments,
-                    les prises et les rappels.
-                </p>
-
-            </div>
-
-        </div>
-
-    </a>
-
-</div>
-
-                <div class="col-md-6">
-
-    <a href="{% url 'sante:suivi_temperature' enfant.id %}"
-       class="text-decoration-none">
-
-        <div class="card border-0 shadow-sm h-100">
-
-            <div class="card-body p-4">
-
-                <i class="bi bi-thermometer-half fs-2 text-danger"></i>
-
-                <h5 class="fw-bold mt-3">
-                    Température
-                </h5>
-
-                <p class="text-muted mb-0">
-                    Enregistrez et suivez l'évolution de la température
-                    de votre enfant.
-                </p>
-
-            </div>
-
-        </div>
-
-    </a>
-
-</div>
-
-                <div class="col-md-6">
-                    <a href="{% url 'sante:vaccination' enfant.id %}"
-                       class="text-decoration-none">
-
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body p-4">
-                                <i class="bi bi-shield-check fs-2 text-warning"></i>
-                                <h5 class="fw-bold mt-3">
-                                    Vaccinations
-                                </h5>
-                                <p class="text-muted">
-                                    Consultez le calendrier vaccinal.
-                                </p>
-                            </div>
-                        </div>
-
-                    </a>
-                </div>
-
-                <div class="col-md-6">
-                    <a href="{% url 'sante:consultation' enfant.id %}"
-                       class="text-decoration-none">
-
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body p-4">
-                                <i class="bi bi-clipboard2-pulse fs-2 text-primary"></i>
-                                <h5 class="fw-bold mt-3">
-                                    Consultations
-                                </h5>
-                                <p class="text-muted">
-                                    Historique médical de l'enfant.
-                                </p>
-                            </div>
-                        </div>
-
-                    </a>
-                </div>
-
-                <div class="col-md-6">
-                    <a href="{% url 'sante:rendez_vous' enfant.id %}"
-                       class="text-decoration-none">
-
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body p-4">
-                                <i class="bi bi-calendar-check fs-2 text-danger"></i>
-                                <h5 class="fw-bold mt-3">
-                                    Rendez-vous
-                                </h5>
-                                <p class="text-muted">
-                                    Consultez les rendez-vous médicaux.
-                                </p>
-                            </div>
-                        </div>
-
-                    </a>
-                </div>
-
-                <div class="col-12">
-                    <a href="{% url 'sante:bien_etre' enfant.id %}"
-                       class="text-decoration-none">
-
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                <i class="bi bi-emoji-smile fs-2 text-success"></i>
-                                <h5 class="fw-bold mt-3">
-                                    Bien-être
-                                </h5>
-                                <p class="text-muted mb-0">
-                                    Suivez l'humeur, le sommeil,
-                                    l'alimentation, l'hydratation et
-                                    le temps d'écran.
-                                </p>
-                            </div>
-                        </div>
-
-                    </a>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="container py-5">
-
-    <!-- Informations générales de l'enfant -->
-
-    <div class="card border-0 shadow-sm">
-        ...
-    </div>
-
-
-    <!-- ===================================== -->
-    <!-- JOURNAL DES SYMPTÔMES -->
-    <!-- ===================================== -->
-
-    <div class="card border-0 shadow-sm mt-4">
-
-        <div class="card-header bg-success text-white">
-
-            <h5 class="mb-0">
-                <i class="bi bi-journal-medical me-2"></i>
-                Journal de suivi des symptômes
-            </h5>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-end mb-3">
-
-               <a href="{% url 'sante:ajouter_symptome' enfant.id %}"
-                 class="btn btn-mandarine rounded-pill btn-symptome">
-
-                  <i class="bi bi-plus-circle me-2"></i>
-
-                     Ajouter un symptôme
-
-                </a>
-            </div>
-
-            {% for suivi in enfant.journaux_symptomes.all %}
-
-                <div class="border rounded p-3 mb-3">
-
-                    <div class="d-flex justify-content-between">
-
-                        <h6 class="fw-bold text-success">
-                            {{ suivi.symptome }}
-                        </h6>
-
-                        <small class="text-muted">
-                            {{ suivi.date|date:"d/m/Y" }}
-                        </small>
-
-                    </div>
-
-                    <p class="mb-1">
-                        <strong>Intensité :</strong>
-                        {{ suivi.get_intensite_display }}
-                    </p>
-
-                    {% if suivi.temperature %}
-                        <p class="mb-1">
-                            <strong>Température :</strong>
-                            {{ suivi.temperature }} °C
-                        </p>
-                    {% endif %}
-
-                    {% if suivi.description %}
-                        <p class="mb-1">
-                            <strong>Description :</strong>
-                            {{ suivi.description }}
-                        </p>
-                    {% endif %}
-
-                    {% if suivi.traitement_pris %}
-                        <p class="mb-1">
-                            <strong>Traitement :</strong>
-                            {{ suivi.traitement_pris }}
-                        </p>
-                    {% endif %}
-
-                    {% if suivi.evolution %}
-                        <p class="mb-0">
-                            <strong>Évolution :</strong>
-                            {{ suivi.get_evolution_display }}
-                        </p>
-                    {% endif %}
-
-                </div>
-
-            {% empty %}
-
-                <div class="text-center text-muted py-4">
-
-                    <i class="bi bi-journal-x fs-1"></i>
-
-                    <p class="mt-2">
-                        Aucun symptôme enregistré pour le moment.
-                    </p>
-
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-  
-    </div>
-    <div class="card border-0 shadow-sm mt-4">
-
-    <div class="card-header bg-success text-white">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <h5 class="mb-0">
-                <i class="bi bi-journal-medical me-2"></i>
-                Journal des symptômes
-            </h5>
+            <!-- Retour -->
 
             <a
-                href="{% url 'sante:ajouter_symptome' enfant.id %}"
-                class="btn btn-light btn-sm rounded-pill"
+                href="{% url 'sante:enfant' %}"
+                class="btn btn-outline-success rounded-pill px-4 mb-3"
             >
-                <i class="bi bi-plus-circle me-1"></i>
-                Nouveau suivi
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                Mes enfants
+
+            </a>
+
+
+            <h1 class="fw-bold mt-2">
+
+                Dossier de {{ enfant.prenom }}
+
+            </h1>
+
+            <p class="text-muted mb-0">
+
+                Consultez et gérez les informations de santé de votre enfant.
+
+            </p>
+
+        </div>
+
+
+        <!-- BOUTONS -->
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a
+                href="{% url 'sante:modifier_enfant' enfant.id %}"
+                class="btn btn-outline-primary rounded-pill px-4"
+            >
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Modifier
+
+            </a>
+
+
+            <a
+                href="{% url 'sante:ajouter_enfant' %}"
+                class="btn btn-success rounded-pill px-4"
+            >
+
+                <i class="bi bi-person-plus-fill me-2"></i>
+
+                Ajouter un enfant
+
             </a>
 
         </div>
@@ -478,187 +163,688 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
     </div>
 
 
-    <div class="card-body">
+    <!-- ===================================================== -->
+    <!-- INFORMATIONS + FONCTIONNALITÉS -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4">
 
 
-        <!-- FILTRE -->
+        <!-- ================================================= -->
+        <!-- INFORMATIONS ENFANT -->
+        <!-- ================================================= -->
 
-        <form method="GET" class="row g-3 mb-4">
+        <div class="col-lg-4">
 
-            <div class="col-md-5">
+            <div class="card border-0 shadow-sm h-100">
 
-                <label class="form-label">
-                    Du
-                </label>
-
-                <input
-                    type="date"
-                    name="date_debut"
-                    class="form-control"
-                    value="{{ date_debut|default:'' }}"
-                >
-
-            </div>
+                <div class="card-body text-center p-4">
 
 
-            <div class="col-md-5">
+                    <!-- PHOTO -->
 
-                <label class="form-label">
-                    Au
-                </label>
+                    {% if enfant.photo %}
 
-                <input
-                    type="date"
-                    name="date_fin"
-                    class="form-control"
-                    value="{{ date_fin|default:'' }}"
-                >
-
-            </div>
-
-
-            <div class="col-md-2 d-flex align-items-end">
-
-                <button
-                    type="submit"
-                    class="btn btn-success w-100"
-                >
-                    Filtrer
-                </button>
-
-            </div>
-
-        </form>
-
-
-        {% for suivi in suivis %}
-
-            <div class="border rounded p-4 mb-3">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <h5 class="fw-bold text-success">
-
-                            <i class="bi bi-thermometer-half me-2"></i>
-
-                            {{ suivi.symptome }}
-
-                        </h5>
-
-                        <small class="text-muted">
-
-                            {{ suivi.date|date:"d/m/Y" }}
-
-                        </small>
-
-                    </div>
-
-
-                    <div>
-
-                        <a
-                            href="{% url 'sante:modifier_symptome' suivi.id %}"
-                            class="btn btn-outline-success btn-sm"
+                        <img
+                            src="{{ enfant.photo.url }}"
+                            class="rounded-circle shadow mb-3"
+                            style="
+                                width:150px;
+                                height:150px;
+                                object-fit:cover;
+                            "
+                            alt="Photo de {{ enfant.prenom }}"
                         >
-                            <i class="bi bi-pencil"></i>
-                        </a>
 
-                        <a
-                            href="{% url 'sante:supprimer_symptome' suivi.id %}"
-                            class="btn btn-outline-danger btn-sm"
+                    {% else %}
+
+                        <div
+                            class="
+                                rounded-circle
+                                bg-success-subtle
+                                text-success
+                                d-flex
+                                align-items-center
+                                justify-content-center
+                                mx-auto
+                                mb-3
+                            "
+                            style="
+                                width:150px;
+                                height:150px;
+                            "
                         >
-                            <i class="bi bi-trash"></i>
-                        </a>
 
-                    </div>
-
-                </div>
-
-
-                <hr>
-
-
-                <div class="row">
-
-                    <div class="col-md-4">
-
-                        <strong>
-                            Intensité :
-                        </strong>
-
-                        {{ suivi.get_intensite_display }}
-
-                    </div>
-
-
-                    {% if suivi.temperature %}
-
-                        <div class="col-md-4">
-
-                            <strong>
-                                Température :
-                            </strong>
-
-                            {{ suivi.temperature }} °C
+                            <i class="bi bi-person-fill fs-1"></i>
 
                         </div>
 
                     {% endif %}
 
 
-                    {% if suivi.evolution %}
+                    <!-- NOM -->
 
-                        <div class="col-md-4">
+                    <h3 class="fw-bold">
+
+                        {{ enfant.prenom }} {{ enfant.nom }}
+
+                    </h3>
+
+
+                    <!-- SEXE -->
+
+                    <p class="text-muted">
+
+                        {% if enfant.sexe == "M" %}
+
+                            <i class="bi bi-gender-male me-1"></i>
+                            Garçon
+
+                        {% else %}
+
+                            <i class="bi bi-gender-female me-1"></i>
+                            Fille
+
+                        {% endif %}
+
+                    </p>
+
+
+                    <hr>
+
+
+                    <!-- INFORMATIONS -->
+
+                    <div class="text-start">
+
+
+                        <p>
 
                             <strong>
-                                Évolution :
+                                <i class="bi bi-calendar3 me-1"></i>
+                                Date de naissance :
                             </strong>
 
-                            {{ suivi.get_evolution_display }}
+                            <br>
 
-                        </div>
+                            {{ enfant.date_naissance|date:"d/m/Y" }}
 
-                    {% endif %}
-
-                </div>
+                        </p>
 
 
-                {% if suivi.description %}
+                        <p>
 
-                    <div class="mt-3">
+                            <strong>
+                                <i class="bi bi-droplet me-1"></i>
+                                Groupe sanguin :
+                            </strong>
 
-                        <strong>
-                            Description
-                        </strong>
+                            <br>
 
-                        <p class="text-muted mb-0">
-                            {{ suivi.description }}
+                            {{ enfant.groupe_sanguin|default:"Non renseigné" }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Allergies :
+                            </strong>
+
+                            <br>
+
+                            {{ enfant.allergies|default:"Aucune information" }}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                <i class="bi bi-heart-pulse me-1"></i>
+                                Antécédents :
+                            </strong>
+
+                            <br>
+
+                            {{ enfant.antecedents|default:"Aucun renseignement" }}
+
+                        </p>
+
+
+                        <p class="mb-0">
+
+                            <strong>
+                                <i class="bi bi-info-circle me-1"></i>
+                                Observations :
+                            </strong>
+
+                            <br>
+
+                            {{ enfant.observations|default:"Aucune observation" }}
+
                         </p>
 
                     </div>
 
-                {% endif %}
+                </div>
 
-                {% if suivi.photos.all %}
+            </div>
 
-    <div class="mt-4">
-
-        <h6 class="fw-bold">
-
-            📷 Photos du suivi
-
-        </h6>
+        </div>
 
 
-        <div class="row g-3">
+        <!-- ================================================= -->
+        <!-- FONCTIONNALITÉS -->
+        <!-- ================================================= -->
 
-            {% for photo in suivi.photos.all %}
+        <div class="col-lg-8">
+
+            <div class="row g-3">
+
+
+                <!-- CROISSANCE -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:croissance' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-graph-up-arrow fs-2 text-success"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Croissance
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Suivez le poids, la taille et le périmètre crânien.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                
+
+
+                <!-- TRAITEMENTS -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:traitements' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-capsule fs-2 text-success"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Traitements
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Planifiez les médicaments, les prises et les rappels.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+                <!-- TEMPÉRATURE -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:suivi_temperature' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-thermometer-half fs-2 text-danger"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Température
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Enregistrez et suivez l'évolution de la température
+                                    de votre enfant.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+                <!-- VACCINATIONS -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:vaccination' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-shield-check fs-2 text-warning"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Vaccinations
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Consultez le calendrier vaccinal.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+                <!-- CONSULTATIONS -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:consultation' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-clipboard2-pulse fs-2 text-primary"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Consultations
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Historique médical de l'enfant.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+                <!-- RENDEZ-VOUS -->
+
+                <div class="col-md-6">
+
+                    <a
+                        href="{% url 'sante:rendez_vous' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm h-100">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-calendar-check fs-2 text-danger"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Rendez-vous
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Consultez les rendez-vous médicaux.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+                <!-- BIEN-ÊTRE -->
+
+                <div class="col-12">
+
+                    <a
+                        href="{% url 'sante:bien_etre' enfant.id %}"
+                        class="text-decoration-none"
+                    >
+
+                        <div class="card dossier-card border-0 shadow-sm">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-emoji-smile fs-2 text-success"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    Bien-être
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Suivez l'humeur, le sommeil, l'alimentation,
+                                    l'hydratation et le temps d'écran.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- JOURNAL DES SYMPTÔMES -->
+    <!-- ===================================================== -->
+
+    <div class="card border-0 shadow-sm mt-5">
+
+
+        <!-- HEADER -->
+
+        <div class="card-header bg-success text-white">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-journal-medical me-2"></i>
+
+                    Journal des symptômes
+
+                </h5>
+
+
+                
+
+                <a
+                href="{% url 'sante:creer_mode_garde' enfant.id %}"
+                class="btn btn-success"
+                >
+                <i class="bi bi-shield-check me-2"></i>
+                   Mode garde
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+
+            <!-- ================================================= -->
+            <!-- FILTRE PAR DATE -->
+            <!-- ================================================= -->
+
+            <form method="GET" class="row g-3 mb-4">
+
+                <div class="col-md-5">
+
+                    <label class="form-label fw-semibold">
+                        Du
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date_debut"
+                        class="form-control"
+                        value="{{ date_debut|default:'' }}"
+                    >
+
+                </div>
+
+
+                <div class="col-md-5">
+
+                    <label class="form-label fw-semibold">
+                        Au
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date_fin"
+                        class="form-control"
+                        value="{{ date_fin|default:'' }}"
+                    >
+
+                </div>
+
+
+                <div class="col-md-2 d-flex align-items-end">
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100"
+                    >
+
+                        <i class="bi bi-funnel me-1"></i>
+
+                        Filtrer
+
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- ================================================= -->
+            <!-- LISTE DES SUIVIS -->
+            <!-- ================================================= -->
+
+            {% for suivi in suivis %}
+
+                <div class="border rounded-3 p-4 mb-3">
+
+
+                    <!-- EN-TÊTE DU SUIVI -->
+
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+
+                        <div>
+
+                            <h5 class="fw-bold text-success mb-1">
+
+                                <i class="bi bi-thermometer-half me-2"></i>
+
+                                {{ suivi.symptome }}
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                <i class="bi bi-calendar3 me-1"></i>
+
+                                {{ suivi.date|date:"d/m/Y à H:i" }}
+
+                            </small>
+
+                        </div>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="d-flex gap-2">
+
+                            <a
+                                href="{% url 'sante:modifier_symptome' suivi.id %}"
+                                class="btn btn-outline-success btn-sm"
+                                title="Modifier"
+                            >
+
+                                <i class="bi bi-pencil"></i>
+
+                            </a>
+
+
+                            <a
+                                href="{% url 'sante:supprimer_symptome' suivi.id %}"
+                                class="btn btn-outline-danger btn-sm"
+                                title="Supprimer"
+                            >
+
+                                <i class="bi bi-trash"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <!-- INFORMATIONS PRINCIPALES -->
+
+                    <div class="row g-3">
+
+
+                        <div class="col-md-4">
+
+                            <strong>
+                                Intensité :
+                            </strong>
+
+                            <br>
+
+                            {{ suivi.get_intensite_display }}
+
+                        </div>
+
+
+                        {% if suivi.temperature %}
+
+                            <div class="col-md-4">
+
+                                <strong>
+                                    <i class="bi bi-thermometer-half me-1"></i>
+                                    Température :
+                                </strong>
+
+                                <br>
+
+                                {{ suivi.temperature }} °C
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if suivi.evolution %}
+
+                            <div class="col-md-4">
+
+                                <strong>
+                                    Évolution :
+                                </strong>
+
+                                <br>
+
+                                {{ suivi.get_evolution_display }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    {% if suivi.description %}
+
+                        <div class="mt-4">
+
+                            <strong>
+                                <i class="bi bi-chat-left-text me-1"></i>
+                                Description
+                            </strong>
+
+                            <p class="text-muted mb-0 mt-1">
+
+                                {{ suivi.description }}
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- ================================================= -->
+                    <!-- PHOTOS -->
+                    <!-- ================================================= -->
+            {% with photos=suivi.photos.all %}
+
+
+            {% if photos %}
+
+                 <div class="mt-4">
+
+                    <h6 class="fw-bold mb-3">
+
+                     <i class="bi bi-camera me-1"></i>
+
+                      Photos du suivi
+
+                    </h6>
+
+
+                 <div class="row g-3">
+
+            {% for photo in photos %}
 
                 <div class="col-6 col-md-3">
 
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm overflow-hidden">
 
                         <a
                             href="{{ photo.photo.url }}"
@@ -667,17 +853,14 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
                             <img
                                 src="{{ photo.photo.url }}"
-                                class="card-img-top"
-                                style="
-                                    height: 180px;
-                                    object-fit: cover;
-                                "
+                                class="photo-suivi"
+                                alt="Photo du symptôme"
                             >
 
                         </a>
 
 
-                {% if photo.description %}
+                        {% if photo.description %}
 
                             <div class="card-body p-2">
 
@@ -689,90 +872,134 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
                             </div>
 
-                    {% endif %}
-
-                            </div>
-
-                            </div>
-
-                {% endfor %}
-
-                          </div>
-
-                          </div>
-
-                {% endif %}
-
-
-                {% if suivi.traitement_pris %}
-
-                    <div class="mt-3">
-
-                        <strong>
-                            <i class="bi bi-capsule me-1"></i>
-                            Traitement pris
-                        </strong>
-
-                        <p class="text-muted mb-0">
-                            {{ suivi.traitement_pris }}
-                        </p>
+                        {% endif %}
 
                     </div>
 
-                {% endif %}
+                </div>
 
+            {% endfor %}
 
-                {% if suivi.observations %}
-
-                    <div class="mt-3">
-
-                        <strong>
-                            Observations
-                        </strong>
-
-                        <p class="text-muted mb-0">
-                            {{ suivi.observations }}
-                        </p>
-
-                    </div>
-
-                {% endif %}
-
-            </div>
-
-
-        {% empty %}
-
-            <div class="text-center py-5">
-
-                <i class="bi bi-journal-x fs-1 text-muted"></i>
-
-                <h5 class="mt-3">
-                    Aucun suivi trouvé
-                </h5>
-
-                <p class="text-muted">
-                    Aucun symptôme n'a été enregistré pour cette période.
-                </p>
-
-                <a
-                    href="{% url 'sante:ajouter_symptome' enfant.id %}"
-                    class="btn btn-success rounded-pill"
-                >
-                    <i class="bi bi-plus-circle me-2"></i>
-                    Ajouter le premier suivi
-                </a>
-
-            </div>
-
-        {% endfor %}
+        </div>
 
     </div>
 
-</div>
+{% endif %}
+
+
+{% endwith %}
+
+                    <!-- ================================================= -->
+                    <!-- TRAITEMENT -->
+                    <!-- ================================================= -->
+
+                    {% if suivi.traitement_pris %}
+
+                        <div class="mt-4">
+
+                            <strong>
+
+                                <i class="bi bi-capsule me-1"></i>
+
+                                Traitement pris
+
+                            </strong>
+
+                            <p class="text-muted mb-0 mt-1">
+
+                                {{ suivi.traitement_pris }}
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- ================================================= -->
+                    <!-- OBSERVATIONS -->
+                    <!-- ================================================= -->
+
+                    {% if suivi.observations %}
+
+                        <div class="mt-4">
+
+                            <strong>
+
+                                <i class="bi bi-info-circle me-1"></i>
+
+                                Observations
+
+                            </strong>
+
+                            <p class="text-muted mb-0 mt-1">
+
+                                {{ suivi.observations }}
+
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% empty %}
+
+
+                <!-- ================================================= -->
+                <!-- AUCUN SUIVI -->
+                <!-- ================================================= -->
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-journal-x fs-1 text-muted"></i>
+
+                    <h5 class="mt-3">
+                        Aucun suivi trouvé
+                    </h5>
+
+                    <p class="text-muted">
+
+                        Aucun symptôme n'a été enregistré
+                        pour cette période.
+
+                    </p>
+
+
+                    <a
+                        href="{% url 'sante:ajouter_symptome' enfant.id %}"
+                        class="btn btn-success rounded-pill"
+                    >
+
+                        <i class="bi bi-plus-circle me-2"></i>
+
+                        Ajouter le premier suivi
+
+                    </a>
+                    <a
+                    href="{% url 'sante:ajouter_symptome' enfant.id %}"
+                    class="btn btn-mandarine rounded-pill btn-symptome"
+                >
+
+                    <i class="bi bi-plus-circle me-2"></i>
+
+                    Ajouter un symptôme
+
+                </a>
+
+                </div>
+
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
 
 </div>
-
 
 {% endblock %}
-```
