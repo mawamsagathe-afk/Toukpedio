@@ -8,6 +8,451 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
 <style>
 
+
+/* ==========================================
+   BOUTON GEMINI
+========================================== */
+
+.btn-gemini {
+    position: fixed;
+
+    right: 25px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 58px;
+    height: 58px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #4285f4,
+        #9b51e0
+    );
+
+    color: white;
+
+    font-size: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 9999;
+
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.25);
+
+    transition: all 0.3s ease;
+}
+
+
+/* Effet au survol */
+
+.btn-gemini:hover {
+
+    transform:
+        translateY(-50%)
+        scale(1.08);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.30);
+}
+
+
+/* ==========================================
+   CARTE DE CHAT
+========================================== */
+
+.fenetre-gemini {
+
+    position: fixed;
+
+    right: 95px;
+    top: 50%;
+
+    transform: translateY(-50%)
+               translateX(40px)
+               scale(0.95);
+
+    width: 520px;
+    height: 620px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    z-index: 9998;
+
+    box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.25);
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0.3s ease;
+}
+
+
+/* ==========================================
+   CARTE OUVERTE
+========================================== */
+
+.fenetre-gemini.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+    transform:
+        translateY(-50%)
+        translateX(0)
+        scale(1);
+}
+
+
+/* ==========================================
+   EN-TÊTE
+========================================== */
+
+.gemini-header {
+
+    min-height: 75px;
+
+    padding: 15px 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4285f4,
+            #7b61ff
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+/* Titre */
+
+.gemini-titre {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.gemini-titre > i {
+
+    font-size: 27px;
+}
+
+
+.gemini-titre strong {
+
+    display: block;
+
+    font-size: 17px;
+}
+
+
+.gemini-titre small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    opacity: 0.8;
+
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   BOUTON FERMER
+========================================== */
+
+.btn-fermer-gemini {
+
+    width: 38px;
+    height: 38px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.15);
+
+    color: white;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+
+.btn-fermer-gemini:hover {
+
+    background:
+        rgba(255,255,255,0.30);
+
+    transform: rotate(90deg);
+}
+
+
+/* ==========================================
+   ZONE DES MESSAGES
+========================================== */
+
+.gemini-messages {
+
+    flex: 1;
+
+    padding: 20px;
+
+    overflow-y: auto;
+
+    background: #f7f8fc;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+/* ==========================================
+   MESSAGE IA
+========================================== */
+
+.message-ia {
+
+    align-self: flex-start;
+
+    max-width: 85%;
+
+    padding: 14px 17px;
+
+    background: white;
+
+    color: #333;
+
+    border-radius:
+        5px
+        18px
+        18px
+        18px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+.message-ia strong {
+
+    color: #635bff;
+}
+
+
+/* ==========================================
+   MESSAGE PARENT
+========================================== */
+
+.message-parent {
+
+    align-self: flex-end;
+
+    max-width: 80%;
+
+    padding: 12px 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4285f4,
+            #6366f1
+        );
+
+    color: white;
+
+    border-radius:
+        18px
+        5px
+        18px
+        18px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.10);
+}
+
+
+.message-parent strong {
+
+    display: block;
+
+    font-size: 12px;
+
+    opacity: 0.8;
+
+    margin-bottom: 4px;
+}
+
+
+/* ==========================================
+   PIED DE LA CARTE
+========================================== */
+
+.gemini-footer {
+
+    padding: 14px;
+
+    background: white;
+
+    border-top: 1px solid #eee;
+}
+
+
+/* Zone input */
+
+.gemini-input {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    background: #f1f3f7;
+
+    border-radius: 30px;
+
+    padding: 5px 6px 5px 16px;
+}
+
+
+.gemini-input input {
+
+    flex: 1;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    font-size: 14px;
+
+    min-width: 0;
+}
+
+
+.gemini-input button {
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4285f4,
+            #7b61ff
+        );
+
+    color: white;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+
+.gemini-input button:hover {
+
+    transform: scale(1.08);
+}
+
+
+/* ==========================================
+   RESPONSIVE MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .btn-gemini {
+
+        right: 15px;
+
+        width: 52px;
+        height: 52px;
+
+    }
+
+
+    .fenetre-gemini {
+
+        right: 10px;
+        left: 10px;
+
+        width: auto;
+
+        height: 70vh;
+
+        border-radius: 18px;
+    }
+
+}
+
+
+
     /* ==========================================
        BOUTON AJOUTER UN SYMPTÔME
     ========================================== */
@@ -83,6 +528,689 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
     .photo-suivi:hover {
         transform: scale(1.03);
     }
+
+    /* ===================================================== */
+    /* BOUTON FLOTTANT ASSISTANT IA */
+    /* ===================================================== */
+
+    .btn-gemini {
+
+    
+        height: 65px;
+
+        border: none;
+
+        border-radius: 50%;
+
+        background: linear-gradient(
+            135deg,
+            #198754,
+            #20c997
+        );
+
+        color: white;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 1.7rem;
+
+        cursor: pointer;
+
+        z-index: 9999;
+
+        box-shadow:
+            0 6px 20px rgba(0, 0, 0, 0.25);
+
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+        
+        animation: geminiPulse 2.5s ease-in-out infinite;
+    }
+
+
+    /* ===================================================== */
+    /* SURVOL */
+    /* ===================================================== */
+
+    .btn-gemini:hover {
+
+        transform: scale(1.12) rotate(5deg);
+
+        box-shadow:
+            0 10px 30px rgba(25, 135, 84, 0.45);
+
+        animation-play-state: paused;
+    }
+
+
+    /* ===================================================== */
+    /* CLIC */
+    /* ===================================================== */
+
+    .btn-gemini:active {
+
+        transform: scale(0.92);
+    }
+
+
+    /* ===================================================== */
+    /* ICÔNE */
+    /* ===================================================== */
+
+    .btn-gemini i {
+
+        animation: geminiStars 2s ease-in-out infinite;
+    }
+
+
+    /* ===================================================== */
+    /* ANIMATION DU BOUTON */
+    /* ===================================================== */
+
+    @keyframes geminiPulse {
+
+        0% {
+
+            transform: scale(1);
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        50% {
+
+            transform: scale(1.06);
+
+            box-shadow:
+                0 10px 30px rgba(32, 201, 151, 0.45);
+        }
+
+        100% {
+
+            transform: scale(1);
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+    }
+
+
+    /* ===================================================== */
+    /* ANIMATION DE L'ÉTOILE */
+    /* ===================================================== */
+
+    @keyframes geminiStars {
+
+        0% {
+
+            transform: rotate(0deg) scale(1);
+        }
+
+        50% {
+
+            transform: rotate(15deg) scale(1.15);
+        }
+
+        100% {
+
+            transform: rotate(0deg) scale(1);
+        }
+    }
+
+
+    /* ===================================================== */
+    /* PETIT INDICATEUR */
+    /* ===================================================== */
+
+    .btn-gemini::after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 12px;
+
+        height: 12px;
+
+        background: #ffc107;
+
+        border: 2px solid white;
+
+        border-radius: 50%;
+
+        right: 2px;
+
+        top: 2px;
+
+        animation: geminiNotification 1.8s ease-in-out infinite;
+    }
+
+
+    @keyframes geminiNotification {
+
+        0%,
+        100% {
+
+            transform: scale(1);
+
+            opacity: 1;
+        }
+
+        50% {
+
+            transform: scale(1.3);
+
+            opacity: 0.65;
+        }
+    }
+
+
+    /* ===================================================== */
+    /* MOBILE */
+    /* ===================================================== */
+
+    @media (max-width: 576px) {
+
+        .btn-gemini {
+
+            width: 58px;
+
+            height: 58px;
+
+            right: 15px;
+
+            bottom: 15px;
+
+            font-size: 1.5rem;
+        }
+    }
+
+
+/* ==========================================
+   CONTENEUR DES SYMPTÔMES
+========================================== */
+
+.symptomes-liste {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+    width: 100%;
+
+}
+
+
+/* ==========================================
+   CARTE SYMPTÔME
+========================================== */
+
+.symptome-card {
+
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.07);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+}
+
+
+.symptome-card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.11);
+
+}
+
+
+/* ==========================================
+   EN-TÊTE
+========================================== */
+
+.symptome-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #f0fff4,
+        #ffffff
+    );
+
+    border-bottom: 1px solid #edf0ed;
+
+}
+
+
+/* ==========================================
+   TITRE
+========================================== */
+
+.symptome-titre {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+}
+
+
+.symptome-icon {
+
+    width: 48px;
+
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background: #e8f7ee;
+
+    color: #198754;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+}
+
+
+.symptome-titre h5 {
+
+    margin: 0;
+
+    color: #198754;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+}
+
+
+.symptome-titre small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #6c757d;
+
+    font-size: 13px;
+
+}
+
+
+/* ==========================================
+   BOUTONS ACTIONS
+========================================== */
+
+.symptome-actions {
+
+    display: flex;
+
+    gap: 8px;
+
+}
+
+
+.btn-action {
+
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+
+}
+
+
+.btn-action.modifier {
+
+    color: #198754;
+
+    background: #eaf7ef;
+
+}
+
+
+.btn-action.modifier:hover {
+
+    background: #198754;
+
+    color: white;
+
+}
+
+
+.btn-action.supprimer {
+
+    color: #dc3545;
+
+    background: #fff0f1;
+
+}
+
+
+.btn-action.supprimer:hover {
+
+    background: #dc3545;
+
+    color: white;
+
+}
+
+
+/* ==========================================
+   CORPS DE LA CARTE
+========================================== */
+
+.symptome-card-body {
+
+    padding: 20px;
+
+}
+
+
+/* ==========================================
+   INFORMATIONS
+========================================== */
+
+.symptome-infos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.info-item {
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    background: #f8f9fa;
+
+    border: 1px solid #edf0f2;
+
+}
+
+
+.info-label {
+
+    display: block;
+
+    color: #6c757d;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+
+}
+
+
+.info-label i {
+
+    margin-right: 5px;
+
+}
+
+
+.info-value {
+
+    font-weight: 600;
+
+    color: #343a40;
+
+}
+
+
+.info-value.temperature {
+
+    color: #dc3545;
+
+}
+
+
+/* ==========================================
+   SECTIONS
+========================================== */
+
+.symptome-section {
+
+    margin-top: 18px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #eeeeee;
+
+}
+
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #198754;
+
+    font-weight: 700;
+
+    margin-bottom: 7px;
+
+}
+
+
+.symptome-section p {
+
+    margin: 0;
+
+    color: #6c757d;
+
+    line-height: 1.6;
+
+}
+
+
+/* ==========================================
+   PHOTOS
+========================================== */
+
+.photos-symptome {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+}
+
+
+.photo-item {
+
+    display: block;
+
+    width: 110px;
+
+    height: 110px;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.photo-item img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition: transform 0.3s ease;
+
+}
+
+
+.photo-item:hover img {
+
+    transform: scale(1.08);
+
+}
+
+
+/* ==========================================
+   AUCUN SYMPTÔME
+========================================== */
+
+.aucun-symptome {
+
+    text-align: center;
+
+    padding: 50px 20px;
+
+    border: 2px dashed #dee2e6;
+
+    border-radius: 18px;
+
+    background: #fafafa;
+
+}
+
+
+.aucun-symptome > i {
+
+    font-size: 50px;
+
+    color: #adb5bd;
+
+}
+
+
+.aucun-symptome h5 {
+
+    margin-top: 15px;
+
+    font-weight: 700;
+
+}
+
+
+.aucun-symptome p {
+
+    color: #6c757d;
+
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .symptome-card-header {
+
+        align-items: flex-start;
+
+    }
+
+
+    .symptome-infos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .symptome-card-header {
+
+        flex-direction: column;
+
+    }
+
+
+    .symptome-actions {
+
+        width: 100%;
+
+        justify-content: flex-end;
+
+    }
+
+
+    .symptome-card-body {
+
+        padding: 15px;
+
+    }
+
+}
+
+
 
 </style>
 
@@ -481,7 +1609,7 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
                 <div class="col-md-6">
 
                     <a
-                        href="{% url 'sante:consultation' enfant.id %}"
+                        href="{% url 'sante:consultations' enfant.id %}"
                         class="text-decoration-none"
                     >
 
@@ -614,6 +1742,7 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
             </div>
 
         </div>
+        
 
 
         <div class="card-body p-4">
@@ -674,332 +1803,550 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
             </form>
 
-
-            <!-- ================================================= -->
-            <!-- LISTE DES SUIVIS -->
-            <!-- ================================================= -->
-
-            {% for suivi in suivis %}
-
-                <div class="border rounded-3 p-4 mb-3">
+            </form>
 
 
-                    <!-- EN-TÊTE DU SUIVI -->
+<!-- ========================================== -->
+<!-- BOUTON AJOUTER UN SYMPTÔME -->
+<!-- ========================================== -->
 
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+<div class="d-flex justify-content-end mb-4">
 
-                        <div>
+    <a
+        href="{% url 'sante:ajouter_symptome' enfant.id %}"
+        class="btn btn-mandarine rounded-pill px-4 btn-symptome"
+    >
+        <i class="bi bi-plus-circle me-2"></i>
+        Ajouter un symptôme
+    </a>
 
-                            <h5 class="fw-bold text-success mb-1">
-
-                                <i class="bi bi-thermometer-half me-2"></i>
-
-                                {{ suivi.symptome }}
-
-                            </h5>
-
-                            <small class="text-muted">
-
-                                <i class="bi bi-calendar3 me-1"></i>
-
-                                {{ suivi.date|date:"d/m/Y à H:i" }}
-
-                            </small>
-
-                        </div>
+</div>
 
 
-                        <!-- ACTIONS -->
+    <!-- ================================================= -->
+    <!-- LISTE DES SYMPTÔMES EN CARTES VERTICALES -->
+    <!-- ================================================= -->
 
-                        <div class="d-flex gap-2">
+<div class="symptomes-liste ">
 
-                            <a
-                                href="{% url 'sante:modifier_symptome' suivi.id %}"
-                                class="btn btn-outline-success btn-sm"
-                                title="Modifier"
-                            >
+    {% for suivi in symptomes %}
 
-                                <i class="bi bi-pencil"></i>
+        <div class="symptome-card ">
 
-                            </a>
+            <div class="symptome-card-header">
 
+                <div class="symptome-titre">
 
-                            <a
-                                href="{% url 'sante:supprimer_symptome' suivi.id %}"
-                                class="btn btn-outline-danger btn-sm"
-                                title="Supprimer"
-                            >
-
-                                <i class="bi bi-trash"></i>
-
-                            </a>
-
-                        </div>
-
+                    <div class="symptome-icon">
+                        <i class="bi bi-thermometer-half"></i>
                     </div>
 
+                    <div>
 
-                    <hr>
+                        <h5>
+                            {{ suivi.symptome }}
+                        </h5>
 
-
-                    <!-- INFORMATIONS PRINCIPALES -->
-
-                    <div class="row g-3">
-
-
-                        <div class="col-md-4">
-
-                            <strong>
-                                Intensité :
-                            </strong>
-
-                            <br>
-
-                            {{ suivi.get_intensite_display }}
-
-                        </div>
-
-
-                        {% if suivi.temperature %}
-
-                            <div class="col-md-4">
-
-                                <strong>
-                                    <i class="bi bi-thermometer-half me-1"></i>
-                                    Température :
-                                </strong>
-
-                                <br>
-
-                                {{ suivi.temperature }} °C
-
-                            </div>
-
-                        {% endif %}
-
-
-                        {% if suivi.evolution %}
-
-                            <div class="col-md-4">
-
-                                <strong>
-                                    Évolution :
-                                </strong>
-
-                                <br>
-
-                                {{ suivi.get_evolution_display }}
-
-                            </div>
-
-                        {% endif %}
-
-                    </div>
-
-
-                    <!-- DESCRIPTION -->
-
-                    {% if suivi.description %}
-
-                        <div class="mt-4">
-
-                            <strong>
-                                <i class="bi bi-chat-left-text me-1"></i>
-                                Description
-                            </strong>
-
-                            <p class="text-muted mb-0 mt-1">
-
-                                {{ suivi.description }}
-
-                            </p>
-
-                        </div>
-
-                    {% endif %}
-
-
-                    <!-- ================================================= -->
-                    <!-- PHOTOS -->
-                    <!-- ================================================= -->
-            {% with photos=suivi.photos.all %}
-
-
-            {% if photos %}
-
-                 <div class="mt-4">
-
-                    <h6 class="fw-bold mb-3">
-
-                     <i class="bi bi-camera me-1"></i>
-
-                      Photos du suivi
-
-                    </h6>
-
-
-                 <div class="row g-3">
-
-            {% for photo in photos %}
-
-                <div class="col-6 col-md-3">
-
-                    <div class="card border-0 shadow-sm overflow-hidden">
-
-                        <a
-                            href="{{ photo.photo.url }}"
-                            target="_blank"
-                        >
-
-                            <img
-                                src="{{ photo.photo.url }}"
-                                class="photo-suivi"
-                                alt="Photo du symptôme"
-                            >
-
-                        </a>
-
-
-                        {% if photo.description %}
-
-                            <div class="card-body p-2">
-
-                                <small class="text-muted">
-
-                                    {{ photo.description }}
-
-                                </small>
-
-                            </div>
-
-                        {% endif %}
+                        <small>
+                           <i class="bi bi-calendar3 me-1"></i>
+                           {{ suivi.date|date:"d/m/Y" }}
+                        </small>
 
                     </div>
 
                 </div>
 
-            {% endfor %}
-
-        </div>
-
-    </div>
-
-{% endif %}
-
-
-{% endwith %}
-
-                    <!-- ================================================= -->
-                    <!-- TRAITEMENT -->
-                    <!-- ================================================= -->
-
-                    {% if suivi.traitement_pris %}
-
-                        <div class="mt-4">
-
-                            <strong>
-
-                                <i class="bi bi-capsule me-1"></i>
-
-                                Traitement pris
-
-                            </strong>
-
-                            <p class="text-muted mb-0 mt-1">
-
-                                {{ suivi.traitement_pris }}
-
-                            </p>
-
-                        </div>
-
-                    {% endif %}
-
-
-                    <!-- ================================================= -->
-                    <!-- OBSERVATIONS -->
-                    <!-- ================================================= -->
-
-                    {% if suivi.observations %}
-
-                        <div class="mt-4">
-
-                            <strong>
-
-                                <i class="bi bi-info-circle me-1"></i>
-
-                                Observations
-
-                            </strong>
-
-                            <p class="text-muted mb-0 mt-1">
-
-                                {{ suivi.observations }}
-
-                            </p>
-
-                        </div>
-
-                    {% endif %}
-
-
-                </div>
-
-
-            {% empty %}
-
-
-                <!-- ================================================= -->
-                <!-- AUCUN SUIVI -->
-                <!-- ================================================= -->
-
-                <div class="text-center py-5">
-
-                    <i class="bi bi-journal-x fs-1 text-muted"></i>
-
-                    <h5 class="mt-3">
-                        Aucun suivi trouvé
-                    </h5>
-
-                    <p class="text-muted">
-
-                        Aucun symptôme n'a été enregistré
-                        pour cette période.
-
-                    </p>
-
+                <div class="symptome-actions">
 
                     <a
-                        href="{% url 'sante:ajouter_symptome' enfant.id %}"
-                        class="btn btn-success rounded-pill"
-                    >
+                        href="{% url 'sante:modifier_symptome' suivi.id %}"
+                        class="btn-action modifier"
+                        title="Modifier">
 
-                        <i class="bi bi-plus-circle me-2"></i>
-
-                        Ajouter le premier suivi
+                        <i class="bi bi-pencil"></i>
 
                     </a>
+
                     <a
-                    href="{% url 'sante:ajouter_symptome' enfant.id %}"
-                    class="btn btn-mandarine rounded-pill btn-symptome"
-                >
+                        href="{% url 'sante:supprimer_symptome' suivi.id %}"
+                        class="btn-action supprimer"
+                        title="Supprimer"
+                        onclick="return confirm('Voulez-vous vraiment supprimer ce symptôme ?');">
 
-                    <i class="bi bi-plus-circle me-2"></i>
+                        <i class="bi bi-trash"></i>
 
-                    Ajouter un symptôme
-
-                </a>
+                    </a>
 
                 </div>
 
+            </div>
 
-            {% endfor %}
+            <div class="symptome-card-body ">
+
+                <div class="symptome-infos">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            <i class="bi bi-speedometer2"></i>
+                            Intensité
+                        </span>
+
+                        <span class="info-value">
+                            {{ suivi.get_intensite_display }}
+                        </span>
+
+                    </div>
+
+                    {% if suivi.temperature %}
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            <i class="bi bi-thermometer-half"></i>
+                            Température
+                        </span>
+
+                        <span class="info-value temperature">
+                            {{ suivi.temperature }} °C
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                    {% if suivi.evolution %}
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            <i class="bi bi-graph-up"></i>
+                            Évolution
+                        </span>
+
+                        <span class="info-value">
+                            {{ suivi.get_evolution_display }}
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% if suivi.description %}
+
+                <div class="symptome-section">
+
+                    <div class="section-title">
+                        <i class="bi bi-chat-left-text"></i>
+                        Description
+                    </div>
+
+                    <p>
+                        {{ suivi.description }}
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+                {% with photos=suivi.photos.all %}
+
+                    {% if photos %}
+
+                    <div class="symptome-section">
+
+                        <div class="section-title">
+                            <i class="bi bi-camera"></i>
+                            Photos du suivi
+                        </div>
+
+                        <div class="photos-symptome">
+
+                            {% for photo in photos %}
+
+                                <a
+                                    href="{{ photo.photo.url }}"
+                                    target="_blank"
+                                    class="photo-item">
+
+                                    <img
+                                        src="{{ photo.photo.url }}"
+                                        alt="Photo du symptôme">
+
+                                </a>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                {% if suivi.traitement_pris %}
+
+                <div class="symptome-section">
+
+                    <div class="section-title">
+                        <i class="bi bi-capsule"></i>
+                        Traitement pris
+                    </div>
+
+                    <p>
+                        {{ suivi.traitement_pris }}
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if suivi.observations %}
+
+                <div class="symptome-section">
+
+                    <div class="section-title">
+                        <i class="bi bi-info-circle"></i>
+                        Observations
+                    </div>
+
+                    <p>
+                        {{ suivi.observations }}
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </div>
 
         </div>
+
+
+    {% empty %}
+
+        <div class="aucun-symptome">
+
+            <i class="bi bi-journal-x"></i>
+
+            <h5>
+                Aucun symptôme enregistré
+            </h5>
+
+            <p>
+                Aucun symptôme n'a été enregistré
+                pour cette période.
+            </p>
+
+            
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
 
     </div>
 
 
 </div>
+
+
+<!-- ========================================== -->
+<!-- BOUTON GEMINI -->
+<!-- ========================================== -->
+
+<button
+    type="button"
+    id="btnGemini"
+    class="btn-gemini"
+    title="Démarrer une discussion avec l'IA"
+    aria-label="Démarrer une discussion avec l'IA">
+
+    <i class="bi bi-stars"></i>
+
+</button>
+
+
+<!-- ========================================== -->
+<!-- CARTE DE DISCUSSION GEMINI -->
+<!-- ========================================== -->
+
+<div id="fenetreGemini" class="fenetre-gemini">
+
+    <!-- EN-TÊTE -->
+    <div class="gemini-header">
+
+        <div class="gemini-titre">
+            <i class="bi bi-stars"></i>
+
+            <div>
+                <strong>Assistant IA</strong>
+                <small>TOUKPEDIO</small>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            id="fermerGemini"
+            class="btn-fermer-gemini"
+            aria-label="Fermer">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- ZONE DES MESSAGES -->
+    <div id="messagesGemini" class="gemini-messages">
+
+        <div class="message-ia">
+
+            <strong>✨ Assistant IA</strong>
+
+            <p class="mb-0 mt-2">
+                Bonjour 👋
+            </p>
+
+            <p class="mb-0">
+                Je suis votre assistant TOUKPEDIO.
+                Comment puis-je vous aider concernant
+                <strong>{{ enfant.prenom }}</strong> ?
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ZONE DE SAISIE -->
+    <div class="gemini-footer">
+
+        <form id="formGemini">
+
+            {% csrf_token %}
+
+            <div class="gemini-input">
+
+                <input
+                    type="text"
+                    id="messageGemini"
+                    placeholder="Écrire votre question..."
+                    autocomplete="off"
+                >
+
+                <button type="submit">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const btnGemini =
+        document.getElementById("btnGemini");
+
+    const fenetreGemini =
+        document.getElementById("fenetreGemini");
+
+    const fermerGemini =
+        document.getElementById("fermerGemini");
+
+    const formGemini =
+        document.getElementById("formGemini");
+
+    const inputGemini =
+        document.getElementById("messageGemini");
+
+    const boutonGemini =
+        formGemini.querySelector("button[type='submit']");
+
+    const csrfToken =
+        formGemini.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    const messagesGemini =
+        document.getElementById("messagesGemini");
+
+
+    /* ==========================================
+       OUVRIR LA CARTE
+    ========================================== */
+
+    btnGemini.addEventListener("click", function () {
+
+        fenetreGemini.classList.add("active");
+
+        setTimeout(function () {
+
+            inputGemini.focus();
+
+        }, 300);
+
+    });
+
+
+    /* ==========================================
+       FERMER LA CARTE
+    ========================================== */
+
+    fermerGemini.addEventListener("click", function () {
+
+        fenetreGemini.classList.remove("active");
+
+    });
+
+
+    /* ==========================================
+       ENVOYER UN MESSAGE
+    ========================================== */
+
+    formGemini.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const message =
+            inputGemini.value.trim();
+
+
+        if (message === "") {
+
+            return;
+
+        }
+
+
+        /* ------------------------------
+           MESSAGE DU PARENT
+        ------------------------------ */
+
+        const messageParent =
+            document.createElement("div");
+
+        messageParent.className =
+            "message-parent";
+
+        const auteurParent = document.createElement("strong");
+        auteurParent.textContent = "Vous";
+
+        const texteParent = document.createElement("div");
+        texteParent.textContent = message;
+
+        messageParent.append(auteurParent, texteParent);
+
+
+        messagesGemini.appendChild(
+            messageParent
+        );
+
+
+        /* Vider le champ */
+
+        inputGemini.value = "";
+
+
+        /* ------------------------------
+           RÉPONSE TEMPORAIRE
+        ------------------------------ */
+
+        const messageIA =
+            document.createElement("div");
+
+        messageIA.className =
+            "message-ia";
+
+        messageIA.innerHTML = `
+            <strong>✨ Assistant IA</strong>
+
+            <p class="mb-0 mt-2 text-muted">
+                Je prépare votre réponse...
+            </p>
+        `;
+
+
+        messagesGemini.appendChild(
+            messageIA
+        );
+
+        inputGemini.disabled = true;
+        boutonGemini.disabled = true;
+
+
+        /* Scroll automatique */
+
+        messagesGemini.scrollTop =
+            messagesGemini.scrollHeight;
+
+        try {
+            const reponse = await fetch(
+                "{% url 'sante:assistant_gemini' %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ message })
+                }
+            );
+
+            const donnees = await reponse.json();
+            messageIA.querySelector("p").textContent =
+                donnees.reply || donnees.error || "Une erreur est survenue.";
+        } catch (error) {
+            messageIA.querySelector("p").textContent =
+                "Impossible de contacter Gemini.";
+        } finally {
+            inputGemini.disabled = false;
+            boutonGemini.disabled = false;
+            inputGemini.focus();
+            messagesGemini.scrollTop = messagesGemini.scrollHeight;
+        }
+
+    });
+
+
+    /* ==========================================
+       TOUCHE ÉCHAP POUR FERMER
+    ========================================== */
+
+    document.addEventListener("keydown", function(event) {
+
+        if (
+            event.key === "Escape" &&
+            fenetreGemini.classList.contains("active")
+        ) {
+
+            fenetreGemini.classList.remove("active");
+
+        }
+
+    });
+
+});
+
+</script>
+
+
+
+
 
 {% endblock %}

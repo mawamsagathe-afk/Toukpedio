@@ -34,7 +34,7 @@
      NAVBAR ADMIN
 ===================================================== -->
 
-<nav class="navbar navbar-dark bg-dark shadow">
+<nav class="navbar navbar-dark bg-dark sticky-top shadow">
 
     <div class="container-fluid">
 
@@ -78,399 +78,296 @@
 
 </nav>
 
+<div class="container py-5">
 
-<!-- =====================================================
-     CONTENU
-===================================================== -->
+    <!-- EN-TÊTE -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
 
-<div class="container-fluid py-4">
+        <div>
+            <h1 class="fw-bold text-success">
+                Administration TOUKPEDIO
+            </h1>
 
-    <div class="mb-4">
-
-        <h2 class="fw-bold">
-
-            Tableau de bord administrateur
-
-        </h2>
-
-        <p class="text-muted">
-
-            Gestion générale de la plateforme Toukpedio.
-
-        </p>
+            <p class="text-muted mb-0">
+                Gestion générale de la plateforme
+            </p>
+        </div>
 
     </div>
 
 
-    <!-- =================================================
-         STATISTIQUES
-    ================================================== -->
-
-    <div class="row g-4">
-
+    <!-- STATISTIQUES -->
+    <div class="row g-4 mb-5">
 
         <!-- PARENTS -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
 
-        <div class="col-md-6 col-xl-3">
+                    <div class="fs-1">👨‍👩‍👧</div>
 
-            <div class="card border-0 shadow-sm h-100">
+                    <h6 class="text-muted">
+                        Parents
+                    </h6>
 
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <p class="text-muted mb-1">
-
-                                Parents
-
-                            </p>
-
-                            <h2 class="fw-bold">
-
-                                {{ nombre_parents }}
-
-                            </h2>
-
-                        </div>
-
-                        <div class="fs-1 text-primary">
-
-                            <i class="bi bi-people"></i>
-
-                        </div>
-
-                    </div>
+                    <h2 class="fw-bold text-success">
+                        {{ nombre_parents }}
+                    </h2>
 
                 </div>
-
             </div>
-
         </div>
 
 
         <!-- ENFANTS -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
 
-        <div class="col-md-6 col-xl-3">
+                    <div class="fs-1">👶</div>
 
-            <div class="card border-0 shadow-sm h-100">
+                    <h6 class="text-muted">
+                        Enfants
+                    </h6>
 
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <p class="text-muted mb-1">
-
-                                Enfants
-
-                            </p>
-
-                            <h2 class="fw-bold">
-
-                                {{ nombre_enfants }}
-
-                            </h2>
-
-                        </div>
-
-                        <div class="fs-1 text-success">
-
-                            <i class="bi bi-person-hearts"></i>
-
-                        </div>
-
-                    </div>
+                    <h2 class="fw-bold text-primary">
+                        {{ nombre_enfants }}
+                    </h2>
 
                 </div>
-
             </div>
+        </div>
 
+
+        <!-- VACCINATIONS -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+
+                    <div class="fs-1">💉</div>
+
+                    <h6 class="text-muted">
+                        Vaccinations
+                    </h6>
+
+                    <h2 class="fw-bold text-warning">
+                        {{ nombre_vaccinations }}
+                    </h2>
+
+                </div>
+            </div>
         </div>
 
 
         <!-- CONSULTATIONS -->
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
 
-        <div class="col-md-6 col-xl-3">
+                    <div class="fs-1">🩺</div>
 
-            <div class="card border-0 shadow-sm h-100">
+                    <h6 class="text-muted">
+                        Consultations
+                    </h6>
 
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <p class="text-muted mb-1">
-
-                                Consultations
-
-                            </p>
-
-                            <h2 class="fw-bold">
-
-                                {{ nombre_consultations }}
-
-                            </h2>
-
-                        </div>
-
-                        <div class="fs-1 text-warning">
-
-                            <i class="bi bi-heart-pulse"></i>
-
-                        </div>
-
-                    </div>
+                    <h2 class="fw-bold text-danger">
+                        {{ nombre_consultations }}
+                    </h2>
 
                 </div>
-
             </div>
-
-        </div>
-
-
-        <!-- RENDEZ-VOUS -->
-
-        <div class="col-md-6 col-xl-3">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-
-                            <p class="text-muted mb-1">
-
-                                Rendez-vous
-
-                            </p>
-
-                            <h2 class="fw-bold">
-
-                                {{ nombre_rendez_vous }}
-
-                            </h2>
-
-                        </div>
-
-                        <div class="fs-1 text-danger">
-
-                            <i class="bi bi-calendar-check"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
 
     </div>
 
 
-    <!-- =================================================
-         INFORMATIONS
-    ================================================== -->
+    <!-- GESTION -->
+    <div class="card shadow-sm border-0 mb-5">
 
-    <div class="row g-4 mt-2">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                ⚙️ Gestion de la plateforme
+            </h5>
+        </div>
 
+        <div class="row g-3">
 
-        <!-- ENFANTS RÉCENTS -->
+    <div class="col-md-6">
+        {% if dernier_enfant %}
+<a href="{% url 'sante:administration_enfant_detail' dernier_enfant.id %}"
+   class="btn btn-outline-dark w-100 py-3">
+    📊 Détail du dernier enfant
+</a>
+{% else %}
+<a href="{% url 'sante:admin_enfants' %}"
+   class="btn btn-outline-dark w-100 py-3">
+    📊 Voir les enfants
+</a>
+{% endif %}
+    </div>
 
-        <div class="col-lg-6">
+    <div class="col-md-6">
+        <a href="{% url 'sante:accueil' %}"
+           class="btn btn-outline-success w-100 py-3">
+            🏠 Retour à l'accueil
+        </a>
+    </div>
 
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-header bg-white">
-
-                    <h5 class="mb-0">
-
-                        <i class="bi bi-person-hearts me-2"></i>
-
-                        Derniers enfants inscrits
-
-                    </h5>
-
-                </div>
-
-
-                <div class="card-body p-0">
-
-                    <div class="table-responsive">
-
-                        <table class="table table-hover mb-0">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Enfant</th>
-
-                                    <th>Parent</th>
-
-                                    <th>Date</th>
-
-                                </tr>
-
-                            </thead>
+</div>
+    </div>
 
 
-                            <tbody>
+    <!-- =====================================================
+     ENFANTS RÉCENTS
+===================================================== -->
 
-                                {% for enfant in enfants_recents %}
+<div class="card shadow-sm border-0 mb-5">
 
-                                <tr>
+    <div class="card-header bg-light">
+        <h5 class="mb-0 fw-bold">
+            👶 Enfants récemment inscrits
+        </h5>
+    </div>
 
-                                    <td>
+    <div class="card-body p-0">
 
-                                        {{ enfant.prenom }}
-                                        {{ enfant.nom }}
+        {% if enfants_recents %}
 
-                                    </td>
+        <div class="table-responsive">
 
-                                    <td>
+            <table class="table table-hover align-middle mb-0">
 
-                                        {{ enfant.parent.username }}
+                <thead>
+                    <tr>
+                        <th>Enfant</th>
+                        <th>Parent</th>
+                        <th>Date d'inscription</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
 
-                                    </td>
+                <tbody>
 
-                                    <td>
+                {% for enfant in enfants_recents %}
 
-                                        {{ enfant.date_creation|date:"d/m/Y" }}
+                    <tr>
 
-                                    </td>
+                        <td>
+                            <strong>
+                                {{ enfant.prenom }}
+                                {{ enfant.nom }}
+                            </strong>
+                        </td>
 
-                                </tr>
+                        <td>
+                            {{ enfant.parent.username }}
+                        </td>
 
-                                {% empty %}
+                        <td>
+                            {{ enfant.date_creation|date:"d/m/Y" }}
+                        </td>
 
-                                <tr>
+                        <td class="text-center">
 
-                                    <td
-                                        colspan="3"
-                                        class="text-center text-muted"
-                                    >
+                            <a
+                                href="{% url 'sante:administration_enfant_detail' enfant.id %}"
+                                class="btn btn-sm btn-outline-primary me-1"
+                            >
+                                <i class="bi bi-eye"></i>
+                                Voir
+                            </a>
 
-                                        Aucun enfant.
+                            <a
+                                href="{% url 'sante:administration_modifier_enfant' enfant.id %}"
+                                class="btn btn-sm btn-outline-success"
+                            >
+                                <i class="bi bi-pencil-square"></i>
+                                Modifier
+                            </a>
 
-                                    </td>
+                        </td>
 
-                                </tr>
+                    </tr>
 
-                                {% endfor %}
+                {% endfor %}
 
-                            </tbody>
+                </tbody>
 
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
+            </table>
 
         </div>
 
+        {% else %}
 
-        <!-- RENDEZ-VOUS -->
+            <div class="p-4 text-center text-muted">
+                Aucun enfant enregistré.
+            </div>
 
-        <div class="col-lg-6">
+        {% endif %}
 
-            <div class="card border-0 shadow-sm">
+    </div>
 
-                <div class="card-header bg-white">
+</div>
+    <!-- RENDEZ-VOUS RÉCENTS -->
+    <div class="card shadow-sm border-0">
 
-                    <h5 class="mb-0">
+        <div class="card-header bg-light">
+            <h5 class="mb-0 fw-bold">
+                📅 Rendez-vous récents
+            </h5>
+        </div>
 
-                        <i class="bi bi-calendar-check me-2"></i>
+        <div class="card-body p-0">
 
-                        Derniers rendez-vous
+            {% if rendez_vous_recents %}
 
-                    </h5>
+            <div class="table-responsive">
 
-                </div>
+                <table class="table table-hover mb-0">
 
+                    <thead>
+                        <tr>
+                            <th>Enfant</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
 
-                <div class="card-body p-0">
+                    <tbody>
 
-                    <div class="table-responsive">
+                    {% for rdv in rendez_vous_recents %}
 
-                        <table class="table table-hover mb-0">
+                        <tr>
 
-                            <thead>
+                            <td>
+                                {{ rdv.enfant }}
+                            </td>
 
-                                <tr>
+                            <td>
+                                {{ rdv.date_rendez_vous|date:"d/m/Y" }}
+                            </td>
 
-                                    <th>Enfant</th>
+                            <td>
+                                {{ rdv.get_statut_display }}
+                            </td>
 
-                                    <th>Date</th>
+                        </tr>
 
-                                    <th>Statut</th>
+                    {% endfor %}
 
-                                </tr>
+                    </tbody>
 
-                            </thead>
-
-
-                            <tbody>
-
-                                {% for rdv in rendez_vous_recents %}
-
-                                <tr>
-
-                                    <td>
-
-                                        {{ rdv.enfant }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ rdv.date_rendez_vous|date:"d/m/Y" }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ rdv.get_statut_display }}
-
-                                    </td>
-
-                                </tr>
-
-                                {% empty %}
-
-                                <tr>
-
-                                    <td
-                                        colspan="3"
-                                        class="text-center text-muted"
-                                    >
-
-                                        Aucun rendez-vous.
-
-                                    </td>
-
-                                </tr>
-
-                                {% endfor %}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
+                </table>
 
             </div>
+
+            {% else %}
+
+                <div class="p-4 text-center text-muted">
+                    Aucun rendez-vous enregistré.
+                </div>
+
+            {% endif %}
 
         </div>
 
@@ -478,7 +375,82 @@
 
 </div>
 
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer class="bg-dark text-white py-4">
+
+    <div class="container">
+
+        <div class="row">
+
+
+            <!-- Présentation -->
+
+            <div class="col-md-6">
+
+                <h5>
+
+                    <i class="bi bi-heart-pulse-fill me-2"></i>
+
+                    Toukpedio
+
+                </h5>
+
+                <p class="text-white-50 mb-0">
+
+                    Plateforme de suivi de la santé et du bien-être
+                    des enfants.
+
+                </p>
+
+            </div>
+
+
+            <!-- Copyright -->
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                <p class="text-white-50 mb-0">
+
+                    &copy; {% now "Y" %} Toukpedio.
+
+                    Tous droits réservés.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ===================================================== -->
+<!-- BOOTSTRAP JAVASCRIPT -->
+<!-- ===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT DU THÈME -->
+<!-- ===================================================== -->
+
+<script src="{% static 'sante/js/theme.js' %}"></script>
+
+
+<!-- ===================================================== -->
+<!-- JAVASCRIPT SPÉCIFIQUE À LA PAGE -->
+<!-- ===================================================== -->   
 
 </body>
-
 </html>
+

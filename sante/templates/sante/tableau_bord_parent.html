@@ -14,6 +14,16 @@ Tableau de bord parent - Toukpedio
     <!-- EN-TÊTE -->
     <!-- ===================================================== -->
 
+    <div class="d-flex gap-2 flex-wrap mt-3 mt-3 mt-md-0 mb-3">
+
+        <a href="{% url 'sante:ajouter_enfant' %}"
+            class="btn btn-success rounded-pill px-4">
+            <i class="bi bi-person-plus-fill me-2"></i>
+
+            Ajouter un enfant
+
+        </a>
+    </div>
     <div class="dashboard-header shadow-sm mb-4">
 
         <div class="d-flex flex-wrap justify-content-between
@@ -44,8 +54,7 @@ Tableau de bord parent - Toukpedio
                 </p>
 
             </div>
-
-
+            
             <!-- DATE -->
 
             <div class="mt-3 mt-md-0">
@@ -973,6 +982,117 @@ Tableau de bord parent - Toukpedio
         </div>
 
     </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ASSISTANT TOUKPEDIO -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+                <i class="bi bi-robot me-2"></i>
+                Assistant Toukpedio
+            </h5>
+
+        </div>
+
+        <div
+            id="chat-messages"
+            class="card-body"
+            style="height: 300px; overflow-y: auto;"
+            aria-live="polite"
+        >
+            <div class="text-muted">
+                Bonjour ! Comment puis-je vous aider ?
+            </div>
+        </div>
+
+        <div class="card-footer">
+
+            <form id="chat-form" class="d-flex gap-2">
+                {% csrf_token %}
+                <input
+                    id="chat-input"
+                    class="form-control"
+                    type="text"
+                    placeholder="Écrivez votre question..."
+                    autocomplete="off"
+                    required
+                >
+                <button id="chat-submit" class="btn btn-success" type="submit">
+                    <i class="bi bi-send me-1"></i>
+                    Envoyer
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+        const chatForm = document.getElementById("chat-form");
+        const chatInput = document.getElementById("chat-input");
+        const chatSubmit = document.getElementById("chat-submit");
+        const chatMessages = document.getElementById("chat-messages");
+        const csrfToken = chatForm.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        chatForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            ajouterMessage("Vous", message);
+            chatInput.value = "";
+            chatInput.disabled = true;
+            chatSubmit.disabled = true;
+
+            const chargement = ajouterMessage("Toukpedio", "Réflexion...");
+
+            try {
+                const response = await fetch(
+                    "{% url 'sante:assistant_gemini' %}",
+                    {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken,
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams({ message })
+                    }
+                );
+
+                const data = await response.json();
+                chargement.remove();
+                ajouterMessage(
+                    "Toukpedio",
+                    data.reply || data.error || "Une erreur est survenue."
+                );
+            } catch (error) {
+                chargement.remove();
+                ajouterMessage(
+                    "Toukpedio",
+                    "Impossible de contacter l'assistant."
+                );
+            } finally {
+                chatInput.disabled = false;
+                chatSubmit.disabled = false;
+                chatInput.focus();
+            }
+        });
+
+        function ajouterMessage(auteur, texte) {
+            const element = document.createElement("div");
+            element.className = "mb-2";
+            element.textContent = `${auteur} : ${texte}`;
+            chatMessages.appendChild(element);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return element;
+        }
+    </script>
 
 
 </div>

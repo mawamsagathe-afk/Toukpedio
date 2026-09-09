@@ -1,12 +1,7 @@
 from django import forms
-from .models import Consultation
-from .models import (
-    JournalSymptome,
-    PhotoSymptome,
-    Traitement,
-    PriseTraitement,
-)
-
+from .models import Consultation, Vaccination
+from .models import (JournalSymptome,PhotoSymptome,Traitement,PriseTraitement,)
+from .models import (Enfant,SuiviCroissance,BienEtre,RendezVous,PartageEnfant,)
 
 
 class ConsultationForm(forms.ModelForm):
@@ -17,8 +12,13 @@ class ConsultationForm(forms.ModelForm):
         fields = [
             "motif",
             "symptomes",
+            "temperature",
+            "poids",
+            "taille",
             "diagnostic",
             "traitement",
+            "recommandations",
+            "prochaine_visite",
         ]
 
         widgets = {
@@ -32,24 +32,56 @@ class ConsultationForm(forms.ModelForm):
             "symptomes": forms.Textarea(
                 attrs={
                     "class": "form-control",
-                    "rows": 4,
-                    "placeholder": "Décrire les symptômes..."
+                    "rows": 3
+                }
+            ),
+
+            "temperature": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.1"
+                }
+            ),
+
+            "poids": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01"
+                }
+            ),
+
+            "taille": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01"
                 }
             ),
 
             "diagnostic": forms.Textarea(
                 attrs={
                     "class": "form-control",
-                    "rows": 4,
-                    "placeholder": "Diagnostic..."
+                    "rows": 3
                 }
             ),
 
             "traitement": forms.Textarea(
                 attrs={
                     "class": "form-control",
-                    "rows": 4,
-                    "placeholder": "Traitement prescrit..."
+                    "rows": 3
+                }
+            ),
+
+            "recommandations": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "prochaine_visite": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
                 }
             ),
         }
@@ -93,22 +125,31 @@ class TemperatureForm(forms.ModelForm):
         }
         
 
+
 class JournalSymptomeForm(forms.ModelForm):
 
     class Meta:
         model = JournalSymptome
 
         fields = [
+            "date",
+            "temperature",
             "symptome",
             "intensite",
-            "temperature",
             "description",
-            "traitement_pris",
-            "evolution",
             "observations",
         ]
 
         widgets = {
+            "date": forms.HiddenInput(),
+
+            "temperature": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.1",
+                    "placeholder": "Ex : 38.5"
+                }
+            ),
 
             "symptome": forms.HiddenInput(),
 
@@ -118,33 +159,11 @@ class JournalSymptomeForm(forms.ModelForm):
                 }
             ),
 
-            "temperature": forms.NumberInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Exemple : 38.2",
-                    "step": "0.1"
-                }
-            ),
-
             "description": forms.Textarea(
                 attrs={
                     "class": "form-control",
                     "rows": 4,
                     "placeholder": "Décrivez ce que vous observez..."
-                }
-            ),
-
-            "traitement_pris": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 2,
-                    "placeholder": "Traitement éventuellement pris..."
-                }
-            ),
-
-            "evolution": forms.Select(
-                attrs={
-                    "class": "form-select"
                 }
             ),
 
@@ -157,6 +176,20 @@ class JournalSymptomeForm(forms.ModelForm):
             ),
         }
 
+        labels = {
+            "date": "Date",
+            "temperature": "Température",
+            "symptome": "Symptôme",
+            "intensite": "Intensité",
+            "description": "Description",
+            "observations": "Observations",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["date"].required = False
+        self.fields["symptome"].required = True
 
 class PhotoSymptomeForm(forms.ModelForm):
     class Meta:
@@ -365,6 +398,351 @@ class ModeGardeForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "+237 6XX XXX XXX"
+                }
+            ),
+        }
+class VaccinationForm(forms.ModelForm):
+
+  class Meta:
+
+    model = Vaccination
+
+    fields = [
+        "nom_vaccin",
+        "dose",
+        "date_prevue",
+        "date_effectuee",
+        "prochaine_dose",
+        "observations",
+    ]
+
+    widgets = {
+
+        "nom_vaccin": forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ex : BCG, Polio, Rougeole..."
+            }
+        ),
+
+        "dose": forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Ex : 1ère dose, 2ème dose..."
+            }
+        ),
+
+        "date_prevue": forms.DateInput(
+            attrs={
+                "class": "form-control",
+                "type": "date"
+            }
+        ),
+
+        "date_effectuee": forms.DateInput(
+            attrs={
+                "class": "form-control",
+                "type": "date"
+            }
+        ),
+
+        "prochaine_dose": forms.DateInput(
+            attrs={
+                "class": "form-control",
+                "type": "date"
+            }
+        ),
+
+        "observations": forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Ajoutez une observation concernant cette vaccination..."
+            }
+        ),
+    }
+
+    labels = {
+
+        "nom_vaccin": "Nom du vaccin",
+
+        "dose": "Dose",
+
+        "date_prevue": "Date prévue",
+
+        "date_effectuee": "Date effectuée",
+
+        "prochaine_dose": "Prochaine dose",
+
+        "observations": "Observations",
+    }
+    
+class EnfantForm(forms.ModelForm):
+
+    class Meta:
+        model = Enfant
+
+        fields = [
+            "nom",
+            "prenom",
+            "date_naissance",
+            "sexe",
+            "photo",
+            "telephone_parent",
+            "adresse",
+            "groupe_sanguin",
+            "allergies",
+            "traitement",
+            "antecedents",
+            "observations",
+        ]
+
+        widgets = {
+            "nom": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+
+            "prenom": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+
+            "date_naissance": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
+                }
+            ),
+
+            "sexe": forms.Select(
+                attrs={"class": "form-select"}
+            ),
+
+            "photo": forms.FileInput(
+                attrs={
+                    "class": "form-control",
+                    "accept": "image/*"
+                }
+            ),
+
+            "telephone_parent": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+
+            "adresse": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 2
+                }
+            ),
+
+            "groupe_sanguin": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
+
+            "allergies": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "traitement": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "antecedents": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "observations": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+        }
+class SuiviCroissanceForm(forms.ModelForm):
+
+    class Meta:
+        model = SuiviCroissance
+
+        fields = [
+            "date_mesure",
+            "poids",
+            "taille",
+            "perimetre_cranien",
+            "observations",
+        ]
+
+        widgets = {
+            "date_mesure": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
+                }
+            ),
+
+            "poids": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "placeholder": "Ex : 12.50"
+                }
+            ),
+
+            "taille": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "placeholder": "Ex : 85.50"
+                }
+            ),
+
+            "perimetre_cranien": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01"
+                }
+            ),
+
+            "observations": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+        }
+        
+class BienEtreForm(forms.ModelForm):
+
+    class Meta:
+        model = BienEtre
+
+        fields = [
+            "date_suivi",
+            "humeur",
+            "sommeil",
+            "alimentation",
+            "hydratation",
+            "activite_physique",
+            "hygiene",
+            "temps_ecran",
+            "observations",
+        ]
+
+        widgets = {
+            "date_suivi": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
+                }
+            ),
+
+            "humeur": forms.Select(
+                attrs={"class": "form-select"}
+            ),
+
+            "sommeil": forms.Select(
+                attrs={"class": "form-select"}
+            ),
+
+            "alimentation": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "hydratation": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "activite_physique": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "hygiene": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "temps_ecran": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "min": "0"
+                }
+            ),
+
+            "observations": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+        }
+        
+class RendezVousForm(forms.ModelForm):
+
+    class Meta:
+        model = RendezVous
+
+        fields = [
+            "date_rendez_vous",
+            "heure",
+            "motif",
+            "professionnel",
+            "statut",
+            "notes",
+        ]
+
+        widgets = {
+            "date_rendez_vous": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date"
+                }
+            ),
+
+            "heure": forms.TimeInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "time"
+                }
+            ),
+
+            "motif": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
+                }
+            ),
+
+            "professionnel": forms.Select(
+                attrs={"class": "form-select"}
+            ),
+
+            "statut": forms.Select(
+                attrs={"class": "form-select"}
+            ),
+
+            "notes": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3
                 }
             ),
         }

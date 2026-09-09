@@ -90,6 +90,17 @@ Journal des symptômes - {{ enfant.prenom }}
 
         {% csrf_token %}
 
+{% if form.errors %}
+    <div class="alert alert-danger">
+
+        <strong>
+            ⚠️ Le formulaire contient une erreur :
+        </strong>
+
+        {{ form.errors }}
+
+    </div>
+{% endif %}
 
         <!-- ============================= -->
         <!-- TEMPERATURE -->

@@ -1,40 +1,57 @@
-from datetime import date
+# =========================================================
+# TOUKPEDIO - views.py
+# =========================================================
+
+from io import BytesIO
+import os
+from urllib.parse import quote
+from datetime import timedelta
+
+from django.db import models
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from django.contrib.admin.views.decorators import staff_member_required
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_POST
 from django.utils import timezone
-from .forms import JournalSymptomeForm, PhotoSymptomeForm
-from datetime import date, timedelta
-from .forms import (
-    JournalSymptomeForm,
-    PhotoSymptomeForm,
-    TraitementForm,
-    PriseTraitementForm,
+from django.urls import reverse
+from google import genai
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from PIL import Image, ImageDraw, ImageFont
+from .models import ( Enfant,Consultation,JournalSymptome,Parent,PartageEnfant,PriseTraitement,
+    Temperature,Traitement,Vaccination,SuiviCroissance,BienEtre,RendezVous,ModeGarde,PhotoSymptome,)
+from .forms import (JournalSymptomeForm,PhotoSymptomeForm,TraitementForm,PriseTraitementForm,
+    ConsultationForm,TemperatureForm,VaccinationForm,ModeGardeForm,)
+
+
+# =========================================================
+# UTILITAIRE ADMINISTRATEUR
+# =========================================================
+
+def est_administrateur(user):
+    return user.is_authenticated and (
+        user.is_staff or user.is_superuser
+    )
+
+
+admin_required = user_passes_test(
+    est_administrateur,
+    login_url="sante:connexion_admin"
 )
 
 
-from .models import (
-    Enfant,
-    Consultation,
-    JournalSymptome,
-    Parent,
-    PartageEnfant,
-    PriseTraitement,
-    Temperature,
-    Traitement,
-    Vaccination,
-    SuiviCroissance,
-    BienEtre,
-    RendezVous,
-)
+# =========================================================
+# UTILITAIRE : REDIRECTION VERS LA FICHE ADMIN ENFANT
+# =========================================================
 
-from .forms import (
-    ConsultationForm,
-    TemperatureForm,
-)
+def retour_admin_enfant(enfant):
+    return redirect(
+        "sante:administration_enfant_detail",
+        enfant_id=enfant.id
+    )
 
 
 # =========================================================
@@ -42,15 +59,22 @@ from .forms import (
 # =========================================================
 
 def accueil(request):
-
     return render(
         request,
         "sante/accueil.html"
     )
-    
+
+
+# =========================================================
+# DECONNEXION
+# =========================================================
+
 def logout_view(request):
     logout(request)
-    return redirect("sante:connexion")
+
+    return redirect(
+        "sante:connexion"
+    )
 
 
 # =========================================================
@@ -84,14 +108,12 @@ def connexion(request):
                 user
             )
 
-            # Administrateur
             if user.is_staff or user.is_superuser:
 
                 return redirect(
                     "sante:tableau_bord_admin"
                 )
 
-            # Parent
             return redirect(
                 "sante:tableau_bord_parent"
             )
@@ -108,7 +130,7 @@ def connexion(request):
 
 
 # =========================================================
-# INSCRIPTION PARENT
+# INSCRIPTION
 # =========================================================
 
 def inscription(request):
@@ -140,10 +162,6 @@ def inscription(request):
             ""
         )
 
-        # -------------------------------------------------
-        # VERIFICATION DES CHAMPS
-        # -------------------------------------------------
-
         if not username or not email or not password:
 
             messages.error(
@@ -155,10 +173,6 @@ def inscription(request):
                 request,
                 "sante/inscription.html"
             )
-
-        # -------------------------------------------------
-        # VERIFICATION USERNAME
-        # -------------------------------------------------
 
         if User.objects.filter(
             username=username
@@ -174,10 +188,6 @@ def inscription(request):
                 "sante/inscription.html"
             )
 
-        # -------------------------------------------------
-        # VERIFICATION EMAIL
-        # -------------------------------------------------
-
         if User.objects.filter(
             email=email
         ).exists():
@@ -192,29 +202,17 @@ def inscription(request):
                 "sante/inscription.html"
             )
 
-        # -------------------------------------------------
-        # CREATION DU COMPTE DJANGO
-        # -------------------------------------------------
-
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
 
-        # -------------------------------------------------
-        # CREATION DU PROFIL PARENT
-        # -------------------------------------------------
-
         Parent.objects.create(
             user=user,
             telephone=telephone,
             adresse=adresse
         )
-
-        # -------------------------------------------------
-        # CONNEXION AUTOMATIQUE
-        # -------------------------------------------------
 
         login(
             request,
@@ -246,43 +244,30 @@ def tableau_bord_parent(request):
     enfants = (
         Enfant.objects
         .filter(parent=request.user)
-        .order_by(
-            "nom",
-            "prenom"
-        )
+        .order_by("nom", "prenom")
     )
 
     nombre_enfants = enfants.count()
 
     nombre_consultations = (
         Consultation.objects
-        .filter(
-            enfant__parent=request.user
-        )
+        .filter(enfant__parent=request.user)
         .count()
     )
 
     nombre_vaccinations = (
         Vaccination.objects
-        .filter(
-            enfant__parent=request.user
-        )
+        .filter(enfant__parent=request.user)
         .count()
     )
 
     nombre_rendez_vous = (
         RendezVous.objects
-        .filter(
-            enfant__parent=request.user
-        )
+        .filter(enfant__parent=request.user)
         .count()
     )
 
     aujourd_hui = timezone.localdate()
-
-    # -----------------------------------------------------
-    # RENDEZ-VOUS A VENIR
-    # -----------------------------------------------------
 
     rendez_vous_a_venir = (
         RendezVous.objects
@@ -304,10 +289,6 @@ def tableau_bord_parent(request):
         )[:5]
     )
 
-    # -----------------------------------------------------
-    # VACCINATIONS A VENIR
-    # -----------------------------------------------------
-
     vaccinations_a_venir = (
         Vaccination.objects
         .filter(
@@ -315,29 +296,17 @@ def tableau_bord_parent(request):
             date_prevue__gte=aujourd_hui,
             date_effectuee__isnull=True
         )
-        .select_related(
-            "enfant"
-        )
-        .order_by(
-            "date_prevue"
-        )[:5]
+        .select_related("enfant")
+        .order_by("date_prevue")[:5]
     )
-
-    # -----------------------------------------------------
-    # DERNIERES CONSULTATIONS
-    # -----------------------------------------------------
 
     dernieres_consultations = (
         Consultation.objects
         .filter(
             enfant__parent=request.user
         )
-        .select_related(
-            "enfant"
-        )
-        .order_by(
-            "-date_consultation"
-        )[:5]
+        .select_related("enfant")
+        .order_by("-date_consultation")[:5]
     )
 
     context = {
@@ -359,35 +328,134 @@ def tableau_bord_parent(request):
 
 
 # =========================================================
-# TABLEAU DE BORD ADMINISTRATEUR
+# ASSISTANT GEMINI
 # =========================================================
 
-@staff_member_required(login_url="sante:connexion_admin")
-def tableau_bord_admin(request):
+@login_required
+@require_POST
+def assistant_gemini(request):
 
-    nombre_parents = (
-        User.objects
-        .filter(
-            is_staff=False,
-            is_superuser=False
+    message = request.POST.get("message", "").strip()
+
+    if not message:
+        return JsonResponse(
+            {"error": "Veuillez écrire un message."},
+            status=400
         )
-        .count()
+
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        return JsonResponse(
+            {"error": "La clé API Gemini n'est pas configurée."},
+            status=500
+        )
+
+    historique = request.session.get("assistant_historique", [])
+    historique_texte = "\n".join(
+        f"{element['role']} : {element['text']}"
+        for element in historique[-10:]
     )
 
+    prompt = f"""
+Tu es l'assistant santé de Toukpedio.
+Réponds en français, clairement et simplement.
+Ne pose jamais de diagnostic et ne remplace pas un professionnel de santé.
+En cas de symptômes graves, recommande immédiatement les urgences.
+
+Historique de la conversation :
+{historique_texte}
+
+Utilisateur : {message}
+Assistant :
+"""
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=prompt,
+        )
+
+        reponse = response.text or "Je ne peux pas répondre actuellement."
+
+        historique.extend([
+            {"role": "Utilisateur", "text": message},
+            {"role": "Assistant", "text": reponse},
+        ])
+        request.session["assistant_historique"] = historique[-10:]
+        request.session.modified = True
+
+        return JsonResponse({"reply": reponse})
+
+    except Exception:
+        return JsonResponse(
+            {"error": "Le service Gemini est momentanément indisponible."},
+            status=503
+        )
+
+
+# =========================================================
+# =========================================================
+#                 ADMINISTRATION
+# =========================================================
+# =========================================================
+
+
+# =========================================================
+# TABLEAU DE BORD ADMIN
+# =========================================================
+@login_required
+@user_passes_test(est_administrateur)
+def tableau_bord_admin(request):
+
     nombre_enfants = Enfant.objects.count()
-
+    dernier_enfant = Enfant.objects.order_by("-id").first()
     nombre_consultations = Consultation.objects.count()
-
     nombre_vaccinations = Vaccination.objects.count()
+    nombre_symptomes = JournalSymptome.objects.count()
+    nombre_temperatures = Temperature.objects.count()
+    nombre_traitements = Traitement.objects.count()
+    nombre_rendez_vous = RendezVous.objects.count()
+    nombre_partages = PartageEnfant.objects.count()
+    nombre_modes_garde = ModeGarde.objects.count()
+    
 
+    contexte = {
+        "nombre_enfants": nombre_enfants,
+        "nombre_consultations": nombre_consultations,
+        "nombre_vaccinations": nombre_vaccinations,
+        "nombre_symptomes": nombre_symptomes,
+        "nombre_temperatures": nombre_temperatures,
+        "nombre_traitements": nombre_traitements,
+        "nombre_rendez_vous": nombre_rendez_vous,
+        "nombre_partages": nombre_partages,
+        "nombre_modes_garde": nombre_modes_garde,
+        
+        "dernier_enfant": dernier_enfant,
+    }
+
+    return render(
+        request,
+        "sante/tableau_bord_admin.html",
+        contexte
+    )
+
+@admin_required
+def administration(request):
+
+    nombre_parents = Parent.objects.count()
+    nombre_enfants = Enfant.objects.count()
+    nombre_vaccinations = Vaccination.objects.count()
+    nombre_traitements = Traitement.objects.count()
+    nombre_temperatures = Temperature.objects.count()
+    nombre_consultations = Consultation.objects.count()
     nombre_rendez_vous = RendezVous.objects.count()
 
     enfants_recents = (
         Enfant.objects
         .select_related("parent")
-        .order_by(
-            "-date_creation"
-        )[:5]
+        .order_by("-date_creation")[:10]
     )
 
     rendez_vous_recents = (
@@ -396,16 +464,16 @@ def tableau_bord_admin(request):
             "enfant",
             "professionnel"
         )
-        .order_by(
-            "-date_creation"
-        )[:5]
+        .order_by("-date_creation")[:10]
     )
 
     context = {
         "nombre_parents": nombre_parents,
         "nombre_enfants": nombre_enfants,
-        "nombre_consultations": nombre_consultations,
         "nombre_vaccinations": nombre_vaccinations,
+        "nombre_traitements": nombre_traitements,
+        "nombre_temperatures": nombre_temperatures,
+        "nombre_consultations": nombre_consultations,
         "nombre_rendez_vous": nombre_rendez_vous,
         "enfants_recents": enfants_recents,
         "rendez_vous_recents": rendez_vous_recents,
@@ -413,8 +481,2031 @@ def tableau_bord_admin(request):
 
     return render(
         request,
-        "sante/tableau_bord_admin.html",
+        "sante/administration.html",
         context
+    )
+
+
+# =========================================================
+# LISTE DES ENFANTS
+# =========================================================
+
+@admin_required
+def administration_enfants(request):
+
+    recherche = request.GET.get(
+        "recherche",
+        ""
+    ).strip()
+
+    enfants = (
+        Enfant.objects
+        .select_related("parent")
+        .order_by(
+            "nom",
+            "prenom"
+        )
+    )
+
+    if recherche:
+
+        enfants = enfants.filter(
+            models.Q(prenom__icontains=recherche)
+            |
+            models.Q(nom__icontains=recherche)
+            |
+            models.Q(parent__username__icontains=recherche)
+        )
+
+    return render(
+        request,
+        "sante/admin_enfants.html",
+        {
+            "enfants": enfants,
+            "recherche": recherche,
+        }
+    )
+
+
+# =========================================================
+# AJOUTER UN ENFANT - ADMIN
+# =========================================================
+
+@admin_required
+def administration_ajouter_enfant(request):
+
+    if request.method == "POST":
+
+        nom = request.POST.get(
+            "nom",
+            ""
+        ).strip()
+
+        prenom = request.POST.get(
+            "prenom",
+            ""
+        ).strip()
+
+        date_naissance = request.POST.get(
+            "date_naissance"
+        )
+
+        sexe = request.POST.get(
+            "sexe"
+        )
+
+        parent_id = request.POST.get(
+            "parent"
+        )
+
+        parent = get_object_or_404(
+            User,
+            id=parent_id
+        )
+
+        if not nom or not prenom or not date_naissance or not sexe:
+
+            messages.error(
+                request,
+                "Veuillez remplir tous les champs obligatoires."
+            )
+
+            return render(
+                request,
+                "sante/admin_ajouter_enfant.html",
+                {
+                    "parents": User.objects.filter(
+                        is_staff=False,
+                        is_superuser=False
+                    )
+                }
+            )
+
+        enfant = Enfant.objects.create(
+            nom=nom,
+            prenom=prenom,
+            date_naissance=date_naissance,
+            sexe=sexe,
+            parent=parent,
+            photo=request.FILES.get("photo"),
+            telephone_parent=request.POST.get(
+                "telephone_parent",
+                ""
+            ).strip(),
+            adresse=request.POST.get(
+                "adresse",
+                ""
+            ).strip(),
+            groupe_sanguin=request.POST.get(
+                "groupe_sanguin",
+                ""
+            ).strip(),
+            allergies=request.POST.get(
+                "allergies",
+                ""
+            ).strip(),
+            traitement=request.POST.get(
+                "traitement",
+                ""
+            ).strip(),
+            antecedents=request.POST.get(
+                "antecedents",
+                ""
+            ).strip(),
+            observations=request.POST.get(
+                "observations",
+                ""
+            ).strip(),
+        )
+
+        messages.success(
+            request,
+            f"{enfant.prenom} {enfant.nom} a été ajouté avec succès."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    parents = (
+        User.objects
+        .filter(
+            is_staff=False,
+            is_superuser=False
+        )
+        .order_by("username")
+    )
+
+    return render(
+        request,
+        "sante/admin_ajouter_enfant.html",
+        {
+            "parents": parents
+        }
+    )
+
+
+# =========================================================
+# MODIFIER UN ENFANT - ADMIN
+# =========================================================
+
+@admin_required
+def administration_modifier_enfant(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        enfant.nom = request.POST.get(
+            "nom",
+            ""
+        ).strip()
+
+        enfant.prenom = request.POST.get(
+            "prenom",
+            ""
+        ).strip()
+
+        enfant.date_naissance = request.POST.get(
+            "date_naissance"
+        )
+
+        enfant.sexe = request.POST.get(
+            "sexe"
+        )
+
+        parent_id = request.POST.get(
+            "parent"
+        )
+
+        if parent_id:
+
+            enfant.parent = get_object_or_404(
+                User,
+                id=parent_id
+            )
+
+        enfant.telephone_parent = request.POST.get(
+            "telephone_parent",
+            ""
+        ).strip()
+
+        enfant.adresse = request.POST.get(
+            "adresse",
+            ""
+        ).strip()
+
+        enfant.groupe_sanguin = request.POST.get(
+            "groupe_sanguin",
+            ""
+        ).strip()
+
+        enfant.allergies = request.POST.get(
+            "allergies",
+            ""
+        ).strip()
+
+        enfant.traitement = request.POST.get(
+            "traitement",
+            ""
+        ).strip()
+
+        enfant.antecedents = request.POST.get(
+            "antecedents",
+            ""
+        ).strip()
+
+        enfant.observations = request.POST.get(
+            "observations",
+            ""
+        ).strip()
+
+        photo = request.FILES.get("photo")
+
+        if photo:
+            enfant.photo = photo
+
+        enfant.save()
+
+        messages.success(
+            request,
+            f"Le dossier de {enfant.prenom} a été modifié."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    parents = (
+        User.objects
+        .filter(
+            is_staff=False,
+            is_superuser=False
+        )
+        .order_by("username")
+    )
+
+    return render(
+        request,
+        "sante/admin_modifier_enfant.html",
+        {
+            "enfant": enfant,
+            "parents": parents,
+        }
+    )
+
+
+# =========================================================
+# SUPPRIMER UN ENFANT - ADMIN
+# =========================================================
+
+@admin_required
+def administration_supprimer_enfant(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method != "POST":
+
+        return render(
+            request,
+            "sante/admin_confirmer_suppression.html",
+            {
+                "objet": enfant,
+                "type_objet": "enfant",
+                "retour": "sante:administration_enfant_detail",
+                "retour_id": enfant.id,
+            }
+        )
+
+    nom = f"{enfant.prenom} {enfant.nom}"
+
+    enfant.delete()
+
+    messages.success(
+        request,
+        f"Le dossier de {nom} a été supprimé définitivement."
+    )
+
+    return redirect(
+        "sante:admin_enfants"
+    )
+
+
+# =========================================================
+# DETAIL COMPLET D'UN ENFANT
+# =========================================================
+
+@admin_required
+def administration_enfant_detail(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant.objects.select_related("parent"),
+        id=enfant_id
+    )
+
+    context = {
+        "enfant": enfant,
+
+        "vaccinations": (
+            enfant.vaccinations
+            .all()
+            .order_by("date_prevue")
+        ),
+
+        "temperatures": (
+            enfant.temperatures
+            .all()
+            .order_by("-date_prise")
+        ),
+
+        "traitements": (
+            enfant.traitements
+            .all()
+            .order_by("prochaine_prise")
+        ),
+
+        "consultations": (
+            enfant.consultations
+            .all()
+            .order_by("-date_consultation")
+        ),
+
+        "symptomes": (
+            enfant.journaux_symptomes
+            .all()
+            .order_by("-date")
+        ),
+
+        "croissances": (
+            enfant.croissances
+            .all()
+            .order_by("-date_mesure")
+        ),
+
+        "bien_etre": (
+            enfant.bien_etre
+            .all()
+            .order_by("-date_suivi")
+        ),
+
+        "rendez_vous": (
+            enfant.rendez_vous
+            .all()
+            .select_related("professionnel")
+            .order_by(
+                "date_rendez_vous",
+                "heure"
+            )
+        ),
+
+        "modes_garde": (
+            enfant.modes_garde
+            .all()
+            .order_by("-date_creation")
+        ),
+
+        "partages": (
+            enfant.partages
+            .all()
+            .select_related("parent")
+            .order_by("-date_invitation")
+        ),
+    }
+
+    return render(
+        request,
+        "sante/admin_enfant_detail.html",
+        context
+    )
+
+
+# =========================================================
+# =========================================================
+# CRUD SYMPTOMES
+# =========================================================
+# =========================================================
+
+@admin_required
+def administration_modifier_symptome(
+    request,
+    symptome_id
+):
+
+    symptome = get_object_or_404(
+        JournalSymptome,
+        id=symptome_id
+    )
+
+    enfant = symptome.enfant
+
+    if request.method == "POST":
+
+        form = JournalSymptomeForm(
+            request.POST,
+            instance=symptome
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Le symptôme a été modifié avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = JournalSymptomeForm(
+            instance=symptome
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier le symptôme",
+            "objet": "Symptôme",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_symptome(
+    request,
+    symptome_id
+):
+
+    symptome = get_object_or_404(
+        JournalSymptome,
+        id=symptome_id
+    )
+
+    enfant = symptome.enfant
+
+    if request.method == "POST":
+
+        symptome.delete()
+
+        messages.success(
+            request,
+            "Le symptôme a été supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": symptome,
+            "type_objet": "symptôme",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD CONSULTATIONS
+# =========================================================
+
+@login_required
+@user_passes_test(est_administrateur)
+def administration_ajouter_symptome(request, enfant_id):
+    enfant = get_object_or_404(Enfant, id=enfant_id)
+
+    if request.method == "POST":
+        form = JournalSymptomeForm(request.POST)
+
+        if form.is_valid():
+            symptome = form.save(commit=False)
+            symptome.enfant = enfant
+            symptome.save()
+
+            messages.success(
+                request,
+                "Le symptôme a été ajouté avec succès."
+            )
+
+            return redirect(
+                "sante:administration_enfant_detail",
+                enfant_id=enfant.id
+            )
+
+    else:
+        form = JournalSymptomeForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "titre": f"Ajouter un symptôme pour {enfant.prenom}",
+            "enfant": enfant,
+        }
+    )
+
+@admin_required
+def administration_ajouter_consultation(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        form = ConsultationForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            consultation = form.save(
+                commit=False
+            )
+
+            consultation.enfant = enfant
+
+            consultation.save()
+
+            messages.success(
+                request,
+                "Consultation ajoutée avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = ConsultationForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter une consultation",
+            "objet": "Consultation",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_consultation(
+    request,
+    consultation_id
+):
+
+    consultation = get_object_or_404(
+        Consultation,
+        id=consultation_id
+    )
+
+    enfant = consultation.enfant
+
+    if request.method == "POST":
+
+        form = ConsultationForm(
+            request.POST,
+            instance=consultation
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Consultation modifiée avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = ConsultationForm(
+            instance=consultation
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier la consultation",
+            "objet": "Consultation",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_consultation(
+    request,
+    consultation_id
+):
+
+    consultation = get_object_or_404(
+        Consultation,
+        id=consultation_id
+    )
+
+    enfant = consultation.enfant
+
+    if request.method == "POST":
+
+        consultation.delete()
+
+        messages.success(
+            request,
+            "Consultation supprimée."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": consultation,
+            "type_objet": "consultation",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD VACCINATIONS
+# =========================================================
+
+@admin_required
+def administration_ajouter_vaccination(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        form = VaccinationForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            vaccination = form.save(
+                commit=False
+            )
+
+            vaccination.enfant = enfant
+
+            vaccination.save()
+
+            messages.success(
+                request,
+                "Vaccination ajoutée avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = VaccinationForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter une vaccination",
+            "objet": "Vaccination",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_vaccination(
+    request,
+    vaccination_id
+):
+
+    vaccination = get_object_or_404(
+        Vaccination,
+        id=vaccination_id
+    )
+
+    enfant = vaccination.enfant
+
+    if request.method == "POST":
+
+        form = VaccinationForm(
+            request.POST,
+            instance=vaccination
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Vaccination modifiée avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = VaccinationForm(
+            instance=vaccination
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier la vaccination",
+            "objet": "Vaccination",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_vaccination(
+    request,
+    vaccination_id
+):
+
+    vaccination = get_object_or_404(
+        Vaccination,
+        id=vaccination_id
+    )
+
+    enfant = vaccination.enfant
+
+    if request.method == "POST":
+
+        vaccination.delete()
+
+        messages.success(
+            request,
+            "Vaccination supprimée."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": vaccination,
+            "type_objet": "vaccination",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD CROISSANCE
+# =========================================================
+
+@admin_required
+def administration_ajouter_croissance(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    champs = [
+        "date_mesure",
+        "poids",
+        "taille",
+        "perimetre_cranien",
+        "observations",
+    ]
+
+    from django.forms import modelform_factory
+
+    CroissanceForm = modelform_factory(
+        SuiviCroissance,
+        fields=champs
+    )
+
+    if request.method == "POST":
+
+        form = CroissanceForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            croissance_obj = form.save(
+                commit=False
+            )
+
+            croissance_obj.enfant = enfant
+
+            croissance_obj.save()
+
+            messages.success(
+                request,
+                "Mesure de croissance ajoutée."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = CroissanceForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter une mesure de croissance",
+            "objet": "Croissance",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_croissance(
+    request,
+    croissance_id
+):
+
+    croissance_obj = get_object_or_404(
+        SuiviCroissance,
+        id=croissance_id
+    )
+
+    enfant = croissance_obj.enfant
+
+    from django.forms import modelform_factory
+
+    CroissanceForm = modelform_factory(
+        SuiviCroissance,
+        fields=[
+            "date_mesure",
+            "poids",
+            "taille",
+            "perimetre_cranien",
+            "observations",
+        ]
+    )
+
+    if request.method == "POST":
+
+        form = CroissanceForm(
+            request.POST,
+            instance=croissance_obj
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Mesure de croissance modifiée."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = CroissanceForm(
+            instance=croissance_obj
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier la croissance",
+            "objet": "Croissance",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_croissance(
+    request,
+    croissance_id
+):
+
+    croissance_obj = get_object_or_404(
+        SuiviCroissance,
+        id=croissance_id
+    )
+
+    enfant = croissance_obj.enfant
+
+    if request.method == "POST":
+
+        croissance_obj.delete()
+
+        messages.success(
+            request,
+            "Mesure de croissance supprimée."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": croissance_obj,
+            "type_objet": "mesure de croissance",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD BIEN-ÊTRE
+# =========================================================
+
+@admin_required
+def administration_ajouter_bien_etre(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    from django.forms import modelform_factory
+
+    BienEtreFormAdmin = modelform_factory(
+        BienEtre,
+        fields=[
+            "date_suivi",
+            "humeur",
+            "sommeil",
+            "alimentation",
+            "hydratation",
+            "activite_physique",
+            "hygiene",
+            "temps_ecran",
+            "observations",
+        ]
+    )
+
+    if request.method == "POST":
+
+        form = BienEtreFormAdmin(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            objet = form.save(
+                commit=False
+            )
+
+            objet.enfant = enfant
+
+            objet.save()
+
+            messages.success(
+                request,
+                "Suivi du bien-être ajouté."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = BienEtreFormAdmin()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter un suivi du bien-être",
+            "objet": "Bien-être",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_bien_etre(
+    request,
+    bien_etre_id
+):
+
+    objet = get_object_or_404(
+        BienEtre,
+        id=bien_etre_id
+    )
+
+    enfant = objet.enfant
+
+    from django.forms import modelform_factory
+
+    BienEtreFormAdmin = modelform_factory(
+        BienEtre,
+        fields=[
+            "date_suivi",
+            "humeur",
+            "sommeil",
+            "alimentation",
+            "hydratation",
+            "activite_physique",
+            "hygiene",
+            "temps_ecran",
+            "observations",
+        ]
+    )
+
+    if request.method == "POST":
+
+        form = BienEtreFormAdmin(
+            request.POST,
+            instance=objet
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Suivi du bien-être modifié."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = BienEtreFormAdmin(
+            instance=objet
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier le suivi du bien-être",
+            "objet": "Bien-être",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_bien_etre(
+    request,
+    bien_etre_id
+):
+
+    objet = get_object_or_404(
+        BienEtre,
+        id=bien_etre_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        objet.delete()
+
+        messages.success(
+            request,
+            "Suivi du bien-être supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": objet,
+            "type_objet": "suivi du bien-être",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD TEMPERATURE
+# =========================================================
+
+@admin_required
+def administration_ajouter_temperature(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        form = TemperatureForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            objet = form.save(
+                commit=False
+            )
+
+            objet.enfant = enfant
+
+            objet.save()
+
+            messages.success(
+                request,
+                "Température ajoutée."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = TemperatureForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter une température",
+            "objet": "Température",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_temperature(
+    request,
+    temperature_id
+):
+
+    objet = get_object_or_404(
+        Temperature,
+        id=temperature_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        form = TemperatureForm(
+            request.POST,
+            instance=objet
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Température modifiée."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = TemperatureForm(
+            instance=objet
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier la température",
+            "objet": "Température",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_temperature(
+    request,
+    temperature_id
+):
+
+    objet = get_object_or_404(
+        Temperature,
+        id=temperature_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        objet.delete()
+
+        messages.success(
+            request,
+            "Température supprimée."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": objet,
+            "type_objet": "température",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD TRAITEMENTS
+# =========================================================
+
+@admin_required
+def administration_ajouter_traitement(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        form = TraitementForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            objet = form.save(
+                commit=False
+            )
+
+            objet.enfant = enfant
+            objet.prochaine_prise = objet.premiere_prise
+
+            objet.save()
+
+            messages.success(
+                request,
+                "Traitement ajouté."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = TraitementForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter un traitement",
+            "objet": "Traitement",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_traitement(
+    request,
+    traitement_id
+):
+
+    objet = get_object_or_404(
+        Traitement,
+        id=traitement_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        form = TraitementForm(
+            request.POST,
+            instance=objet
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Traitement modifié."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = TraitementForm(
+            instance=objet
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier le traitement",
+            "objet": "Traitement",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_traitement(
+    request,
+    traitement_id
+):
+
+    objet = get_object_or_404(
+        Traitement,
+        id=traitement_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        objet.delete()
+
+        messages.success(
+            request,
+            "Traitement supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": objet,
+            "type_objet": "traitement",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD RENDEZ-VOUS
+# =========================================================
+
+@admin_required
+def administration_ajouter_rendez_vous(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    from django.forms import modelform_factory
+
+    RendezVousFormAdmin = modelform_factory(
+        RendezVous,
+        fields=[
+            "date_rendez_vous",
+            "heure",
+            "motif",
+            "professionnel",
+            "statut",
+            "notes",
+        ]
+    )
+
+    if request.method == "POST":
+
+        form = RendezVousFormAdmin(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            objet = form.save(
+                commit=False
+            )
+
+            objet.enfant = enfant
+
+            objet.save()
+
+            messages.success(
+                request,
+                "Rendez-vous ajouté."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = RendezVousFormAdmin()
+
+    form.fields["professionnel"].queryset = (
+        User.objects
+        .filter(is_staff=True)
+        .order_by(
+            "first_name",
+            "last_name"
+        )
+    )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Ajouter un rendez-vous",
+            "objet": "Rendez-vous",
+        }
+    )
+
+
+@admin_required
+def administration_modifier_rendez_vous(
+    request,
+    rendez_vous_id
+):
+
+    objet = get_object_or_404(
+        RendezVous,
+        id=rendez_vous_id
+    )
+
+    enfant = objet.enfant
+
+    from django.forms import modelform_factory
+
+    RendezVousFormAdmin = modelform_factory(
+        RendezVous,
+        fields=[
+            "date_rendez_vous",
+            "heure",
+            "motif",
+            "professionnel",
+            "statut",
+            "notes",
+        ]
+    )
+
+    if request.method == "POST":
+
+        form = RendezVousFormAdmin(
+            request.POST,
+            instance=objet
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Rendez-vous modifié."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = RendezVousFormAdmin(
+            instance=objet
+        )
+
+    form.fields["professionnel"].queryset = (
+        User.objects
+        .filter(is_staff=True)
+        .order_by(
+            "first_name",
+            "last_name"
+        )
+    )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier le rendez-vous",
+            "objet": "Rendez-vous",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_rendez_vous(
+    request,
+    rendez_vous_id
+):
+
+    objet = get_object_or_404(
+        RendezVous,
+        id=rendez_vous_id
+    )
+
+    enfant = objet.enfant
+
+    if request.method == "POST":
+
+        objet.delete()
+
+        messages.success(
+            request,
+            "Rendez-vous supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": objet,
+            "type_objet": "rendez-vous",
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD PARTAGE PARENT
+# =========================================================
+
+@admin_required
+def administration_ajouter_partage(request, enfant_id):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        email = request.POST.get("email", "").strip().lower()
+
+        if not email:
+            messages.error(
+                request,
+                "Veuillez saisir l'adresse e-mail du parent."
+            )
+
+            return redirect(
+                "sante:administration_ajouter_partage",
+                enfant_id=enfant.id
+            )
+
+        # Recherche du compte parent
+        parent = User.objects.filter(
+            email__iexact=email
+        ).first()
+
+        if not parent:
+            messages.error(
+                request,
+                "Aucun compte TOUKPEDIO ne correspond à cette adresse e-mail."
+            )
+
+            return redirect(
+                "sante:administration_ajouter_partage",
+                enfant_id=enfant.id
+            )
+
+        # Le parent principal ne peut pas être invité
+        if parent == enfant.parent:
+
+            messages.warning(
+                request,
+                "Ce parent est déjà le parent principal de cet enfant."
+            )
+
+            return redirect(
+                "sante:administration_enfant_detail",
+                enfant_id=enfant.id
+            )
+
+        # Vérifier si un partage existe déjà
+        partage_existant = PartageEnfant.objects.filter(
+            enfant=enfant,
+            parent=parent
+        ).first()
+
+        if partage_existant:
+
+            if partage_existant.accepte:
+
+                messages.info(
+                    request,
+                    "Ce parent possède déjà un accès au dossier."
+                )
+
+            else:
+
+                messages.info(
+                    request,
+                    "Une invitation existe déjà pour ce parent."
+                )
+
+            return redirect(
+                "sante:administration_enfant_detail",
+                enfant_id=enfant.id
+            )
+
+        # Création du partage
+        PartageEnfant.objects.create(
+            enfant=enfant,
+            parent=parent,
+            accepte=False
+        )
+
+        messages.success(
+            request,
+            f"Invitation créée pour {parent.email}."
+        )
+
+        return redirect(
+            "sante:administration_enfant_detail",
+            enfant_id=enfant.id
+        )
+
+    return render(
+        request,
+        "sante/admin_ajouter_partage.html",
+        {
+            "enfant": enfant,
+        }
+    )
+
+@admin_required
+def administration_supprimer_partage(
+    request,
+    partage_id
+):
+
+    partage = get_object_or_404(
+        PartageEnfant,
+        id=partage_id
+    )
+
+    enfant = partage.enfant
+
+    if request.method == "POST":
+
+        partage.delete()
+
+        messages.success(
+            request,
+            "Le partage a été supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": partage,
+            "type_objet": "partage",
+            "enfant": enfant,
+        }
+    )
+
+
+@admin_required
+def administration_modifier_partage(
+    request,
+    partage_id
+):
+
+    partage = get_object_or_404(
+        PartageEnfant,
+        id=partage_id
+    )
+
+    enfant = partage.enfant
+
+    if request.method == "POST":
+
+        partage.accepte = (
+            request.POST.get("accepte")
+            == "1"
+        )
+
+        partage.save()
+
+        messages.success(
+            request,
+            "Statut du partage modifié."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_modifier_partage.html",
+        {
+            "partage": partage,
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# CRUD MODE GARDE
+# =========================================================
+
+@admin_required
+def administration_ajouter_mode_garde(request, enfant_id):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    if request.method == "POST":
+
+        formulaire = ModeGardeForm(request.POST)
+
+        if formulaire.is_valid():
+
+            mode_garde = formulaire.save(commit=False)
+
+            mode_garde.enfant = enfant
+
+            # Si ton modèle possède un champ parent/created_by,
+            # on peut le renseigner ici.
+            if hasattr(mode_garde, "parent"):
+                mode_garde.parent = enfant.parent
+
+            if hasattr(mode_garde, "cree_par"):
+                mode_garde.cree_par = request.user
+
+            mode_garde.save()
+
+            messages.success(
+                request,
+                f"Le mode garde de {enfant.prenom} a été créé avec succès."
+            )
+
+            return redirect(
+                "sante:administration_enfant_detail",
+                enfant_id=enfant.id
+            )
+
+    else:
+
+        formulaire = ModeGardeForm()
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "enfant": enfant,
+            "form": formulaire,
+            "objet": "Mode garde",
+            "titre": "Créer un mode garde",
+        }
+    )
+
+@admin_required
+def administration_modifier_mode_garde(
+    request,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id
+    )
+
+    enfant = mode_garde.enfant
+
+    if request.method == "POST":
+
+        form = ModeGardeForm(
+            request.POST,
+            instance=mode_garde
+        )
+
+        if form.is_valid():
+
+            objet = form.save(
+                commit=False
+            )
+
+            objet.enfant = enfant
+            objet.parent = mode_garde.parent
+
+            objet.save()
+
+            messages.success(
+                request,
+                "Mode garde modifié avec succès."
+            )
+
+            return retour_admin_enfant(
+                enfant
+            )
+
+    else:
+
+        form = ModeGardeForm(
+            instance=mode_garde
+        )
+
+    return render(
+        request,
+        "sante/admin_form.html",
+        {
+            "form": form,
+            "enfant": enfant,
+            "titre": "Modifier le mode garde",
+            "objet": "Mode garde",
+        }
+    )
+
+
+@admin_required
+def administration_supprimer_mode_garde(
+    request,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id
+    )
+
+    enfant = mode_garde.enfant
+
+    if request.method == "POST":
+
+        mode_garde.delete()
+
+        messages.success(
+            request,
+            "Mode garde supprimé."
+        )
+
+        return retour_admin_enfant(
+            enfant
+        )
+
+    return render(
+        request,
+        "sante/admin_confirmer_suppression.html",
+        {
+            "objet": mode_garde,
+            "type_objet": "mode garde",
+            "enfant": enfant,
+        }
+    )
+
+
+@admin_required
+def administration_desactiver_mode_garde(
+    request,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id
+    )
+
+    enfant = mode_garde.enfant
+
+    if request.method == "POST":
+
+        mode_garde.actif = False
+        mode_garde.save(
+            update_fields=["actif"]
+        )
+
+        messages.success(
+            request,
+            "Mode garde désactivé."
+        )
+
+    return retour_admin_enfant(
+        enfant
     )
 
 
@@ -491,9 +2582,7 @@ def enfant(request):
 
     enfants = (
         Enfant.objects
-        .filter(
-            parent=request.user
-        )
+        .filter(parent=request.user)
         .order_by(
             "nom",
             "prenom"
@@ -510,9 +2599,8 @@ def enfant(request):
 
 
 # =========================================================
-# AJOUTER UN ENFANT
+# AJOUTER UN ENFANT - PARENT
 # =========================================================
-from .models import Enfant, JournalSymptome, PhotoSymptome
 
 @login_required
 def ajouter_enfant(request):
@@ -537,55 +2625,7 @@ def ajouter_enfant(request):
             "sexe"
         )
 
-        photo = request.FILES.get(
-            "photo"
-        )
-
-        telephone_parent = request.POST.get(
-            "telephone_parent",
-            ""
-        ).strip()
-
-        adresse = request.POST.get(
-            "adresse",
-            ""
-        ).strip()
-
-        groupe_sanguin = request.POST.get(
-            "groupe_sanguin",
-            ""
-        ).strip()
-
-        allergies = request.POST.get(
-            "allergies",
-            ""
-        ).strip()
-
-        traitement = request.POST.get(
-            "traitement",
-            ""
-        ).strip()
-
-        antecedents = request.POST.get(
-            "antecedents",
-            ""
-        ).strip()
-
-        observations = request.POST.get(
-            "observations",
-            ""
-        ).strip()
-
-        # -------------------------------------------------
-        # VERIFICATION
-        # -------------------------------------------------
-
-        if (
-            not nom
-            or not prenom
-            or not date_naissance
-            or not sexe
-        ):
+        if not nom or not prenom or not date_naissance or not sexe:
 
             messages.error(
                 request,
@@ -597,24 +2637,41 @@ def ajouter_enfant(request):
                 "sante/ajouter_enfant.html"
             )
 
-        # -------------------------------------------------
-        # CREATION
-        # -------------------------------------------------
-
         Enfant.objects.create(
             nom=nom,
             prenom=prenom,
             date_naissance=date_naissance,
             sexe=sexe,
-            photo=photo,
+            photo=request.FILES.get("photo"),
             parent=request.user,
-            telephone_parent=telephone_parent,
-            adresse=adresse,
-            groupe_sanguin=groupe_sanguin,
-            allergies=allergies,
-            traitement=traitement,
-            antecedents=antecedents,
-            observations=observations,
+            telephone_parent=request.POST.get(
+                "telephone_parent",
+                ""
+            ).strip(),
+            adresse=request.POST.get(
+                "adresse",
+                ""
+            ).strip(),
+            groupe_sanguin=request.POST.get(
+                "groupe_sanguin",
+                ""
+            ).strip(),
+            allergies=request.POST.get(
+                "allergies",
+                ""
+            ).strip(),
+            traitement=request.POST.get(
+                "traitement",
+                ""
+            ).strip(),
+            antecedents=request.POST.get(
+                "antecedents",
+                ""
+            ).strip(),
+            observations=request.POST.get(
+                "observations",
+                ""
+            ).strip(),
         )
 
         messages.success(
@@ -633,11 +2690,14 @@ def ajouter_enfant(request):
 
 
 # =========================================================
-# AJOUTER UN SYMPTOME
+# AJOUTER SYMPTOME - PARENT
 # =========================================================
 
 @login_required
-def ajouter_symptome(request, enfant_id):
+def ajouter_symptome(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -647,38 +2707,30 @@ def ajouter_symptome(request, enfant_id):
 
     if request.method == "POST":
 
-        # ==========================================
-        # FORMULAIRE DU JOURNAL
-        # ==========================================
-
-        form = JournalSymptomeForm(request.POST)
+        form = JournalSymptomeForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            # Création du journal sans enregistrer immédiatement
-            journal = form.save(commit=False)
+            journal = form.save(
+                commit=False
+            )
 
-            # Association à l'enfant
             journal.enfant = enfant
-
-            # Date automatique
             journal.date = timezone.localdate()
 
-            # Enregistrement du symptôme
             journal.save()
 
-            # ==========================================
-            # PHOTO
-            # ==========================================
-
-            fichier_photo = request.FILES.get("photo")
+            fichier_photo = request.FILES.get(
+                "photo"
+            )
 
             description_photo = request.POST.get(
                 "photo_description",
                 ""
             ).strip()
 
-            # Si une photo a été sélectionnée
             if fichier_photo:
 
                 PhotoSymptome.objects.create(
@@ -687,9 +2739,10 @@ def ajouter_symptome(request, enfant_id):
                     description=description_photo
                 )
 
-            # ==========================================
-            # REDIRECTION
-            # ==========================================
+            messages.success(
+                request,
+                "Le suivi a bien été enregistré."
+            )
 
             return redirect(
                 "sante:detail_enfant",
@@ -699,10 +2752,6 @@ def ajouter_symptome(request, enfant_id):
     else:
 
         form = JournalSymptomeForm()
-
-    # ==========================================
-    # AFFICHAGE
-    # ==========================================
 
     return render(
         request,
@@ -714,186 +2763,91 @@ def ajouter_symptome(request, enfant_id):
     )
 
 
-
 # =========================================================
-# MODIFIER UN SYMPTOME
+# MODIFIER SYMPTOME - PARENT
 # =========================================================
-
 @login_required
 def modifier_symptome(request, symptome_id):
 
-    suivi = get_object_or_404(
+    symptome = get_object_or_404(
         JournalSymptome,
-        id=symptome_id,
-        enfant__parent=request.user
+        id=symptome_id
     )
+
+    enfant = symptome.enfant
+
+    # Vérification du propriétaire
+    acces_principal = (
+        enfant.parent == request.user
+    )
+
+    # Vérification d'un partage accepté
+    acces_partage = PartageEnfant.objects.filter(
+        enfant=enfant,
+        parent=request.user,
+        accepte=True
+    ).exists()
+
+    if not (acces_principal or acces_partage):
+        messages.error(
+            request,
+            "Vous n'avez pas accès à ce dossier."
+        )
+
+        return redirect("sante:enfant")
 
     if request.method == "POST":
 
-        suivi.symptome = request.POST.get(
-            "symptome"
+        formulaire = JournalSymptomeForm(
+            request.POST,
+            instance=symptome
         )
 
-        suivi.intensite = request.POST.get(
-            "intensite"
-        )
+        if formulaire.is_valid():
 
-        suivi.date = request.POST.get(
-            "date"
-        )
+            formulaire.save()
 
-        suivi.description = request.POST.get(
-            "description"
-        )
+            messages.success(
+                request,
+                "Le symptôme a été modifié avec succès."
+            )
 
-        temperature = request.POST.get(
-            "temperature"
-        )
+            return redirect(
+                "sante:detail_enfant",
+                enfant_id=enfant.id
+            )
 
-        suivi.temperature = (
-            temperature
-            if temperature
-            else None
-        )
+    else:
 
-        suivi.traitement_pris = request.POST.get(
-            "traitement_pris"
-        )
-
-        suivi.evolution = request.POST.get(
-            "evolution"
-        )
-
-        suivi.observations = request.POST.get(
-            "observations"
-        )
-
-        suivi.save()
-
-        messages.success(
-            request,
-            "Le suivi a été modifié avec succès."
-        )
-
-        return redirect(
-            "sante:dossier_enfant",
-            enfant_id=suivi.enfant.id
+        formulaire = JournalSymptomeForm(
+            instance=symptome
         )
 
     return render(
         request,
         "sante/modifier_symptome.html",
         {
-            "suivi": suivi,
-            "enfant": suivi.enfant,
+            "form": formulaire,
+            "symptome": symptome,
+            "enfant": enfant,
         }
     )
 
-
 # =========================================================
-# SUPPRIMER UN SYMPTOME
+# SUPPRIMER SYMPTOME - PARENT
 # =========================================================
 
 @login_required
 def supprimer_symptome(request, symptome_id):
 
-    suivi = get_object_or_404(
+    symptome = get_object_or_404(
         JournalSymptome,
-        id=symptome_id,
-        enfant__parent=request.user
+        id=symptome_id
     )
 
-    enfant_id = suivi.enfant.id
+    enfant = symptome.enfant
 
-    if request.method == "POST":
-
-        suivi.delete()
-
-        messages.success(
-            request,
-            "Le suivi a été supprimé."
-        )
-
-        return redirect(
-            "sante:dossier_enfant",
-            enfant_id=enfant_id
-        )
-
-    return render(
-        request,
-        "sante/confirmer_suppression_symptome.html",
-        {
-            "suivi": suivi
-        }
-    )
-
-
-# =========================================================
-# DOSSIER D'UN ENFANT
-# =========================================================
-
-@login_required
-def dossier_enfant(request, enfant_id):
-
-    enfant = get_object_or_404(
-        Enfant,
-        id=enfant_id,
-        parent=request.user
-    )
-
-    suivis = (
-        enfant.journaux_symptomes
-        .all()
-        .order_by(
-            "-date",
-            "-created_at"
-        )
-    )
-
-    date_debut = request.GET.get(
-        "date_debut"
-    )
-
-    date_fin = request.GET.get(
-        "date_fin"
-    )
-
-    if date_debut:
-
-        suivis = suivis.filter(
-            date__gte=date_debut
-        )
-
-    if date_fin:
-
-        suivis = suivis.filter(
-            date__lte=date_fin
-        )
-
-    return render(
-        request,
-        "sante/dossier_enfant.html",
-        {
-            "enfant": enfant,
-            "suivis": suivis,
-            "date_debut": date_debut,
-            "date_fin": date_fin,
-        }
-    )
-
-
-# =========================================================
-# DETAIL D'UN ENFANT
-# =========================================================
-
-@login_required
-def detail_enfant(request, enfant_id):
-
-    enfant = get_object_or_404(
-        Enfant,
-        id=enfant_id
-    )
-
+    # Vérifier que l'utilisateur a accès à l'enfant
     acces_principal = (
         enfant.parent == request.user
     )
@@ -904,32 +2858,95 @@ def detail_enfant(request, enfant_id):
         accepte=True
     ).exists()
 
-    if not acces_principal and not acces_partage:
+    if not (acces_principal or acces_partage):
         messages.error(
             request,
             "Vous n'avez pas accès à ce dossier."
         )
-        return redirect("sante:tableau_bord_parent")
+        return redirect("sante:enfant")
+
+    # Suppression
+    symptome.delete()
+
+    messages.success(
+        request,
+        "Le symptôme a été supprimé avec succès."
+    )
+
+    return redirect(
+        "sante:detail_enfant",
+        enfant_id=enfant.id
+    )
+
+# =========================================================
+# DETAIL ENFANT - PARENT
+# =========================================================
+
+@login_required
+def detail_enfant(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id
+    )
+
+    acces_principal = (
+        enfant.parent == request.user
+    )
+
+    acces_partage = (
+        PartageEnfant.objects
+        .filter(
+            enfant=enfant,
+            parent=request.user,
+            accepte=True
+        )
+        .exists()
+    )
+
+    if not acces_principal and not acces_partage:
+
+        messages.error(
+            request,
+            "Vous n'avez pas accès à ce dossier."
+        )
+
+        return redirect(
+            "sante:tableau_bord_parent"
+        )
+
+    symptomes = (
+        JournalSymptome.objects
+        .filter(enfant=enfant)
+        .order_by("-date")
+    )
 
     return render(
         request,
         "sante/detail_enfant.html",
         {
-            "enfant": enfant
+            "enfant": enfant,
+            "symptomes": symptomes,
         }
     )
 
 
 # =========================================================
-# MODIFIER UN ENFANT
+# MODIFIER ENFANT - PARENT
 # =========================================================
 
 @login_required
-def modifier_enfant(request, pk):
+def modifier_enfant(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
-        pk=pk,
+        id=enfant_id,
         parent=request.user
     )
 
@@ -1019,13 +3036,12 @@ def modifier_enfant(request, pk):
 
         messages.success(
             request,
-            f"Les informations de {enfant.prenom} "
-            f"{enfant.nom} ont été modifiées avec succès."
+            "Les informations ont été modifiées."
         )
 
         return redirect(
             "sante:detail_enfant",
-            pk=enfant.id
+            enfant_id=enfant.id
         )
 
     return render(
@@ -1038,11 +3054,14 @@ def modifier_enfant(request, pk):
 
 
 # =========================================================
-# SUIVI DE CROISSANCE
+# CROISSANCE - PARENT
 # =========================================================
 
 @login_required
-def croissance(request, enfant_id):
+def croissance(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1064,15 +3083,6 @@ def croissance(request, enfant_id):
             "taille"
         )
 
-        perimetre_cranien = request.POST.get(
-            "perimetre_cranien"
-        )
-
-        observations = request.POST.get(
-            "observations",
-            ""
-        ).strip()
-
         if not date_mesure or not poids or not taille:
 
             messages.error(
@@ -1088,11 +3098,15 @@ def croissance(request, enfant_id):
                 poids=poids,
                 taille=taille,
                 perimetre_cranien=(
-                    perimetre_cranien
-                    if perimetre_cranien
-                    else None
+                    request.POST.get(
+                        "perimetre_cranien"
+                    )
+                    or None
                 ),
-                observations=observations,
+                observations=request.POST.get(
+                    "observations",
+                    ""
+                ).strip(),
             )
 
             messages.success(
@@ -1108,9 +3122,7 @@ def croissance(request, enfant_id):
     croissances = (
         SuiviCroissance.objects
         .filter(enfant=enfant)
-        .order_by(
-            "-date_mesure"
-        )
+        .order_by("-date_mesure")
     )
 
     return render(
@@ -1124,11 +3136,14 @@ def croissance(request, enfant_id):
 
 
 # =========================================================
-# VACCINATIONS
+# VACCINATION - PARENT
 # =========================================================
 
 @login_required
-def vaccination(request, enfant_id):
+def vaccination(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1136,78 +3151,10 @@ def vaccination(request, enfant_id):
         parent=request.user
     )
 
-    if request.method == "POST":
-
-        nom_vaccin = request.POST.get(
-            "nom_vaccin",
-            ""
-        ).strip()
-
-        dose = request.POST.get(
-            "dose",
-            ""
-        ).strip()
-
-        date_prevue = request.POST.get(
-            "date_prevue"
-        )
-
-        date_effectuee = request.POST.get(
-            "date_effectuee"
-        )
-
-        prochaine_dose = request.POST.get(
-            "prochaine_dose"
-        )
-
-        observations = request.POST.get(
-            "observations",
-            ""
-        ).strip()
-
-        if not nom_vaccin or not date_prevue:
-
-            messages.error(
-                request,
-                "Le nom du vaccin et la date prévue sont obligatoires."
-            )
-
-        else:
-
-            Vaccination.objects.create(
-                enfant=enfant,
-                nom_vaccin=nom_vaccin,
-                dose=dose,
-                date_prevue=date_prevue,
-                date_effectuee=(
-                    date_effectuee
-                    if date_effectuee
-                    else None
-                ),
-                prochaine_dose=(
-                    prochaine_dose
-                    if prochaine_dose
-                    else None
-                ),
-                observations=observations,
-            )
-
-            messages.success(
-                request,
-                "La vaccination a été enregistrée."
-            )
-
-            return redirect(
-                "sante:vaccination",
-                enfant_id=enfant.id
-            )
-
     vaccinations = (
         Vaccination.objects
         .filter(enfant=enfant)
-        .order_by(
-            "date_prevue"
-        )
+        .order_by("date_prevue")
     )
 
     return render(
@@ -1221,11 +3168,14 @@ def vaccination(request, enfant_id):
 
 
 # =========================================================
-# RENDEZ-VOUS
+# AJOUT VACCINATION - PARENT
 # =========================================================
 
 @login_required
-def rendez_vous(request, enfant_id):
+def ajouter_vaccination(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1235,75 +3185,62 @@ def rendez_vous(request, enfant_id):
 
     if request.method == "POST":
 
-        date_rendez_vous = request.POST.get(
-            "date_rendez_vous"
+        form = VaccinationForm(
+            request.POST
         )
 
-        heure = request.POST.get(
-            "heure"
-        )
+        if form.is_valid():
 
-        motif = request.POST.get(
-            "motif",
-            ""
-        ).strip()
-
-        professionnel_id = request.POST.get(
-            "professionnel"
-        )
-
-        notes = request.POST.get(
-            "notes",
-            ""
-        ).strip()
-
-        if (
-            not date_rendez_vous
-            or not heure
-            or not motif
-        ):
-
-            messages.error(
-                request,
-                "La date, l'heure et le motif sont obligatoires."
+            objet = form.save(
+                commit=False
             )
 
-        else:
-
-            professionnel = None
-
-            if professionnel_id:
-
-                professionnel = get_object_or_404(
-                    User,
-                    id=professionnel_id,
-                    is_staff=True
-                )
-
-            RendezVous.objects.create(
-                enfant=enfant,
-                date_rendez_vous=date_rendez_vous,
-                heure=heure,
-                motif=motif,
-                professionnel=professionnel,
-                notes=notes,
-            )
+            objet.enfant = enfant
+            objet.save()
 
             messages.success(
                 request,
-                "Le rendez-vous a été enregistré."
+                "La vaccination a été enregistrée."
             )
 
             return redirect(
-                "sante:rendez_vous",
+                "sante:vaccination",
                 enfant_id=enfant.id
             )
 
+    else:
+
+        form = VaccinationForm()
+
+    return render(
+        request,
+        "sante/ajouter_vaccination.html",
+        {
+            "form": form,
+            "enfant": enfant,
+        }
+    )
+
+
+# =========================================================
+# RENDEZ-VOUS - PARENT
+# =========================================================
+
+@login_required
+def rendez_vous(
+    request,
+    enfant_id
+):
+
+    enfant = get_object_or_404(
+        Enfant,
+        id=enfant_id,
+        parent=request.user
+    )
+
     professionnels = (
         User.objects
-        .filter(
-            is_staff=True
-        )
+        .filter(is_staff=True)
         .order_by(
             "first_name",
             "last_name"
@@ -1313,9 +3250,7 @@ def rendez_vous(request, enfant_id):
     rendez_vous_list = (
         RendezVous.objects
         .filter(enfant=enfant)
-        .select_related(
-            "professionnel"
-        )
+        .select_related("professionnel")
         .order_by(
             "date_rendez_vous",
             "heure"
@@ -1323,22 +3258,25 @@ def rendez_vous(request, enfant_id):
     )
 
     return render(
-    request,
-    "sante/rendez_vous.html",
-    {
-        "enfant": enfant,
-        "professionnels": professionnels,
-        "rendez_vous_list": rendez_vous_list,
-    }
-)
+        request,
+        "sante/rendez_vous.html",
+        {
+            "enfant": enfant,
+            "professionnels": professionnels,
+            "rendez_vous_list": rendez_vous_list,
+        }
+    )
 
 
 # =========================================================
-# CONSULTATIONS
+# CONSULTATIONS - PARENT
 # =========================================================
 
 @login_required
-def consultation(request, enfant_id):
+def consultation(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1349,9 +3287,7 @@ def consultation(request, enfant_id):
     consultations = (
         Consultation.objects
         .filter(enfant=enfant)
-        .order_by(
-            "-date_consultation"
-        )
+        .order_by("-date_consultation")
     )
 
     return render(
@@ -1364,12 +3300,11 @@ def consultation(request, enfant_id):
     )
 
 
-# =========================================================
-# LISTE DES CONSULTATIONS
-# =========================================================
-
 @login_required
-def liste_consultations(request, enfant_id):
+def liste_consultations(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1380,9 +3315,7 @@ def liste_consultations(request, enfant_id):
     consultations = (
         Consultation.objects
         .filter(enfant=enfant)
-        .order_by(
-            "-date_consultation"
-        )
+        .order_by("-date_consultation")
     )
 
     return render(
@@ -1395,12 +3328,11 @@ def liste_consultations(request, enfant_id):
     )
 
 
-# =========================================================
-# AJOUTER UNE CONSULTATION
-# =========================================================
-
 @login_required
-def ajouter_consultation(request, enfant_id):
+def ajouter_consultation(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1416,17 +3348,16 @@ def ajouter_consultation(request, enfant_id):
 
         if form.is_valid():
 
-            consultation = form.save(
+            objet = form.save(
                 commit=False
             )
 
-            consultation.enfant = enfant
-
-            consultation.save()
+            objet.enfant = enfant
+            objet.save()
 
             messages.success(
                 request,
-                "La consultation a été ajoutée avec succès."
+                "La consultation a été ajoutée."
             )
 
             return redirect(
@@ -1449,11 +3380,11 @@ def ajouter_consultation(request, enfant_id):
 
 
 # =========================================================
-# BIEN-ÊTRE
+# BIEN-ÊTRE - PARENT
 # =========================================================
 
 @login_required
-def bien_etre(request, enfant_id):
+def bien_etre(request,enfant_id):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1461,105 +3392,10 @@ def bien_etre(request, enfant_id):
         parent=request.user
     )
 
-    if request.method == "POST":
-
-        date_suivi = request.POST.get(
-            "date_suivi"
-        )
-
-        humeur = request.POST.get(
-            "humeur"
-        )
-
-        sommeil = request.POST.get(
-            "sommeil"
-        )
-
-        alimentation = request.POST.get(
-            "alimentation",
-            ""
-        ).strip()
-
-        hydratation = request.POST.get(
-            "hydratation",
-            ""
-        ).strip()
-
-        activite_physique = request.POST.get(
-            "activite_physique",
-            ""
-        ).strip()
-
-        hygiene = request.POST.get(
-            "hygiene",
-            ""
-        ).strip()
-
-        temps_ecran = request.POST.get(
-            "temps_ecran",
-            0
-        )
-
-        observations = request.POST.get(
-            "observations",
-            ""
-        ).strip()
-
-        if (
-            not date_suivi
-            or not humeur
-            or not sommeil
-        ):
-
-            messages.error(
-                request,
-                "La date, l'humeur et le sommeil sont obligatoires."
-            )
-
-        else:
-
-            try:
-
-                temps_ecran = int(
-                    temps_ecran
-                )
-
-            except (
-                TypeError,
-                ValueError
-            ):
-
-                temps_ecran = 0
-
-            BienEtre.objects.create(
-                enfant=enfant,
-                date_suivi=date_suivi,
-                humeur=humeur,
-                sommeil=sommeil,
-                alimentation=alimentation,
-                hydratation=hydratation,
-                activite_physique=activite_physique,
-                hygiene=hygiene,
-                temps_ecran=temps_ecran,
-                observations=observations,
-            )
-
-            messages.success(
-                request,
-                "Le suivi du bien-être a été enregistré."
-            )
-
-            return redirect(
-                "sante:bien_etre",
-                enfant_id=enfant.id
-            )
-
     suivis = (
         BienEtre.objects
         .filter(enfant=enfant)
-        .order_by(
-            "-date_suivi"
-        )
+        .order_by("-date_suivi")
     )
 
     return render(
@@ -1572,13 +3408,12 @@ def bien_etre(request, enfant_id):
     )
 
 
-
 # =========================================================
-# SUIVI TEMPERATURE
+# TEMPERATURE - PARENT
 # =========================================================
 
 @login_required
-def suivi_temperature(request, enfant_id):
+def suivi_temperature(request,enfant_id):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1594,13 +3429,12 @@ def suivi_temperature(request, enfant_id):
 
         if form.is_valid():
 
-            temperature = form.save(
+            objet = form.save(
                 commit=False
             )
 
-            temperature.enfant = enfant
-
-            temperature.save()
+            objet.enfant = enfant
+            objet.save()
 
             messages.success(
                 request,
@@ -1619,9 +3453,7 @@ def suivi_temperature(request, enfant_id):
     temperatures = (
         Temperature.objects
         .filter(enfant=enfant)
-        .order_by(
-            "-date_prise"
-        )
+        .order_by("-date_prise")
     )
 
     return render(
@@ -1635,12 +3467,8 @@ def suivi_temperature(request, enfant_id):
     )
 
 
-# =========================================================
-# SUPPRIMER UNE TEMPERATURE
-# =========================================================
-
 @login_required
-def supprimer_temperature(request, temperature_id):
+def supprimer_temperature(request,temperature_id):
 
     temperature = get_object_or_404(
         Temperature,
@@ -1663,10 +3491,14 @@ def supprimer_temperature(request, temperature_id):
         "sante:suivi_temperature",
         enfant_id=enfant_id
     )
-      
-    
+
+
+# =========================================================
+# TRAITEMENTS - PARENT
+# =========================================================
+
 @login_required
-def ajouter_traitement(request, enfant_id):
+def ajouter_traitement(request,enfant_id):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1676,21 +3508,20 @@ def ajouter_traitement(request, enfant_id):
 
     if request.method == "POST":
 
-        form = TraitementForm(request.POST)
+        form = TraitementForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            traitement = form.save(
+            objet = form.save(
                 commit=False
             )
 
-            traitement.enfant = enfant
+            objet.enfant = enfant
+            objet.prochaine_prise = objet.premiere_prise
 
-            traitement.prochaine_prise = (
-                traitement.premiere_prise
-            )
-
-            traitement.save()
+            objet.save()
 
             messages.success(
                 request,
@@ -1706,7 +3537,6 @@ def ajouter_traitement(request, enfant_id):
 
         form = TraitementForm()
 
-
     return render(
         request,
         "sante/ajouter_traitement.html",
@@ -1715,8 +3545,10 @@ def ajouter_traitement(request, enfant_id):
             "form": form,
         }
     )
+
+
 @login_required
-def traitements(request, enfant_id):
+def traitements(request,enfant_id):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1733,20 +3565,22 @@ def traitements(request, enfant_id):
         .order_by("prochaine_prise")
     )
 
-    maintenant = timezone.now()
-
     return render(
         request,
         "sante/traitements.html",
         {
             "enfant": enfant,
             "traitements": liste_traitements,
-            "maintenant": maintenant,
+            "maintenant": timezone.now(),
         }
     )
-    
+
+
 @login_required
-def enregistrer_prise(request, traitement_id):
+def enregistrer_prise(
+    request,
+    traitement_id
+):
 
     traitement = get_object_or_404(
         Traitement,
@@ -1770,41 +3604,30 @@ def enregistrer_prise(request, traitement_id):
             enfant_id=traitement.enfant.id
         )
 
-
     if request.method == "POST":
 
         PriseTraitement.objects.create(
-
             traitement=traitement,
-
             date_heure_prevue=(
                 traitement.prochaine_prise
                 or maintenant
             ),
-
             date_heure_prise=maintenant,
-
             statut="prise",
-
             observation=request.POST.get(
                 "observation",
                 ""
             )
         )
 
-
-        # =====================================
-        # CALCUL DE LA PROCHAINE PRISE
-        # =====================================
-
         if traitement.intervalle_heures:
 
             traitement.prochaine_prise = (
-                maintenant +
-
+                maintenant
+                +
                 timedelta(
                     hours=traitement.intervalle_heures
-                 )
+                )
             )
 
             traitement.save(
@@ -1823,20 +3646,26 @@ def enregistrer_prise(request, traitement_id):
                 ]
             )
 
-
         messages.success(
             request,
             "Prise enregistrée."
         )
-
 
     return redirect(
         "sante:traitements",
         enfant_id=traitement.enfant.id
     )
 
+
+# =========================================================
+# PARTAGE PARENT
+# =========================================================
+
 @login_required
-def inviter_parent(request, enfant_id):
+def inviter_parent(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1846,51 +3675,70 @@ def inviter_parent(request, enfant_id):
 
     if request.method == "POST":
 
-        email = request.POST.get("email", "").strip()
+        email = request.POST.get(
+            "email",
+            ""
+        ).strip()
 
         if not email:
+
             messages.error(
                 request,
-                "Veuillez saisir l'adresse e-mail du parent."
+                "Veuillez saisir l'adresse e-mail."
             )
+
             return redirect(
                 "sante:inviter_parent",
                 enfant_id=enfant.id
             )
 
         try:
-            parent = User.objects.get(email=email)
+
+            parent = User.objects.get(
+                email=email
+            )
+
         except User.DoesNotExist:
+
             messages.error(
                 request,
                 "Aucun compte ne correspond à cette adresse e-mail."
             )
+
             return redirect(
                 "sante:inviter_parent",
                 enfant_id=enfant.id
             )
 
         if parent == request.user:
+
             messages.error(
                 request,
                 "Vous ne pouvez pas vous inviter vous-même."
             )
+
             return redirect(
                 "sante:inviter_parent",
                 enfant_id=enfant.id
             )
 
-        partage, created = PartageEnfant.objects.get_or_create(
-            enfant=enfant,
-            parent=parent
+        partage, created = (
+            PartageEnfant.objects
+            .get_or_create(
+                enfant=enfant,
+                parent=parent
+            )
         )
 
         if not created and partage.accepte:
+
             messages.info(
                 request,
                 "Ce parent a déjà accès à cet enfant."
             )
+
         else:
+
             partage.accepte = False
             partage.save()
 
@@ -1904,9 +3752,11 @@ def inviter_parent(request, enfant_id):
             enfant_id=enfant.id
         )
 
-    partages = PartageEnfant.objects.filter(
-        enfant=enfant
-    ).select_related("parent")
+    partages = (
+        PartageEnfant.objects
+        .filter(enfant=enfant)
+        .select_related("parent")
+    )
 
     return render(
         request,
@@ -1916,9 +3766,13 @@ def inviter_parent(request, enfant_id):
             "partages": partages,
         }
     )
-    
+
+
 @login_required
-def accepter_partage(request, partage_id):
+def accepter_partage(
+    request,
+    partage_id
+):
 
     partage = get_object_or_404(
         PartageEnfant,
@@ -1931,45 +3785,24 @@ def accepter_partage(request, partage_id):
 
     messages.success(
         request,
-        f"Vous avez maintenant accès au dossier de {partage.enfant.prenom}."
+        f"Vous avez maintenant accès au dossier de "
+        f"{partage.enfant.prenom}."
     )
 
-    return redirect("sante:tableau_bord_parent")
+    return redirect(
+        "sante:tableau_bord_parent"
+    )
+
 
 # =========================================================
-# MODE GARDE
-# =========================================================
-
-from io import BytesIO
-from urllib.parse import quote
-
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from django.urls import reverse
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-
-from PIL import Image, ImageDraw, ImageFont
-
-from .models import (
-    Enfant,
-    ModeGarde,
-    BienEtre,
-    Vaccination,
-    Consultation,
-)
-
-from .forms import ModeGardeForm
-
-# =========================================================
-# CREER UN MODE GARDE
+# MODE GARDE - CREATION
 # =========================================================
 
 @login_required
-def creer_mode_garde(request, enfant_id):
+def creer_mode_garde(
+    request,
+    enfant_id
+):
 
     enfant = get_object_or_404(
         Enfant,
@@ -1979,29 +3812,30 @@ def creer_mode_garde(request, enfant_id):
 
     if request.method == "POST":
 
-        form = ModeGardeForm(request.POST)
+        form = ModeGardeForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            mode_garde = form.save(
+            objet = form.save(
                 commit=False
             )
 
-            mode_garde.enfant = enfant
-            mode_garde.parent = request.user
+            objet.enfant = enfant
+            objet.parent = request.user
 
-            mode_garde.save()
+            objet.save()
 
             messages.success(
                 request,
-                f"Le mode garde de {enfant.prenom} "
-                f"a été créé avec succès."
+                "Mode garde créé avec succès."
             )
 
             return redirect(
                 "sante:mode_garde_detail",
                 enfant_id=enfant.id,
-                mode_garde_id=mode_garde.id
+                mode_garde_id=objet.id
             )
 
     else:
@@ -2009,16 +3843,10 @@ def creer_mode_garde(request, enfant_id):
         form = ModeGardeForm(
             initial={
                 "date_debut": timezone.localdate(),
-
                 "partager_allergies": True,
                 "partager_traitement": True,
                 "partager_alimentation": True,
                 "partager_sommeil": True,
-
-                "partager_antecedents": False,
-                "partager_vaccinations": False,
-                "partager_consultations": False,
-
                 "partager_contact_parent": True,
             }
         )
@@ -2031,7 +3859,8 @@ def creer_mode_garde(request, enfant_id):
             "form": form,
         }
     )
-    
+
+
 @login_required
 def desactiver_mode_garde(
     request,
@@ -2046,19 +3875,86 @@ def desactiver_mode_garde(
         parent=request.user
     )
 
-    mode_garde.actif = False
-    mode_garde.save()
+    if request.method == "POST":
+
+        mode_garde.actif = False
+        mode_garde.save()
+
+        messages.success(
+            request,
+            "Mode garde désactivé."
+        )
 
     return redirect(
         "sante:detail_enfant",
         enfant_id=enfant_id
     )
-    
+
+
 # =========================================================
-# CONSULTATION PUBLIQUE DU MODE GARDE
+# DETAIL MODE GARDE
 # =========================================================
 
-def consulter_mode_garde(request, token):
+@login_required
+def mode_garde_detail(
+    request,
+    enfant_id,
+    mode_garde_id
+):
+
+    mode_garde = get_object_or_404(
+        ModeGarde,
+        id=mode_garde_id,
+        enfant_id=enfant_id,
+        parent=request.user
+    )
+
+    enfant = mode_garde.enfant
+
+    dernier_bien_etre = (
+        BienEtre.objects
+        .filter(enfant=enfant)
+        .order_by("-date_suivi")
+        .first()
+    )
+
+    vaccinations = (
+        Vaccination.objects
+        .filter(enfant=enfant)
+        .order_by("date_prevue")
+        if mode_garde.partager_vaccinations
+        else Vaccination.objects.none()
+    )
+
+    consultations = (
+        Consultation.objects
+        .filter(enfant=enfant)
+        .order_by("-date_consultation")
+        if mode_garde.partager_consultations
+        else Consultation.objects.none()
+    )
+
+    return render(
+        request,
+        "sante/mode_garde_detail.html",
+        {
+            "mode_garde": mode_garde,
+            "enfant": enfant,
+            "dernier_bien_etre": dernier_bien_etre,
+            "vaccinations": vaccinations,
+            "consultations": consultations,
+        }
+    )
+
+
+# =========================================================
+# MODE GARDE PUBLIC
+# =========================================================
+
+def consulter_mode_garde(
+    request,
+    token
+):
 
     mode_garde = get_object_or_404(
         ModeGarde,
@@ -2086,18 +3982,36 @@ def consulter_mode_garde(request, token):
         .filter(enfant=enfant)
         .order_by("-date_suivi")
         .first()
+        if (
+            mode_garde.partager_alimentation
+            or mode_garde.partager_sommeil
+            or mode_garde.partager_hydratation
+        )
+        else None
     )
 
     vaccinations = (
         Vaccination.objects
         .filter(enfant=enfant)
         .order_by("date_prevue")
+        if mode_garde.partager_vaccinations
+        else Vaccination.objects.none()
     )
 
     consultations = (
         Consultation.objects
         .filter(enfant=enfant)
         .order_by("-date_consultation")
+        if mode_garde.partager_consultations
+        else Consultation.objects.none()
+    )
+
+    temperatures = (
+        Temperature.objects
+        .filter(enfant=enfant)
+        .order_by("-date_prise")[:5]
+        if mode_garde.partager_temperature
+        else Temperature.objects.none()
     )
 
     return render(
@@ -2109,79 +4023,13 @@ def consulter_mode_garde(request, token):
             "dernier_bien_etre": dernier_bien_etre,
             "vaccinations": vaccinations,
             "consultations": consultations,
+            "temperatures": temperatures,
         }
     )
-    # =========================================================
-# DETAIL DU MODE GARDE
+
+
 # =========================================================
-
-@login_required
-def mode_garde_detail(
-    request,
-    enfant_id,
-    mode_garde_id
-):
-
-    mode_garde = get_object_or_404(
-        ModeGarde,
-        id=mode_garde_id,
-        enfant_id=enfant_id,
-        parent=request.user
-    )
-
-    enfant = mode_garde.enfant
-
-    # -----------------------------------------------------
-    # DERNIER SUIVI DU BIEN-ÊTRE
-    # -----------------------------------------------------
-
-    dernier_bien_etre = (
-        BienEtre.objects
-        .filter(enfant=enfant)
-        .order_by("-date_suivi")
-        .first()
-    )
-
-    # -----------------------------------------------------
-    # VACCINATIONS
-    # -----------------------------------------------------
-
-    vaccinations = (
-        Vaccination.objects
-        .filter(enfant=enfant)
-        .order_by("date_prevue")
-    )
-
-    # -----------------------------------------------------
-    # CONSULTATIONS
-    # -----------------------------------------------------
-
-    consultations = (
-        Consultation.objects
-        .filter(enfant=enfant)
-        .order_by("-date_consultation")
-    )
-
-    # -----------------------------------------------------
-    # CONTEXTE
-    # -----------------------------------------------------
-
-    context = {
-        "mode_garde": mode_garde,
-        "enfant": enfant,
-        "dernier_bien_etre": dernier_bien_etre,
-        "vaccinations": vaccinations,
-        "consultations": consultations,
-    }
-
-    return render(
-        request,
-        "sante/mode_garde_detail.html",
-        context
-    )
-    
-# =========================================================
-# GENERER PDF MODE GARDE
+# PDF MODE GARDE
 # =========================================================
 
 @login_required
@@ -2218,10 +4066,6 @@ def mode_garde_pdf(
 
     y = hauteur - 55
 
-    # -----------------------------------------------------
-    # TITRE
-    # -----------------------------------------------------
-
     pdf.setFont(
         "Helvetica-Bold",
         22
@@ -2247,10 +4091,6 @@ def mode_garde_pdf(
     )
 
     y -= 30
-
-    # -----------------------------------------------------
-    # INFORMATIONS GARDIEN
-    # -----------------------------------------------------
 
     pdf.setFont(
         "Helvetica",
@@ -2281,10 +4121,6 @@ def mode_garde_pdf(
 
     y -= 15
 
-    # -----------------------------------------------------
-    # INFORMATIONS IMPORTANTES
-    # -----------------------------------------------------
-
     pdf.setFont(
         "Helvetica-Bold",
         14
@@ -2302,10 +4138,6 @@ def mode_garde_pdf(
         "Helvetica",
         10
     )
-
-    # -----------------------------------------------------
-    # ALLERGIES
-    # -----------------------------------------------------
 
     if mode_garde.partager_allergies:
 
@@ -2325,10 +4157,6 @@ def mode_garde_pdf(
 
         y -= 25
 
-    # -----------------------------------------------------
-    # TRAITEMENT
-    # -----------------------------------------------------
-
     if mode_garde.partager_traitement:
 
         pdf.drawString(
@@ -2347,18 +4175,17 @@ def mode_garde_pdf(
 
         y -= 25
 
-    # -----------------------------------------------------
-    # ALIMENTATION
-    # -----------------------------------------------------
+    dernier_bien_etre = (
+        BienEtre.objects
+        .filter(enfant=enfant)
+        .order_by("-date_suivi")
+        .first()
+    )
 
-    if mode_garde.partager_alimentation:
-
-        dernier_bien_etre = (
-            BienEtre.objects
-            .filter(enfant=enfant)
-            .order_by("-date_suivi")
-            .first()
-        )
+    if (
+        mode_garde.partager_alimentation
+        and dernier_bien_etre
+    ):
 
         pdf.drawString(
             50,
@@ -2368,33 +4195,19 @@ def mode_garde_pdf(
 
         y -= 17
 
-        alimentation = (
-            dernier_bien_etre.alimentation
-            if dernier_bien_etre
-            and dernier_bien_etre.alimentation
-            else "Aucune information"
-        )
-
         pdf.drawString(
             70,
             y,
-            alimentation[:100]
+            dernier_bien_etre.alimentation
+            or "Aucune information"
         )
 
         y -= 25
 
-    # -----------------------------------------------------
-    # SOMMEIL
-    # -----------------------------------------------------
-
-    if mode_garde.partager_sommeil:
-
-        dernier_bien_etre = (
-            BienEtre.objects
-            .filter(enfant=enfant)
-            .order_by("-date_suivi")
-            .first()
-        )
+    if (
+        mode_garde.partager_sommeil
+        and dernier_bien_etre
+    ):
 
         pdf.drawString(
             50,
@@ -2404,23 +4217,13 @@ def mode_garde_pdf(
 
         y -= 17
 
-        sommeil = (
-            dernier_bien_etre.get_sommeil_display()
-            if dernier_bien_etre
-            else "Aucune information"
-        )
-
         pdf.drawString(
             70,
             y,
-            sommeil
+            dernier_bien_etre.get_sommeil_display()
         )
 
         y -= 25
-
-    # -----------------------------------------------------
-    # ANTECEDENTS
-    # -----------------------------------------------------
 
     if mode_garde.partager_antecedents:
 
@@ -2440,10 +4243,6 @@ def mode_garde_pdf(
 
         y -= 25
 
-    # -----------------------------------------------------
-    # CONTACT PARENT
-    # -----------------------------------------------------
-
     if mode_garde.partager_contact_parent:
 
         pdf.drawString(
@@ -2454,10 +4253,6 @@ def mode_garde_pdf(
         )
 
         y -= 25
-
-    # -----------------------------------------------------
-    # CONTACT URGENCE
-    # -----------------------------------------------------
 
     if mode_garde.contact_urgence:
 
@@ -2472,16 +4267,12 @@ def mode_garde_pdf(
             f"Urgence : {mode_garde.contact_urgence}"
         )
 
+        y -= 25
+
         pdf.setFont(
             "Helvetica",
             10
         )
-
-        y -= 25
-
-    # -----------------------------------------------------
-    # VACCINATIONS
-    # -----------------------------------------------------
 
     if mode_garde.partager_vaccinations:
 
@@ -2535,12 +4326,6 @@ def mode_garde_pdf(
                     10
                 )
 
-        y -= 10
-
-    # -----------------------------------------------------
-    # CONSULTATIONS
-    # -----------------------------------------------------
-
     if mode_garde.partager_consultations:
 
         pdf.setFont(
@@ -2569,13 +4354,8 @@ def mode_garde_pdf(
 
         for consultation in consultations:
 
-            date_consultation = (
-                consultation.date_consultation
-                .strftime("%d/%m/%Y")
-            )
-
             texte = (
-                f"{date_consultation} - "
+                f"{consultation.date_consultation:%d/%m/%Y} - "
                 f"{consultation.motif[:80]}"
             )
 
@@ -2586,23 +4366,6 @@ def mode_garde_pdf(
             )
 
             y -= 17
-
-            if y < 80:
-
-                pdf.showPage()
-
-                y = hauteur - 60
-
-                pdf.setFont(
-                    "Helvetica",
-                    10
-                )
-
-        y -= 10
-
-    # -----------------------------------------------------
-    # CONSIGNES
-    # -----------------------------------------------------
 
     if mode_garde.consignes:
 
@@ -2663,12 +4426,6 @@ def mode_garde_pdf(
                 ligne
             )
 
-            y -= 25
-
-    # -----------------------------------------------------
-    # PIED DE PAGE
-    # -----------------------------------------------------
-
     pdf.setFont(
         "Helvetica-Oblique",
         8
@@ -2686,6 +4443,10 @@ def mode_garde_pdf(
     return response
 
 
+# =========================================================
+# IMAGE MODE GARDE
+# =========================================================
+
 @login_required
 def mode_garde_image(
     request,
@@ -2700,6 +4461,8 @@ def mode_garde_image(
         parent=request.user
     )
 
+    enfant = mode_garde.enfant
+
     largeur = 1200
     hauteur = 1600
 
@@ -2709,7 +4472,9 @@ def mode_garde_image(
         "white"
     )
 
-    draw = ImageDraw.Draw(image)
+    draw = ImageDraw.Draw(
+        image
+    )
 
     try:
 
@@ -2745,11 +4510,9 @@ def mode_garde_image(
 
     y += 100
 
-    enfant = mode_garde.enfant
-
     draw.text(
         (60, y),
-        f"👧 {enfant.prenom}",
+        f"{enfant.prenom} {enfant.nom}",
         font=font_sous_titre,
         fill="black"
     )
@@ -2792,7 +4555,7 @@ def mode_garde_image(
 
         draw.text(
             (60, y),
-            "⚠ Allergies :",
+            "Allergies :",
             font=font_sous_titre,
             fill="black"
         )
@@ -2812,7 +4575,7 @@ def mode_garde_image(
 
         draw.text(
             (60, y),
-            "💊 Traitement :",
+            "Traitement :",
             font=font_sous_titre,
             fill="black"
         )
@@ -2821,7 +4584,7 @@ def mode_garde_image(
 
         draw.text(
             (80, y),
-            enfant.traitement or "Aucun traitement indiqué",
+            enfant.traitement or "Aucun traitement",
             font=font,
             fill="black"
         )
@@ -2917,10 +4680,8 @@ def mode_garde_image(
                 fill="black"
             )
 
-    y = hauteur - 80
-
     draw.text(
-        (60, y),
+        (60, hauteur - 80),
         "TOUKPEDIO",
         font=font,
         fill="black"
@@ -2940,17 +4701,16 @@ def mode_garde_image(
         content_type="image/png"
     )
 
-    response[
-        "Content-Disposition"
-    ] = (
+    response["Content-Disposition"] = (
         f'attachment; filename="mode_garde_'
         f'{enfant.prenom}.png"'
     )
 
     return response
 
+
 # =========================================================
-# WHATSAPP
+# WHATSAPP MODE GARDE
 # =========================================================
 
 @login_required
@@ -2996,17 +4756,14 @@ def mode_garde_whatsapp(
         .replace("+", "")
     )
 
-    whatsapp_url = (
+    return redirect(
         f"https://wa.me/{telephone}"
         f"?text={quote(message)}"
     )
 
-    return redirect(
-        whatsapp_url
-    )
-    
+
 # =========================================================
-# SMS
+# SMS MODE GARDE
 # =========================================================
 
 @login_required

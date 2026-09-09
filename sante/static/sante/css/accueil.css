@@ -640,6 +640,7 @@ body {
     font-weight: 800;
 }
 
+
 .stat-item p {
     color:
         rgba(255,255,255,.75);
@@ -1082,91 +1083,118 @@ body {
         opacity: 0;
     }
 }
-/* =========================================================
-   MODE NUIT
-========================================================= */
+
+
+body {
+    transition:
+        background-color 0.4s ease,
+        color 0.4s ease;
+}
+
+/* ================================
+   MODE NUIT AUTOMATIQUE
+   BLEU NUIT
+================================ */
 
 body.dark-mode {
-
-    --blanc-casse: #101d35;
-    --blanc: #172944;
-
-    --texte: #f4f8fb;
-    --texte-secondaire: #b7c5d6;
-
-    --bleu-horizon-clair: #203b55;
-    --vert-menthe-clair: #1d4038;
-
-    background:
-        var(--bleu-nuit);
-
-    color:
-        var(--texte);
+    background-color: #0B1F3A !important;
+    color: #F5F7FA !important;
 }
 
-
-body.dark-mode .hero {
-
-    background:
-        linear-gradient(
-            135deg,
-            #101d35,
-            #172944
-        );
+/* Cartes */
+body.dark-mode .card {
+    background-color: #132B4F !important;
+    color: #F5F7FA !important;
+    border-color: #28466B !important;
 }
 
-
-body.dark-mode .hero-title,
-body.dark-mode .section-title,
-body.dark-mode .service-card h4,
-body.dark-mode .hero-card h3,
-body.dark-mode .about-box h5 {
-
-    color:
-        #ffffff;
+body.dark-mode .card-body {
+    background-color: #132B4F !important;
+    color: #F5F7FA !important;
 }
 
-
-body.dark-mode .hero-card,
-body.dark-mode .service-card {
-
-    background:
-        #172944;
-
-    border-color:
-        rgba(255,255,255,.08);
+/* Navbar */
+body.dark-mode .navbar {
+    background-color: #08172B !important;
 }
 
-
-body.dark-mode .service-card p,
-body.dark-mode .hero-card-text,
-body.dark-mode .about-text {
-
-    color:
-        #b7c5d6;
+/* Textes */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode span {
+    color: #F5F7FA !important;
 }
 
-
-body.dark-mode .services-section,
-body.dark-mode .about-section {
-
-    background:
-        #101d35;
+/* Champs de formulaire */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: #1B3558 !important;
+    color: #FFFFFF !important;
+    border-color: #41658D !important;
 }
 
-
-body.dark-mode .btn-secondaire {
-
-    color:
-        white;
-
-    background:
-        #172944;
+body.dark-mode .form-control::placeholder {
+    color: #B8C7D9 !important;
 }
 
-
-body.dark-mode .about-box h5 {
-
-    color:
-        white;
+/* Tableaux */
+body.dark-mode .table {
+    color: #FFFFFF !important;
 }
+
+body.dark-mode .table th,
+body.dark-mode .table td {
+    background-color: #132B4F !important;
+    color: #FFFFFF !important;
+    border-color: #365477 !important;
+}
+
+/* Fond Bootstrap */
+body.dark-mode .bg-light {
+    background-color: #0B1F3A !important;
+}
+
+body.dark-mode .bg-white {
+    background-color: #132B4F !important;
+}
+
+/* Texte Bootstrap */
+body.dark-mode .text-dark {
+    color: #F5F7FA !important;
+}
+
+/* Liens */
+body.dark-mode a {
+    color: #8EC5FF;
+}
+
+body.dark-mode a:hover {
+    color: #B9DDFF;
+}
+
+/* Dropdown */
+body.dark-mode .dropdown-menu {
+    background-color: #132B4F !important;
+    border-color: #365477 !important;
+}
+
+body.dark-mode .dropdown-item {
+    color: #F5F7FA !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #1B3558 !important;
+}
+
+/* Footer */
+body.dark-mode footer {
+    background-color: #08172B !important;
+    color: #F5F7FA !important;
+}
+

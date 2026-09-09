@@ -1,0 +1,339 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+{{ titre }} - TOUKPEDIO
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .admin-form-container {
+        max-width: 850px;
+        margin: 40px auto;
+    }
+
+    .admin-form-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .admin-form-header {
+        padding: 25px 30px;
+        background: linear-gradient(
+            135deg,
+            #0d6efd,
+            #0b5ed7
+        );
+        color: white;
+    }
+
+    .admin-form-header h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .admin-form-header p {
+        margin: 8px 0 0;
+        opacity: 0.9;
+    }
+
+    .admin-form-body {
+        padding: 30px;
+    }
+
+    .child-info {
+        background: #f8f9fa;
+        border-radius: 14px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        border-left: 5px solid #0d6efd;
+    }
+
+    .child-info strong {
+        color: #0d6efd;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        min-height: 48px;
+        border: 1px solid #dee2e6;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+    }
+
+    .field-error {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+
+    .required-star {
+        color: #dc3545;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .btn-admin {
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+
+        .admin-form-container {
+            margin: 20px 10px;
+        }
+
+        .admin-form-header,
+        .admin-form-body {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions a,
+        .form-actions button {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+    <div class="admin-form-container">
+
+        <div class="card admin-form-card">
+
+            <!-- =============================== -->
+            <!-- EN-TÊTE -->
+            <!-- =============================== -->
+
+            <div class="admin-form-header">
+
+                <h2>
+                    {% if "Vaccination" in objet %}
+                        💉
+                    {% elif "Sympt" in objet %}
+                        🩺
+                    {% elif "Consultation" in objet %}
+                        🏥
+                    {% elif "Température" in objet %}
+                        🌡️
+                    {% elif "Traitement" in objet %}
+                        💊
+                    {% elif "Croissance" in objet %}
+                        📈
+                    {% elif "Bien" in objet %}
+                        ❤️
+                    {% elif "Rendez" in objet %}
+                        📅
+                    {% else %}
+                        📝
+                    {% endif %}
+
+                    {{ titre }}
+                </h2>
+
+                <p>
+                    Gestion administrative du dossier médical
+                </p>
+
+            </div>
+
+
+            <!-- =============================== -->
+            <!-- CORPS -->
+            <!-- =============================== -->
+
+            <div class="admin-form-body">
+
+
+                <!-- INFORMATIONS ENFANT -->
+
+                <div class="child-info">
+
+                    <div>
+                        <strong>👶 Enfant :</strong>
+
+                        {{ enfant.prenom }}
+                        {{ enfant.nom }}
+                    </div>
+
+                    {% if enfant.date_naissance %}
+
+                    <small class="text-muted">
+
+                        Date de naissance :
+                        {{ enfant.date_naissance|date:"d/m/Y" }}
+
+                    </small>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =============================== -->
+                <!-- FORMULAIRE -->
+                <!-- =============================== -->
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    {% if form.non_field_errors %}
+
+                    <div class="alert alert-danger">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div class="row g-4">
+
+
+                        {% for field in form %}
+
+                        <div
+                            class="
+                                {% if field.name == 'observations' %}
+                                    col-12
+                                {% else %}
+                                    col-md-6
+                                {% endif %}
+                            "
+                        >
+
+                            <label
+                                for="{{ field.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ field.label }}
+
+                                {% if field.field.required %}
+                                    <span class="required-star">*</span>
+                                {% endif %}
+
+                            </label>
+
+
+                            {{ field }}
+
+
+                            {% if field.help_text %}
+
+                            <div class="form-text">
+
+                                {{ field.help_text }}
+
+                            </div>
+
+                            {% endif %}
+
+
+                            {% if field.errors %}
+
+                            {% for error in field.errors %}
+
+                            <div class="field-error">
+
+                                {{ error }}
+
+                            </div>
+
+                            {% endfor %}
+
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =============================== -->
+                    <!-- BOUTONS -->
+                    <!-- =============================== -->
+
+                    <div class="form-actions">
+
+                        <a
+                            href="{% url 'sante:administration_enfant_detail' enfant.id %}"
+                            class="btn btn-outline-secondary btn-admin"
+                        >
+                            ← Annuler
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-admin"
+                        >
+
+                            {% if "Ajouter" in titre %}
+
+                                ➕ Ajouter
+
+                            {% else %}
+
+                                💾 Enregistrer
+
+                            {% endif %}
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

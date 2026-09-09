@@ -1,0 +1,104 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Ajouter un parent - {{ enfant.prenom }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-primary text-white py-3">
+
+                    <h4 class="mb-0">
+                        <i class="bi bi-people-fill me-2"></i>
+                        Ajouter un parent
+                    </h4>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <div class="alert alert-info">
+
+                        <strong>
+                            Dossier de {{ enfant.prenom }} {{ enfant.nom }}
+                        </strong>
+
+                        <br>
+
+                        Saisissez l'adresse e-mail du compte du parent
+                        auquel vous souhaitez donner accès au dossier.
+
+                    </div>
+
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+
+                            <label
+                                for="email"
+                                class="form-label fw-bold"
+                            >
+                                Adresse e-mail du parent
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                class="form-control form-control-lg"
+                                placeholder="parent@example.com"
+                                required
+                            >
+
+                            <div class="form-text">
+                                Le parent doit déjà posséder un compte
+                                TOUKPEDIO avec cette adresse e-mail.
+                            </div>
+
+                        </div>
+
+
+                        <div class="d-flex gap-2">
+
+                            <a
+                                href="{% url 'sante:administration_enfant_detail' enfant.id %}"
+                                class="btn btn-outline-secondary"
+                            >
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Annuler
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                <i class="bi bi-person-plus me-1"></i>
+                                Ajouter le parent
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
