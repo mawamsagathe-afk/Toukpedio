@@ -96,6 +96,8 @@ body {
 
     color:
         var(--texte);
+    
+    position: fixed;
 
 }
 

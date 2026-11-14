@@ -1,0 +1,184 @@
+{% extends "sante/base.html" %}
+{% load static %}
+
+{% block title %}{{ conversation.sujet }} - Messagerie TOUKPEDIO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .conversation-panel { max-width: 900px; margin: 0 auto; }
+    .message-list { height: min(62vh, 620px); overflow-y: auto; background: #f5f8fa; }
+    .message-row { display: flex; margin-bottom: 12px; }
+    .message-row.mine { justify-content: flex-end; }
+    .message-bubble { max-width: min(82%, 620px); padding: 10px 14px; border-radius: 16px; background: white; overflow-wrap: anywhere; }
+    .message-row.mine .message-bubble { background: #d9f3e5; }
+    .message-meta { font-size: .75rem; color: #64748b; margin-top: 5px; }
+    .presence-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #94a3b8; }
+    .presence-dot.online { background: #198754; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="conversation-panel">
+        <a class="text-decoration-none" href="{% url 'sante:messagerie' %}">
+            <i class="bi bi-arrow-left me-1"></i>Retour aux conversations
+        </a>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} mt-3" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <section
+            class="card shadow-sm mt-3"
+            id="conversationApp"
+            data-websocket-url="{% if request.is_secure %}wss{% else %}ws{% endif %}://{{ request.get_host }}/ws/messagerie/{{ conversation.pk }}/"
+            data-conversation-id="{{ conversation.pk }}"
+            data-current-user-id="{{ request.user.pk }}"
+            data-peer-id="{{ autre_participant.pk }}"
+            data-peer-name="{{ autre_participant.get_full_name|default:autre_participant.username }}"
+            data-can-send="{{ conversation.ouverte|yesno:'true,false' }}">
+            <header class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h1 class="h5 mb-1">{{ conversation.sujet }}</h1>
+                        <div class="small text-muted">
+                            Avec {{ autre_participant.get_full_name|default:autre_participant.username }}
+                            {% if conversation.enfant %}· Dossier de {{ conversation.enfant.prenom }}{% endif %}
+                        </div>
+                        <div class="small mt-1" aria-live="polite">
+                            <span class="presence-dot" id="presenceDot"></span>
+                            <span id="presenceStatus">Connexion en cours…</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm" type="button" id="enableNotifications">
+                        <i class="bi bi-bell me-1"></i>Activer les notifications
+                    </button>
+                </div>
+            </header>
+
+            <div class="message-list card-body" id="messageList" aria-live="polite">
+                {% for message in messages_conversation %}
+                    <article
+                        class="message-row {% if message.expediteur_id == request.user.pk %}mine{% endif %}"
+                        data-message-id="{{ message.pk }}"
+                        data-sender-id="{{ message.expediteur_id }}">
+                        <div class="message-bubble">
+                            <div class="small fw-semibold">
+                                {{ message.expediteur.get_full_name|default:message.expediteur.username }}
+                            </div>
+                            <div class="message-text">{{ message.texte }}</div>
+                            <div class="message-meta">
+                                {{ message.envoye_le|date:"d/m/Y H:i" }}
+                                {% if message.expediteur_id == request.user.pk %}
+                                    · <span class="read-status">{% if message.lu_le %}Lu{% else %}Envoyé{% endif %}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p class="text-center text-muted my-4" id="emptyMessages">
+                        Envoyez un message pour commencer la conversation.
+                    </p>
+                {% endfor %}
+            </div>
+
+            <div class="card-footer bg-white">
+                {% if conversation.ouverte %}
+                    <form id="messageForm" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <label class="visually-hidden" for="messageInput">Votre message</label>
+                        <textarea
+                            class="form-control"
+                            id="messageInput"
+                            rows="2"
+                            maxlength="4000"
+                            placeholder="Écrire un message…"
+                            required></textarea>
+                        <button class="btn btn-success align-self-end" id="sendButton" type="submit" disabled>
+                            <i class="bi bi-send"></i><span class="visually-hidden">Envoyer</span>
+                        </button>
+                    </form>
+                    <div class="d-flex justify-content-between small text-muted mt-2">
+                        <span id="connectionStatus">Connexion en cours…</span>
+                        <span>Texte uniquement · 4 000 caractères maximum</span>
+                    </div>
+                {% else %}
+                    <div class="text-muted">Cette conversation est terminée et ne peut plus recevoir de messages.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if conversation.enfant %}
+            <section class="card shadow-sm mt-3">
+                <div class="card-header bg-white">
+                    <h2 class="h6 mb-0">
+                        Traitements de {{ conversation.enfant.prenom }}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if traitements_actifs %}
+                        <div class="list-group mb-3">
+                            {% for traitement in traitements_actifs %}
+                                <div class="list-group-item">
+                                    <div class="fw-semibold">
+                                        {{ traitement.medicament }} — {{ traitement.dose }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {{ traitement.get_frequence_display }}
+                                        {% if traitement.date_fin %}
+                                            · jusqu’au {{ traitement.date_fin|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </div>
+                                    {% if traitement.prescrit_par %}
+                                        <div class="small text-muted">
+                                            Prescrit par
+                                            {{ traitement.prescrit_par.get_full_name|default:traitement.prescrit_par.username }}
+                                        </div>
+                                    {% endif %}
+                                    {% if traitement.notes %}
+                                        <div class="mt-1">{{ traitement.notes }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-3">Aucun traitement actif enregistré.</p>
+                    {% endif %}
+
+                    {% if peut_prescrire %}
+                        <details>
+                            <summary class="btn btn-outline-success">
+                                <i class="bi bi-prescription2 me-1"></i>
+                                Ajouter une prescription
+                            </summary>
+                            <form
+                                class="mt-3"
+                                method="post"
+                                action="{% url 'sante:professionnel_prescrire_traitement' conversation.pk %}">
+                                {% csrf_token %}
+                                {{ prescription_form.as_p }}
+                                <button class="btn btn-success" type="submit">
+                                    Enregistrer la prescription
+                                </button>
+                            </form>
+                        </details>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
+
+        <p class="small text-muted mt-3">
+            Les messages sont conservés dans TOUKPEDIO et visibles uniquement par les deux participants autorisés.
+            En cas d'urgence, contactez directement les services d'urgence.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'sante/js/messagerie.js' %}" defer></script>
+{% endblock %}

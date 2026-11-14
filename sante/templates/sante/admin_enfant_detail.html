@@ -2222,6 +2222,14 @@
 
                         </span>
 
+                    {% elif partage.refusee %}
+
+                        <span class="badge bg-secondary">
+
+                            Invitation refusée
+
+                        </span>
+
                     {% else %}
 
                         <span class="badge bg-warning text-dark">
@@ -2424,7 +2432,7 @@
                 <div class="col-md-3 text-md-end action-buttons">
 
                     <a
-                        href="{% url 'sante:mode_garde_detail' enfant.id mode.id %}"
+                        href="{% url 'sante:mode_garde_detail' enfant.pk mode.pk %}"
                         class="btn btn-sm btn-outline-primary"
                         title="Voir"
                     >

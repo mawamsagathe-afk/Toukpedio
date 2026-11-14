@@ -96,9 +96,29 @@
 
     <div class="card-body">
 
+        {% if human_contact_summary %}
+        <div class="alert alert-info" role="status">
+            <h6 class="fw-bold">Résumé à joindre à la demande</h6>
+            <p class="small">
+                Après l'enregistrement, ce résumé sera visible dans TOUKPEDIO
+                aux comptes professionnels enregistrés. Aucun courriel ni
+                aucune notification automatique n'est envoyé. Cela ne signifie
+                pas qu'un professionnel a déjà lu ou confirmé le rendez-vous.
+            </p>
+            <pre class="small text-wrap mb-2">{{ human_contact_summary }}</pre>
+        </div>
+        {% endif %}
+
         <form method="POST">
 
             {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                Veuillez vérifier les informations saisies.
+                {{ form.errors }}
+            </div>
+            {% endif %}
 
             <div class="row g-3">
 
@@ -194,6 +214,17 @@
                 Enregistrer le rendez-vous
 
             </button>
+
+            {% if human_contact_summary %}
+            <button
+                type="submit"
+                name="annuler_resume"
+                value="1"
+                formnovalidate
+                class="btn btn-outline-secondary mt-3 rounded-pill px-4">
+                Ne pas transmettre le résumé
+            </button>
+            {% endif %}
 
         </form>
 

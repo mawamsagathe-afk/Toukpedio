@@ -1,0 +1,17 @@
+{% extends "sante/base.html" %}
+
+{% block title %}Fiche de garde introuvable — TOUKPEDIO{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow-sm mx-auto text-center" style="max-width: 600px;">
+        <div class="card-body p-4 p-md-5">
+            <i class="bi bi-shield-exclamation text-warning" style="font-size: 3rem;"></i>
+            <h1 class="h3 fw-bold mt-3">Fiche de garde introuvable</h1>
+            <p class="text-muted mb-0">
+                Cette fiche n'existe pas ou vous n'êtes pas autorisé à la consulter.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

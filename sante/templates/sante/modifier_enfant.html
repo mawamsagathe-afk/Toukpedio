@@ -54,6 +54,12 @@ Modifier {{ enfant.prenom }} - TOUKPEDIO
 
                 {% csrf_token %}
 
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+
 
                 <!-- ================================= -->
                 <!-- IDENTITÉ -->
@@ -249,23 +255,69 @@ Modifier {{ enfant.prenom }} - TOUKPEDIO
 
 
                     <!-- ================================= -->
-                    <!-- TÉLÉPHONE -->
+                    <!-- COORDONNÉES PARENT -->
                     <!-- ================================= -->
 
                     <div class="col-md-6">
 
                         <label class="form-label fw-semibold">
 
-                            Téléphone du parent
+                            Adresse e-mail du parent
 
                         </label>
 
                         <input
-                            type="text"
+                            type="email"
+                            name="email_parent"
+                            class="form-control"
+                            value="{% if form.is_bound %}{{ form.email_parent.value|default_if_none:'' }}{% else %}{{ request.user.email }}{% endif %}"
+                            placeholder="exemple@domaine.com"
+                            autocomplete="email"
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Numéro WhatsApp du parent
+
+                        </label>
+
+                        <input
+                            type="tel"
                             name="telephone_parent"
                             class="form-control"
                             value="{{ enfant.telephone_parent|default:'' }}"
+                            placeholder="+237 6XX XXX XXX"
+                            autocomplete="tel"
+                            inputmode="tel"
                         >
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <div class="form-check">
+
+                            <input
+                                type="checkbox"
+                                name="whatsapp_consent"
+                                id="whatsapp_consent"
+                                class="form-check-input"
+                                {% if form.is_bound and form.whatsapp_consent.value or not form.is_bound and enfant.whatsapp_consent %}checked{% endif %}
+                            >
+
+                            <label class="form-check-label" for="whatsapp_consent">
+                                J'accepte de recevoir les rappels de vaccination par WhatsApp.
+                            </label>
+
+                        </div>
+
+                        <small class="form-text text-muted">
+                            Les messages utilisent un modèle WhatsApp approuvé et ne contiennent pas de données médicales.
+                        </small>
 
                     </div>
 

@@ -113,10 +113,16 @@ Partager {{ enfant.prenom }}
 
                     {% else %}
 
+                        {% if partage.refusee %}
+                            <span class="badge bg-secondary">
+                                Invitation refusée
+                            </span>
+                        {% else %}
                         <span class="badge bg-warning text-dark">
                             <i class="bi bi-clock me-1"></i>
                             En attente
                         </span>
+                        {% endif %}
 
                     {% endif %}
 

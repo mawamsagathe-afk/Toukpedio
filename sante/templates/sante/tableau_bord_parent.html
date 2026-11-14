@@ -7,7 +7,8 @@ Tableau de bord parent - Toukpedio
 
 {% block content %}
 
-<div class="container py-4">
+<div class="container-fluid py-4">
+
 
 
     <!-- ===================================================== -->
@@ -72,6 +73,47 @@ Tableau de bord parent - Toukpedio
         </div>
 
     </div>
+
+    {% if invitations_en_attente %}
+        <section class="card border-warning shadow-sm mb-4" aria-labelledby="invitations-title">
+            <div class="card-header bg-warning-subtle">
+                <h2 class="h5 fw-bold mb-0" id="invitations-title">
+                    <i class="bi bi-envelope-open me-2"></i>
+                    Invitations de partage en attente
+                </h2>
+            </div>
+            <div class="card-body">
+                {% for partage in invitations_en_attente %}
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 {% if not forloop.last %}border-bottom pb-3 mb-3{% endif %}">
+                        <div>
+                            <strong>
+                                {{ partage.enfant.parent.get_full_name|default:partage.enfant.parent.username }}
+                            </strong>
+                            vous invite à partager le dossier de
+                            <strong>{{ partage.enfant.prenom }} {{ partage.enfant.nom }}</strong>.
+                            <div class="small text-muted">
+                                Invitation du {{ partage.date_invitation|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form method="post" action="{% url 'sante:accepter_partage' partage.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-check-lg me-1"></i>Accepter
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'sante:refuser_partage' partage.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-x-lg me-1"></i>Refuser
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
 
 
 
@@ -982,117 +1024,6 @@ Tableau de bord parent - Toukpedio
         </div>
 
     </div>
-
-
-    <!-- ===================================================== -->
-    <!-- ASSISTANT TOUKPEDIO -->
-    <!-- ===================================================== -->
-
-    <div class="card shadow-sm mb-5">
-
-        <div class="card-header bg-success text-white">
-
-            <h5 class="mb-0">
-                <i class="bi bi-robot me-2"></i>
-                Assistant Toukpedio
-            </h5>
-
-        </div>
-
-        <div
-            id="chat-messages"
-            class="card-body"
-            style="height: 300px; overflow-y: auto;"
-            aria-live="polite"
-        >
-            <div class="text-muted">
-                Bonjour ! Comment puis-je vous aider ?
-            </div>
-        </div>
-
-        <div class="card-footer">
-
-            <form id="chat-form" class="d-flex gap-2">
-                {% csrf_token %}
-                <input
-                    id="chat-input"
-                    class="form-control"
-                    type="text"
-                    placeholder="Écrivez votre question..."
-                    autocomplete="off"
-                    required
-                >
-                <button id="chat-submit" class="btn btn-success" type="submit">
-                    <i class="bi bi-send me-1"></i>
-                    Envoyer
-                </button>
-            </form>
-
-        </div>
-
-    </div>
-
-    <script>
-        const chatForm = document.getElementById("chat-form");
-        const chatInput = document.getElementById("chat-input");
-        const chatSubmit = document.getElementById("chat-submit");
-        const chatMessages = document.getElementById("chat-messages");
-        const csrfToken = chatForm.querySelector("[name=csrfmiddlewaretoken]").value;
-
-        chatForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const message = chatInput.value.trim();
-            if (!message) return;
-
-            ajouterMessage("Vous", message);
-            chatInput.value = "";
-            chatInput.disabled = true;
-            chatSubmit.disabled = true;
-
-            const chargement = ajouterMessage("Toukpedio", "Réflexion...");
-
-            try {
-                const response = await fetch(
-                    "{% url 'sante:assistant_gemini' %}",
-                    {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": csrfToken,
-                            "Content-Type": "application/x-www-form-urlencoded"
-                        },
-                        body: new URLSearchParams({ message })
-                    }
-                );
-
-                const data = await response.json();
-                chargement.remove();
-                ajouterMessage(
-                    "Toukpedio",
-                    data.reply || data.error || "Une erreur est survenue."
-                );
-            } catch (error) {
-                chargement.remove();
-                ajouterMessage(
-                    "Toukpedio",
-                    "Impossible de contacter l'assistant."
-                );
-            } finally {
-                chatInput.disabled = false;
-                chatSubmit.disabled = false;
-                chatInput.focus();
-            }
-        });
-
-        function ajouterMessage(auteur, texte) {
-            const element = document.createElement("div");
-            element.className = "mb-2";
-            element.textContent = `${auteur} : ${texte}`;
-            chatMessages.appendChild(element);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return element;
-        }
-    </script>
 
 
 </div>

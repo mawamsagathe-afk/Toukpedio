@@ -1,0 +1,106 @@
+{% extends "sante/base.html" %}
+{% load static %}
+
+{% block title %}Messagerie santé - TOUKPEDIO{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Messagerie santé</h1>
+            <p class="text-muted mb-0">
+                {% if role_messagerie == "professionnel" %}
+                    Boîte de réception des conversations qui vous sont attribuées.
+                {% else %}
+                    Vos échanges avec les professionnels de santé.
+                {% endif %}
+            </p>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" type="button" id="enableInboxNotifications">
+            <i class="bi bi-bell me-1"></i>Activer les notifications
+        </button>
+        {% if role_messagerie == "professionnel" %}
+            <a class="btn btn-outline-success" href="{% url 'sante:espace_sante' %}">
+                <i class="bi bi-heart-pulse me-1"></i>Espace santé
+            </a>
+        {% endif %}
+        {% if role_messagerie == "parent" %}
+            <a class="btn btn-success" href="{% url 'sante:nouvelle_conversation' %}">
+                <i class="bi bi-chat-dots me-1"></i>Nouvelle conversation
+            </a>
+        {% endif %}
+    </div>
+
+    {% if conversations %}
+        <div
+            class="list-group shadow-sm"
+            id="conversationList"
+            data-inbox-websocket-url="{% if request.is_secure %}wss{% else %}ws{% endif %}://{{ request.get_host }}/ws/messagerie/inbox/"
+            data-role="{{ role_messagerie }}">
+            {% for conversation in conversations %}
+                <a
+                    class="list-group-item list-group-item-action p-3"
+                    data-conversation-id="{{ conversation.pk }}"
+                    href="{% url 'sante:conversation_detail' conversation.pk %}">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div class="min-w-0">
+                            <div class="fw-semibold">
+                                {% if role_messagerie == "professionnel" %}
+                                    {{ conversation.parent.get_full_name|default:conversation.parent.username }}
+                                {% else %}
+                                    {{ conversation.professionnel.get_full_name|default:conversation.professionnel.username }}
+                                {% endif %}
+                                {% if conversation.enfant %}
+                                    <span class="text-muted fw-normal">· {{ conversation.enfant.prenom }}</span>
+                                {% endif %}
+                            </div>
+                            <div>{{ conversation.sujet }}</div>
+                            <small class="text-muted">
+                                {% if conversation.dernier_message_le %}
+                                    Dernier message {{ conversation.dernier_message_le|date:"d/m/Y à H:i" }}
+                                {% else %}
+                                    Conversation créée {{ conversation.creee_le|date:"d/m/Y à H:i" }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            {% if conversation.non_lus %}
+                                <span class="badge rounded-pill bg-success unread-badge">
+                                    {{ conversation.non_lus }} non lu{{ conversation.non_lus|pluralize }}
+                                </span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-success unread-badge" hidden></span>
+                            {% endif %}
+                            {% if not conversation.ouverte %}
+                                <span class="badge bg-secondary">Terminée</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="list-group" id="conversationList"
+            data-inbox-websocket-url="{% if request.is_secure %}wss{% else %}ws{% endif %}://{{ request.get_host }}/ws/messagerie/inbox/"
+            data-role="{{ role_messagerie }}">
+        </div>
+        <div class="card shadow-sm" id="emptyInbox">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-chat-square-text fs-1 text-success"></i>
+                <h2 class="h5 mt-3">Aucune conversation</h2>
+                <p class="text-muted mb-0">
+                    {% if role_messagerie == "professionnel" %}
+                        Les nouveaux messages apparaîtront ici.
+                    {% else %}
+                        Vous pourrez retrouver ici vos échanges avec un professionnel.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'sante/js/messagerie_inbox.js' %}" defer></script>
+{% endblock %}

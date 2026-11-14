@@ -8,6 +8,7 @@ from .models import (
     SuiviCroissance,
     BienEtre,
     RendezVous,
+    VaccinationRappel,
 )
 
 
@@ -147,6 +148,38 @@ class VaccinationAdmin(admin.ModelAdmin):
     autocomplete_fields = (
         "enfant",
     )
+
+
+@admin.register(VaccinationRappel)
+class VaccinationRappelAdmin(admin.ModelAdmin):
+    list_display = (
+        "vaccination",
+        "canal",
+        "delai",
+        "statut",
+        "date_tentative",
+        "nombre_tentatives",
+    )
+    list_filter = ("canal", "statut", "delai")
+    search_fields = ("vaccination__nom_vaccin", "resultat", "fournisseur_message_id")
+    readonly_fields = (
+        "vaccination",
+        "canal",
+        "delai",
+        "statut",
+        "date_tentative",
+        "nombre_tentatives",
+        "resultat",
+        "fournisseur_message_id",
+        "created_at",
+        "updated_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 # =========================================================

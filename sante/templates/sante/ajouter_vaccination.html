@@ -1,18 +1,15 @@
 {% extends "sante/base.html" %}
 
 {% block title %}
-Ajouter une vaccination - {{ enfant.prenom }} - TOUKPEDIO
+{% if modification %}Modifier{% else %}Ajouter{% endif %} une vaccination - {{ enfant.prenom }} - TOUKPEDIO
 {% endblock %}
+
 
 {% block extra_css %}
 
 <style>
 
-    /* ===================================================== */
-    /* EN-TÊTE */
-    /* ===================================================== */
-
-    .vaccination-form-header {
+    .vaccination-header {
 
         background: linear-gradient(
             135deg,
@@ -23,14 +20,8 @@ Ajouter une vaccination - {{ enfant.prenom }} - TOUKPEDIO
         color: white;
 
         border-radius: 20px;
-
-        padding: 30px;
     }
 
-
-    /* ===================================================== */
-    /* CARTE FORMULAIRE */
-    /* ===================================================== */
 
     .vaccination-form-card {
 
@@ -39,35 +30,46 @@ Ajouter une vaccination - {{ enfant.prenom }} - TOUKPEDIO
         border-radius: 20px;
 
         box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.08);
+            0 8px 25px
+            rgba(0, 0, 0, 0.08);
     }
 
 
-    /* ===================================================== */
-    /* LABELS */
-    /* ===================================================== */
+    .form-section {
+
+        background: #f8f9fa;
+
+        border-radius: 15px;
+
+        padding: 20px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .form-section-title {
+
+        color: #198754;
+
+        font-weight: 700;
+
+        margin-bottom: 18px;
+    }
+
 
     .form-label {
 
         font-weight: 600;
 
-        color: #333;
+        color: #343a40;
     }
 
-
-    /* ===================================================== */
-    /* CHAMPS */
-    /* ===================================================== */
 
     .form-control {
 
         border-radius: 12px;
 
         padding: 11px 14px;
-
-        border: 1px solid #dee2e6;
-
-        transition: all 0.25s ease;
     }
 
 
@@ -76,41 +78,12 @@ Ajouter une vaccination - {{ enfant.prenom }} - TOUKPEDIO
         border-color: #20c997;
 
         box-shadow:
-            0 0 0 0.2rem rgba(32, 201, 151, 0.15);
+            0 0 0 0.2rem
+            rgba(32, 201, 151, 0.15);
     }
 
 
-    /* ===================================================== */
-    /* ICÔNES DES CHAMPS */
-    /* ===================================================== */
-
-    .field-icon {
-
-        width: 42px;
-
-        height: 42px;
-
-        border-radius: 10px;
-
-        background: #d1e7dd;
-
-        color: #198754;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        flex-shrink: 0;
-    }
-
-
-    /* ===================================================== */
-    /* BOUTON ENREGISTRER */
-    /* ===================================================== */
-
-    .btn-enregistrer {
+    .btn-vaccin {
 
         background-color: #F28C28;
 
@@ -120,378 +93,443 @@ Ajouter une vaccination - {{ enfant.prenom }} - TOUKPEDIO
 
         font-weight: 600;
 
-        border-radius: 25px;
+        border-radius: 50px;
 
         padding: 11px 25px;
-
-        transition: all 0.3s ease;
     }
 
 
-    .btn-enregistrer:hover {
+    .btn-vaccin:hover {
 
         background-color: #D96F0B;
 
         border-color: #D96F0B;
 
         color: white;
-
-        transform: translateY(-2px);
-
-        box-shadow:
-            0 5px 15px rgba(242, 140, 40, 0.3);
     }
 
-
-    /* ===================================================== */
-    /* BOUTON ANNULER */
-    /* ===================================================== */
 
     .btn-retour {
 
-        border-radius: 25px;
+        border-radius: 50px;
 
-        padding: 11px 25px;
+        padding: 10px 20px;
     }
 
 
-    /* ===================================================== */
-    /* ERREURS */
-    /* ===================================================== */
-
-    .errorlist {
-
-        list-style: none;
-
-        padding: 0;
-
-        margin-top: 5px;
+    .required-star {
 
         color: #dc3545;
-
-        font-size: 0.9rem;
-    }
-
-
-    /* ===================================================== */
-    /* MOBILE */
-    /* ===================================================== */
-
-    @media (max-width: 576px) {
-
-        .vaccination-form-header {
-
-            padding: 22px;
-        }
-
-        .vaccination-form-header h1 {
-
-            font-size: 1.7rem;
-        }
-
     }
 
 </style>
 
 {% endblock %}
 
+
 {% block content %}
 
 <div class="container py-5">
 
-```
-<!-- ===================================================== -->
-<!-- EN-TÊTE -->
-<!-- ===================================================== -->
+    <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
 
-<div class="vaccination-form-header shadow-sm mb-4">
+    <div class="vaccination-header shadow-sm p-4 mb-4">
 
-    <div
-        class="d-flex flex-column flex-md-row
-               justify-content-between
-               align-items-md-center"
-    >
+        <div class="
+            d-flex
+            flex-column
+            flex-md-row
+            justify-content-between
+            align-items-md-center
+        ">
 
-        <div>
+            <div>
 
-            <h1 class="fw-bold mb-2">
+                <h1 class="fw-bold mb-2">
 
-                <i class="bi bi-shield-plus me-2"></i>
+                    <i class="bi bi-shield-plus me-2"></i>
 
-                Ajouter une vaccination
+                    {% if modification %}Modifier{% else %}Ajouter{% endif %} une vaccination
 
-            </h1>
+                </h1>
 
-            <p class="mb-0">
+                <p class="mb-0">
 
-                Ajouter une vaccination au carnet de
+                    Carnet de vaccination de
 
-                <strong>
-                    {{ enfant.prenom }} {{ enfant.nom }}
-                </strong>
+                    <strong>
 
-            </p>
+                        {{ enfant.prenom }}
+                        {{ enfant.nom }}
 
-        </div>
+                    </strong>
 
-
-        <div class="mt-3 mt-md-0">
-
-            <a
-                href="{% url 'sante:vaccination' enfant.id %}"
-                class="btn btn-light rounded-pill px-4"
-            >
-
-                <i class="bi bi-arrow-left me-2"></i>
-
-                Retour
-
-            </a>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-<!-- ===================================================== -->
-<!-- FORMULAIRE -->
-<!-- ===================================================== -->
-
-<div class="card vaccination-form-card">
-
-    <div class="card-body p-4 p-md-5">
-
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-
-            <!-- ================================================= -->
-            <!-- NOM DU VACCIN -->
-            <!-- ================================================= -->
-
-            <div class="mb-4">
-
-                <label
-                    for="{{ form.nom_vaccin.id_for_label }}"
-                    class="form-label"
-                >
-
-                    <i class="bi bi-shield-check text-success me-2"></i>
-
-                    Nom du vaccin
-
-                </label>
-
-                {{ form.nom_vaccin }}
-
-                {% if form.nom_vaccin.errors %}
-
-                    {{ form.nom_vaccin.errors }}
-
-                {% endif %}
+                </p>
 
             </div>
 
 
-
-            <!-- ================================================= -->
-            <!-- DOSE -->
-            <!-- ================================================= -->
-
-            <div class="mb-4">
-
-                <label
-                    for="{{ form.dose.id_for_label }}"
-                    class="form-label"
-                >
-
-                    <i class="bi bi-capsule text-success me-2"></i>
-
-                    Dose
-
-                </label>
-
-                {{ form.dose }}
-
-                {% if form.dose.errors %}
-
-                    {{ form.dose.errors }}
-
-                {% endif %}
-
-            </div>
-
-
-
-            <!-- ================================================= -->
-            <!-- DATES -->
-            <!-- ================================================= -->
-
-            <div class="row g-4">
-
-
-                <!-- DATE PRÉVUE -->
-
-                <div class="col-md-4">
-
-                    <label
-                        for="{{ form.date_prevue.id_for_label }}"
-                        class="form-label"
-                    >
-
-                        <i class="bi bi-calendar-event text-success me-2"></i>
-
-                        Date prévue
-
-                    </label>
-
-                    {{ form.date_prevue }}
-
-                    {% if form.date_prevue.errors %}
-
-                        {{ form.date_prevue.errors }}
-
-                    {% endif %}
-
-                </div>
-
-
-                <!-- DATE EFFECTUÉE -->
-
-                <div class="col-md-4">
-
-                    <label
-                        for="{{ form.date_effectuee.id_for_label }}"
-                        class="form-label"
-                    >
-
-                        <i class="bi bi-calendar-check text-success me-2"></i>
-
-                        Date effectuée
-
-                    </label>
-
-                    {{ form.date_effectuee }}
-
-                    {% if form.date_effectuee.errors %}
-
-                        {{ form.date_effectuee.errors }}
-
-                    {% endif %}
-
-                </div>
-
-
-                <!-- PROCHAINE DOSE -->
-
-                <div class="col-md-4">
-
-                    <label
-                        for="{{ form.prochaine_dose.id_for_label }}"
-                        class="form-label"
-                    >
-
-                        <i class="bi bi-calendar-plus text-success me-2"></i>
-
-                        Prochaine dose
-
-                    </label>
-
-                    {{ form.prochaine_dose }}
-
-                    {% if form.prochaine_dose.errors %}
-
-                        {{ form.prochaine_dose.errors }}
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ================================================= -->
-            <!-- OBSERVATIONS -->
-            <!-- ================================================= -->
-
-            <div class="mt-4 mb-4">
-
-                <label
-                    for="{{ form.observations.id_for_label }}"
-                    class="form-label"
-                >
-
-                    <i class="bi bi-chat-left-text text-success me-2"></i>
-
-                    Observations
-
-                </label>
-
-                {{ form.observations }}
-
-                {% if form.observations.errors %}
-
-                    {{ form.observations.errors }}
-
-                {% endif %}
-
-            </div>
-
-
-
-            <hr class="my-4">
-
-
-
-            <!-- ================================================= -->
-            <!-- BOUTONS -->
-            <!-- ================================================= -->
-
-            <div
-                class="d-flex
-                       flex-column flex-md-row
-                       justify-content-end
-                       gap-2"
-            >
+            <div class="mt-3 mt-md-0">
 
                 <a
                     href="{% url 'sante:vaccination' enfant.id %}"
-                    class="btn btn-outline-secondary btn-retour"
+                    class="btn btn-light btn-retour"
                 >
 
-                    <i class="bi bi-x-circle me-2"></i>
+                    <i class="bi bi-arrow-left me-1"></i>
 
-                    Annuler
+                    Retour
 
                 </a>
 
-
-                <button
-                    type="submit"
-                    class="btn btn-enregistrer"
-                >
-
-                    <i class="bi bi-check-circle me-2"></i>
-
-                    Enregistrer la vaccination
-
-                </button>
-
             </div>
 
-
-        </form>
+        </div>
 
     </div>
 
-</div>
-```
+
+    <!-- =====================================================
+         FORMULAIRE
+    ====================================================== -->
+
+    <div class="card vaccination-form-card">
+
+        <div class="card-body p-4 p-md-5">
+
+            <form
+                method="post"
+                novalidate
+            >
+
+                {% csrf_token %}
+
+
+                <!-- =========================================
+                     INFORMATIONS DU VACCIN
+                ========================================== -->
+
+                <div class="form-section">
+
+                    <h5 class="form-section-title">
+
+                        <i class="bi bi-shield-check me-2"></i>
+
+                        Informations du vaccin
+
+                    </h5>
+
+
+                    <div class="row g-4">
+
+                        <!-- ÂGE -->
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="{{ form.age.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.age.label }}
+
+                                <span class="required-star">
+                                    *
+                                </span>
+
+                            </label>
+
+                            {{ form.age }}
+
+                            {% if form.age.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.age.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                            <div class="form-text">
+
+                                Exemple :
+                                Naissance,
+                                6 semaines,
+                                10 semaines,
+                                9 mois.
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NOM DU VACCIN -->
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="{{ form.nom_vaccin.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.nom_vaccin.label }}
+
+                                <span class="required-star">
+                                    *
+                                </span>
+
+                            </label>
+
+                            {{ form.nom_vaccin }}
+
+                            {% if form.nom_vaccin.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.nom_vaccin.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- DOSE -->
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="{{ form.dose.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.dose.label }}
+
+                            </label>
+
+                            {{ form.dose }}
+
+                            {% if form.dose.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.dose.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     DATES
+                ========================================== -->
+
+                <div class="form-section">
+
+                    <h5 class="form-section-title">
+
+                        <i class="bi bi-calendar-check me-2"></i>
+
+                        Dates de vaccination
+
+                    </h5>
+
+
+                    <div class="row g-4">
+
+                        <!-- DATE PRÉVUE -->
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="{{ form.date_prevue.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.date_prevue.label }}
+
+                            </label>
+
+                            {{ form.date_prevue }}
+
+                            {% if form.date_prevue.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.date_prevue.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- DATE EFFECTUÉE -->
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="{{ form.date_effectuee.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.date_effectuee.label }}
+
+                            </label>
+
+                            {{ form.date_effectuee }}
+
+                            {% if form.date_effectuee.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.date_effectuee.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- PROCHAIN RENDEZ-VOUS -->
+
+                        <div class="col-md-4">
+
+                            <label
+                                for="{{ form.prochaine_dose.id_for_label }}"
+                                class="form-label"
+                            >
+
+                                {{ form.prochaine_dose.label }}
+
+                            </label>
+
+                            {{ form.prochaine_dose }}
+
+                            {% if form.prochaine_dose.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.prochaine_dose.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     OBSERVATIONS
+                ========================================== -->
+
+                <div class="form-section">
+
+                    <h5 class="form-section-title">
+
+                        <i class="bi bi-journal-text me-2"></i>
+
+                        Observations
+
+                    </h5>
+
+                    <label
+                        for="{{ form.observations.id_for_label }}"
+                        class="form-label"
+                    >
+
+                        {{ form.observations.label }}
+
+                    </label>
+
+                    {{ form.observations }}
+
+                    {% if form.observations.errors %}
+
+                        <div class="text-danger small mt-1">
+
+                            {{ form.observations.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================================
+                     ERREURS GÉNÉRALES
+                ========================================== -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="alert alert-danger">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =========================================
+                     BOUTONS
+                ========================================== -->
+
+                <div class="
+                    d-flex
+                    flex-column
+                    flex-md-row
+                    justify-content-end
+                    gap-2
+                ">
+
+                    <a
+                        href="{% url 'sante:vaccination' enfant.id %}"
+                        class="btn btn-outline-secondary btn-retour"
+                    >
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Annuler
+
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-vaccin"
+                    >
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        {% if modification %}Enregistrer les modifications{% else %}Enregistrer la vaccination{% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

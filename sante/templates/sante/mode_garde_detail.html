@@ -23,7 +23,7 @@ Fiche de garde - {{ enfant.prenom }}
                 </h2>
 
                 <p class="text-muted">
-                    {{ enfant.prenom }}
+                    {{ enfant.prenom }} {{ enfant.nom }}
                 </p>
 
             </div>
@@ -48,6 +48,14 @@ Fiche de garde - {{ enfant.prenom }}
                 <br>
 
                 <strong>
+                    E-mail :
+                </strong>
+
+                {{ mode_garde.email_gardien }}
+
+                <br>
+
+                <strong>
                     Valable du :
                 </strong>
 
@@ -57,6 +65,36 @@ Fiche de garde - {{ enfant.prenom }}
 
                 {{ mode_garde.date_fin|date:"d/m/Y" }}
 
+                {% if mode_garde.heure_debut %}
+                    à {{ mode_garde.heure_debut|time:"H:i" }}
+                {% endif %}
+                {% if mode_garde.heure_fin %}
+                    — {{ mode_garde.heure_fin|time:"H:i" }}
+                {% endif %}
+
+            </div>
+
+            <div class="alert {% if mode_garde.token_revoked_at %}alert-secondary{% elif mode_garde.est_valide %}alert-info{% else %}alert-warning{% endif %}">
+                {% if mode_garde.token_revoked_at %}
+                    Le lien public a été révoqué le {{ mode_garde.token_revoked_at|date:"d/m/Y à H:i" }}.
+                {% else %}
+                    {% if mode_garde.est_valide %}
+                        Lien public valide jusqu'au {{ mode_garde.token_expires_at|date:"d/m/Y à H:i" }}.
+                        <a href="{{ lien_public }}" class="alert-link" target="_blank" rel="noopener">Ouvrir la fiche publique</a>
+                    {% else %}
+                        Le lien public est expiré ou la fiche n'est pas actuellement valide.
+                    {% endif %}
+                    <form method="post"
+                          action="{% url 'sante:revoquer_lien_mode_garde' enfant.id mode_garde.id %}"
+                          class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Révoquer définitivement le lien public ?')">
+                            Révoquer le lien public
+                        </button>
+                    </form>
+                {% endif %}
             </div>
 
 

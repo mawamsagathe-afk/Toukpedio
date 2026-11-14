@@ -1,0 +1,232 @@
+:is(html.dark-mode, body.dark-mode) {
+    color-scheme: dark;
+    color: #ffffff;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    small,
+    label,
+    .form-label,
+    li,
+    dt,
+    dd,
+    td,
+    th,
+    legend,
+    figcaption,
+    blockquote,
+    .card-title,
+    .card-text,
+    .modal-title,
+    .navbar-text,
+    .breadcrumb-item,
+    .page-link,
+    .form-text,
+    .invalid-feedback,
+    .valid-feedback
+):not(.badge):not(.btn) {
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(
+    .text-muted,
+    .text-secondary,
+    .text-body-secondary,
+    .text-dark,
+    .text-black-50,
+    .text-body-tertiary,
+    .form-text
+):not(.badge):not(.btn) {
+    color: #e6edf5 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(
+    .card,
+    .card-body,
+    .card-header,
+    .card-footer,
+    .dashboard-header,
+    .bg-white,
+    .bg-light,
+    .bg-body,
+    .bg-body-tertiary,
+    .dropdown-menu,
+    .list-group-item,
+    .modal-content,
+    .accordion-item,
+    .accordion-button,
+    .alert-light
+) {
+    background-color: #0d1b2a !important;
+    color: #ffffff !important;
+    border-color: #526579 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(
+    .form-control,
+    .form-select,
+    input,
+    select,
+    textarea
+) {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+    border-color: #71869b !important;
+}
+
+:is(html.dark-mode, body.dark-mode) select option {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) select option:checked,
+:is(html.dark-mode, body.dark-mode) select option:hover {
+    background-color: #24527a !important;
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(
+    .form-control,
+    .form-select,
+    input,
+    textarea
+)::placeholder {
+    color: #e6edf5 !important;
+    opacity: 1;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(.table, table) {
+    --bs-table-color: #ffffff;
+    --bs-table-bg: #0d1b2a;
+    --bs-table-border-color: #526579;
+}
+
+:is(html.dark-mode, body.dark-mode) :is(th, td) {
+    background-color: #0d1b2a !important;
+    border-color: #526579 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) a:not(.btn):not(.nav-link):not(.dropdown-item) {
+    color: #a8d5ff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
+    color: #d7ecff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .text-danger {
+    color: #ffb4ab !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .text-warning {
+    color: #ffe69c !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .text-success {
+    color: #9aefbd !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .text-info {
+    color: #a1eaff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .text-primary {
+    color: #a8d5ff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .symptome-card {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+    border-color: #71869b !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .symptome-card .symptome-name,
+:is(html.dark-mode, body.dark-mode) .symptome-card .symptome-icon {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+:is(html.dark-mode, body.dark-mode) .symptome-card.active {
+    background-color: #164c43 !important;
+    color: #ffffff !important;
+    border-color: #7de2b8 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .symptome-card.active .symptome-name,
+:is(html.dark-mode, body.dark-mode) .symptome-card.active .symptome-icon {
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) #id_intensite,
+:is(html.dark-mode, body.dark-mode) #id_intensite option {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+:is(html.dark-mode, body.dark-mode) #id_intensite option:checked {
+    background-color: #24527a !important;
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .photo-zone {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+    border-color: #7de2b8 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .fenetre-gemini {
+    background-color: #0d1b2a !important;
+    color: #ffffff !important;
+    border: 1px solid #71869b;
+}
+
+:is(html.dark-mode, body.dark-mode) .gemini-messages {
+    background-color: #071521 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .message-ia {
+    background-color: #14283d !important;
+    color: #ffffff !important;
+    border: 1px solid #526579;
+}
+
+:is(html.dark-mode, body.dark-mode) .message-ia strong {
+    color: #c6baff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .gemini-footer,
+:is(html.dark-mode, body.dark-mode) .agent-contact-consent {
+    background-color: #0d1b2a !important;
+    color: #ffffff !important;
+    border-color: #526579 !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .agent-contact-summary {
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .gemini-input {
+    background-color: #14283d !important;
+    border: 1px solid #71869b;
+}
+
+:is(html.dark-mode, body.dark-mode) .gemini-input input {
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+:is(html.dark-mode, body.dark-mode) .btn-agent-contact {
+    background-color: #14283d !important;
+    color: #aaf0cf !important;
+    border-color: #7de2b8 !important;
+}

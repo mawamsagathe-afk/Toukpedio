@@ -19,7 +19,7 @@ Fiche de garde - {{ enfant.prenom }}
         </h1>
 
         <h3>
-            {{ enfant.prenom }}
+            {{ enfant.prenom }} {{ enfant.nom }}
         </h3>
 
         <p class="text-muted">
@@ -53,6 +53,14 @@ Fiche de garde - {{ enfant.prenom }}
                 <br>
 
                 <strong>
+                    E-mail :
+                </strong>
+
+                {{ mode_garde.email_gardien|default:"Non renseigné" }}
+
+                <br>
+
+                <strong>
                     Valable du :
                 </strong>
 
@@ -61,8 +69,35 @@ Fiche de garde - {{ enfant.prenom }}
                 au
 
                 {{ mode_garde.date_fin|date:"d/m/Y" }}
+                {% if mode_garde.heure_debut %}
+                    à {{ mode_garde.heure_debut|time:"H:i" }}
+                {% endif %}
+                {% if mode_garde.heure_fin %}
+                    — {{ mode_garde.heure_fin|time:"H:i" }}
+                {% endif %}
 
             </div>
+
+            {% if dernier_bien_etre and mode_garde.partager_alimentation %}
+                <div class="mb-4">
+                    <h5>🍽️ Alimentation</h5>
+                    <p style="white-space: pre-line;">{{ dernier_bien_etre.alimentation|default:"Aucune information" }}</p>
+                </div>
+            {% endif %}
+
+            {% if dernier_bien_etre and mode_garde.partager_sommeil %}
+                <div class="mb-4">
+                    <h5>😴 Sommeil</h5>
+                    <p>{{ dernier_bien_etre.get_sommeil_display }}</p>
+                </div>
+            {% endif %}
+
+            {% if dernier_bien_etre and mode_garde.partager_hydratation %}
+                <div class="mb-4">
+                    <h5>💧 Hydratation</h5>
+                    <p style="white-space: pre-line;">{{ dernier_bien_etre.hydratation|default:"Aucune information" }}</p>
+                </div>
+            {% endif %}
 
 
             {% if mode_garde.partager_allergies %}
@@ -132,6 +167,57 @@ Fiche de garde - {{ enfant.prenom }}
 
             {% endif %}
 
+            {% if mode_garde.partager_vaccinations %}
+                <div class="mb-4">
+                    <h5>💉 Vaccinations partagées</h5>
+                    {% for vaccination in vaccinations %}
+                        <div class="border-bottom py-2">
+                            <strong>{{ vaccination.nom_vaccin }}</strong>
+                            {% if vaccination.dose %} — {{ vaccination.dose }}{% endif %}
+                            <div class="small text-muted">
+                                {% if vaccination.date_prevue %}Prévue le {{ vaccination.date_prevue|date:"d/m/Y" }}{% endif %}
+                                {% if vaccination.date_effectuee %} — effectuée le {{ vaccination.date_effectuee|date:"d/m/Y" }}{% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Aucune vaccination enregistrée.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if mode_garde.partager_consultations %}
+                <div class="mb-4">
+                    <h5>🩺 Consultations partagées</h5>
+                    {% for consultation in consultations %}
+                        <div class="border-bottom py-2">
+                            <strong>{{ consultation.date_consultation|date:"d/m/Y H:i" }}</strong>
+                            <p class="mb-1">{{ consultation.motif }}</p>
+                            {% if consultation.recommandations %}
+                                <p class="small mb-0">{{ consultation.recommandations }}</p>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p>Aucune consultation enregistrée.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if mode_garde.partager_temperature %}
+                <div class="mb-4">
+                    <h5>🌡️ Températures récentes</h5>
+                    {% for temperature in temperatures %}
+                        <div class="border-bottom py-2">
+                            {{ temperature.valeur }} °C — {{ temperature.date_prise|date:"d/m/Y H:i" }}
+                            {% if temperature.observation %}
+                                <div class="small">{{ temperature.observation }}</div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p>Aucune température enregistrée.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
 
             {% if mode_garde.contact_urgence %}
 
@@ -166,6 +252,10 @@ Fiche de garde - {{ enfant.prenom }}
 
             {% endif %}
 
+            <hr>
+            <p class="small text-muted text-center mb-0">
+                Lien personnel expirant le {{ mode_garde.token_expires_at|date:"d/m/Y à H:i" }}.
+            </p>
 
             <hr>
 

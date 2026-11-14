@@ -1,0 +1,38 @@
+{% extends "sante/base.html" %}
+
+{% block title %}
+Envoyer la fiche par SMS — TOUKPEDIO
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body p-4 p-md-5 text-center">
+            <i class="bi bi-chat-dots text-success" style="font-size: 3rem;"></i>
+            <h1 class="h3 fw-bold mt-3">Envoyer la fiche par SMS</h1>
+            <p class="text-muted">
+                Un SMS destiné à {{ mode_garde.nom_gardien }} est prêt.
+                Vérifiez son contenu puis envoyez-le depuis votre application SMS.
+            </p>
+
+            <a href="{{ sms_url }}" id="open-sms-app" class="btn btn-success btn-lg w-100">
+                <i class="bi bi-chat-dots me-2"></i>
+                Ouvrir mon application SMS
+            </a>
+
+            <a href="{% url 'sante:mode_garde_detail' mode_garde.enfant_id mode_garde.id %}"
+               class="btn btn-link mt-3">
+                Retour à la fiche de garde
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+        window.setTimeout(function () {
+            window.location.href = document.getElementById("open-sms-app").href;
+        }, 300);
+    });
+</script>
+{% endblock %}

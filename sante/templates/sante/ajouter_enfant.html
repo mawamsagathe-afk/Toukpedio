@@ -33,6 +33,12 @@
                         {% endfor %}
                     {% endif %}
 
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.errors }}
+                        </div>
+                    {% endif %}
+
                     <form method="POST"
                           enctype="multipart/form-data">
 
@@ -182,15 +188,54 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">
-                                    Téléphone
+                                    Adresse e-mail du parent
                                 </label>
 
-                                <input type="text"
-                                       name="telephone_parent"
-                                       class="form-control">
+                                <input type="email"
+                                       name="email_parent"
+                                       class="form-control"
+                                       value="{% if form.is_bound %}{{ form.email_parent.value|default_if_none:'' }}{% else %}{{ request.user.email }}{% endif %}"
+                                       placeholder="exemple@domaine.com"
+                                       autocomplete="email">
+                                <small class="form-text text-muted">
+                                    Utilisée pour les rappels de vaccination par e-mail.
+                                </small>
                             </div>
 
                             <div class="col-md-6">
+                                <label class="form-label">
+                                    Numéro WhatsApp du parent
+                                </label>
+
+                                <input type="tel"
+                                       name="telephone_parent"
+                                       class="form-control"
+                                       value="{{ form.telephone_parent.value|default:'' }}"
+                                       placeholder="+237 6XX XXX XXX"
+                                       autocomplete="tel"
+                                       inputmode="tel">
+                                <small class="form-text text-muted">
+                                    Indiquez l'indicatif international, par exemple +237.
+                                </small>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                           name="whatsapp_consent"
+                                           id="whatsapp_consent"
+                                           class="form-check-input"
+                                           {% if form.is_bound and form.whatsapp_consent.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="whatsapp_consent">
+                                        J'accepte de recevoir les rappels de vaccination par WhatsApp.
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Les messages WhatsApp utilisent un modèle approuvé et ne contiennent pas de données médicales.
+                                </small>
+                            </div>
+
+                            <div class="col-12">
                                 <label class="form-label">
                                     Adresse
                                 </label>

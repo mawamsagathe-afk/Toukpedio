@@ -8,229 +8,281 @@ Modifier le suivi - TOUKPEDIO
 
 <div class="container py-5">
 
-    <div class="row justify-content-center">
 
-        <div class="col-lg-8">
+<div class="row justify-content-center">
 
-            <div class="card border-0 shadow">
+    <div class="col-lg-8">
 
-                <div class="card-header bg-success text-white p-4">
+        <div class="card border-0 shadow">
 
-                    <h3 class="mb-1">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        Modifier le suivi
-                    </h3>
+            <!-- EN-TÊTE -->
+            <div class="card-header bg-success text-white p-4">
 
-                    <p class="mb-0">
-                        {{ enfant.prenom }} {{ enfant.nom }}
-                    </p>
+                <h3 class="mb-1">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Modifier le suivi
+                </h3>
 
-                </div>
+                <p class="mb-0">
+                    {{ enfant.prenom }} {{ enfant.nom }}
+                </p>
 
-                <div class="card-body p-4">
+            </div>
 
-                    <form method="POST">
 
-                        {% csrf_token %}
+            <!-- FORMULAIRE -->
+            <div class="card-body p-4">
 
-                        <div class="mb-3">
+                <form method="POST">
 
-                            <label class="form-label">
-                                Date
-                            </label>
+                    {% csrf_token %}
 
-                            <input
-                                type="date"
-                                name="date"
-                                class="form-control"
-                                value="{{ suivi.date|date:'Y-m-d' }}"
-                                required
+
+                    <!-- DATE -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Date
+                        </label>
+
+                        {{ form.date }}
+
+                        {% if form.date.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.date.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- SYMPTÔME -->
+                    
+
+<div class="mb-3">
+
+
+<label class="form-label">
+    Symptôme
+</label>
+
+{{ form.symptome }}
+
+<div class="form-control bg-light">
+
+    <i class="bi bi-clipboard2-pulse me-2 text-success"></i>
+
+   
+
+</div>
+
+
+
+
+                    <!-- INTENSITÉ -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Intensité
+                        </label>
+
+                        <select
+                            name="intensite"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="faible"
+                                {% if symptome.intensite == "faible" %}
+                                    selected
+                                {% endif %}
                             >
+                                Faible
+                            </option>
 
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Symptôme
-                            </label>
-
-                            <input
-                                type="text"
-                                name="symptome"
-                                class="form-control"
-                                value="{{ suivi.symptome }}"
-                                required
+                            <option value="moderee"
+                                {% if symptome.intensite == "moderee" %}
+                                    selected
+                                {% endif %}
                             >
+                                Modérée
+                            </option>
 
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Intensité
-                            </label>
-
-                            <select
-                                name="intensite"
-                                class="form-select"
-                                required
+                            <option value="forte"
+                                {% if symptome.intensite == "forte" %}
+                                    selected
+                                {% endif %}
                             >
+                                Forte
+                            </option>
 
-                                <option value="faible"
-                                    {% if suivi.intensite == "faible" %}selected{% endif %}>
-                                    Faible
-                                </option>
+                            <option value="tres_forte"
+                                {% if symptome.intensite == "tres_forte" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Très forte
+                            </option>
 
-                                <option value="moderee"
-                                    {% if suivi.intensite == "moderee" %}selected{% endif %}>
-                                    Modérée
-                                </option>
+                        </select>
 
-                                <option value="forte"
-                                    {% if suivi.intensite == "forte" %}selected{% endif %}>
-                                    Forte
-                                </option>
-
-                                <option value="tres_forte"
-                                    {% if suivi.intensite == "tres_forte" %}selected{% endif %}>
-                                    Très forte
-                                </option>
-
-                            </select>
-
-                        </div>
+                    </div>
 
 
-                        <div class="mb-3">
+                    <!-- TEMPÉRATURE -->
+                    <div class="mb-3">
 
-                            <label class="form-label">
-                                Température
-                            </label>
+                        <label class="form-label">
+                            Température
+                        </label>
+
+                        <div class="input-group">
 
                             <input
                                 type="number"
                                 name="temperature"
                                 class="form-control"
                                 step="0.1"
-                                value="{{ suivi.temperature|default:'' }}"
+                                value="{{ symptome.temperature|default:'' }}"
                             >
 
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Description
-                            </label>
-
-                            <textarea
-                                name="description"
-                                class="form-control"
-                                rows="3"
-                            >{{ suivi.description }}</textarea>
+                            <span class="input-group-text">
+                                °C
+                            </span>
 
                         </div>
 
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Traitement pris
-                            </label>
-
-                            <textarea
-                                name="traitement_pris"
-                                class="form-control"
-                                rows="2"
-                            >{{ suivi.traitement_pris }}</textarea>
-
-                        </div>
+                    </div>
 
 
-                        <div class="mb-3">
+                    <!-- DESCRIPTION -->
+                    <div class="mb-3">
 
-                            <label class="form-label">
-                                Évolution
-                            </label>
+                        <label class="form-label">
+                            Description
+                        </label>
 
-                            <select
-                                name="evolution"
-                                class="form-select"
+                        <textarea
+                            name="description"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Décrivez les symptômes observés..."
+                        >{{ symptome.description }}</textarea>
+
+                    </div>
+
+
+                    <!-- TRAITEMENT -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Traitement pris
+                        </label>
+
+                        <textarea
+                            name="traitement_pris"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Indiquez le traitement pris, si nécessaire..."
+                        >{{ symptome.traitement_pris }}</textarea>
+
+                    </div>
+
+
+                    <!-- ÉVOLUTION -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Évolution
+                        </label>
+
+                        <select
+                            name="evolution"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                Sélectionner
+                            </option>
+
+                            <option value="ameliore"
+                                {% if symptome.evolution == "ameliore" %}
+                                    selected
+                                {% endif %}
                             >
+                                Amélioration
+                            </option>
 
-                                <option value="">
-                                    Sélectionner
-                                </option>
-
-                                <option value="ameliore"
-                                    {% if suivi.evolution == "ameliore" %}selected{% endif %}>
-                                    Amélioration
-                                </option>
-
-                                <option value="stable"
-                                    {% if suivi.evolution == "stable" %}selected{% endif %}>
-                                    Stable
-                                </option>
-
-                                <option value="aggrave"
-                                    {% if suivi.evolution == "aggrave" %}selected{% endif %}>
-                                    Aggravation
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="mb-4">
-
-                            <label class="form-label">
-                                Observations
-                            </label>
-
-                            <textarea
-                                name="observations"
-                                class="form-control"
-                                rows="3"
-                            >{{ suivi.observations }}</textarea>
-
-                        </div>
-
-
-                        <div class="d-flex justify-content-between">
-
-                            <a
-                                href="{% url 'sante:detail_enfant' enfant.id %}"
-                                class="btn btn-outline-secondary rounded-pill px-4"
+                            <option value="stable"
+                                {% if symptome.evolution == "stable" %}
+                                    selected
+                                {% endif %}
                             >
-                                Retour
-                            </a>
+                                Stable
+                            </option>
 
-                            
-
-                            <button
-                                type="submit"
-                                class="btn btn-success rounded-pill px-4"
+                            <option value="aggrave"
+                                {% if symptome.evolution == "aggrave" %}
+                                    selected
+                                {% endif %}
                             >
-                                <i class="bi bi-save me-2"></i>
-                                Enregistrer les modifications
-                            </button>
+                                Aggravation
+                            </option>
 
-                        </div>
+                        </select>
 
-                    </form>
+                    </div>
 
-                </div>
+
+                    <!-- OBSERVATIONS -->
+                    <div class="mb-4">
+
+                        <label class="form-label">
+                            Observations
+                        </label>
+
+                        <textarea
+                            name="observations"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Ajoutez vos observations..."
+                        >{{ symptome.observations }}</textarea>
+
+                    </div>
+
+
+                    <!-- BOUTONS -->
+                    <div class="d-flex justify-content-between">
+
+                        <a
+                            href="{% url 'sante:detail_enfant' enfant.id %}"
+                            class="btn btn-outline-secondary rounded-pill px-4"
+                        >
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Retour
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-success rounded-pill px-4"
+                        >
+                            <i class="bi bi-save me-2"></i>
+                            Enregistrer les modifications
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 
         </div>
 
     </div>
+
+</div>
+
 
 </div>
 

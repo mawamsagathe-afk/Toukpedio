@@ -1,0 +1,89 @@
+{% extends "sante/base.html" %}
+
+{% block title %}Espace santé - TOUKPEDIO{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Espace professionnel de santé</h1>
+            <p class="text-muted mb-0">
+                Bonjour {{ request.user.get_full_name|default:request.user.username }}.
+                Répondez directement aux parents et suivez les dossiers qui vous sont confiés.
+            </p>
+        </div>
+        <a class="btn btn-success" href="{% url 'sante:messagerie' %}">
+            <i class="bi bi-chat-dots me-1"></i>Ouvrir la messagerie
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Conversations ouvertes</div>
+                    <div class="display-6 fw-semibold">{{ conversations_ouvertes }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Messages non lus</div>
+                    <div class="display-6 fw-semibold">{{ messages_non_lus }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Vos demandes de santé</h2>
+        </div>
+        {% if conversations %}
+            <div class="list-group list-group-flush">
+                {% for conversation in conversations %}
+                    <a class="list-group-item list-group-item-action p-3"
+                       href="{% url 'sante:conversation_detail' conversation.pk %}">
+                        <div class="d-flex justify-content-between gap-3">
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ conversation.parent.get_full_name|default:conversation.parent.username }}
+                                    {% if conversation.enfant %}
+                                        <span class="text-muted fw-normal">
+                                            · {{ conversation.enfant.prenom }} {{ conversation.enfant.nom }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div>{{ conversation.sujet }}</div>
+                                <small class="text-muted">
+                                    {% if conversation.dernier_message_le %}
+                                        Dernier message {{ conversation.dernier_message_le|date:"d/m/Y à H:i" }}
+                                    {% else %}
+                                        Créée {{ conversation.creee_le|date:"d/m/Y à H:i" }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                {% if conversation.non_lus %}
+                                    <span class="badge rounded-pill bg-success">
+                                        {{ conversation.non_lus }} non lu{{ conversation.non_lus|pluralize }}
+                                    </span>
+                                {% endif %}
+                                {% if not conversation.ouverte %}
+                                    <span class="badge bg-secondary">Terminée</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card-body text-center py-5">
+                <i class="bi bi-chat-square-text fs-1 text-success"></i>
+                <p class="text-muted mt-3 mb-0">Aucune demande ne vous a encore été attribuée.</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

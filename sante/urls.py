@@ -52,9 +52,51 @@ urlpatterns = [
     ),
 
     path(
-        "assistant-gemini/",
+        "espace-sante/",
+        views.espace_sante,
+        name="espace_sante"
+    ),
+
+    path(
+        "espace-sante/conversation/<int:conversation_id>/prescrire/",
+        views.professionnel_prescrire_traitement,
+        name="professionnel_prescrire_traitement"
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/assistant-gemini/",
         views.assistant_gemini,
         name="assistant_gemini"
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/assistant-contact-resume/",
+        views.assistant_contact_resume,
+        name="assistant_contact_resume"
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/assistant-contact-agent/",
+        views.assistant_contact_agent,
+        name="assistant_contact_agent"
+    ),
+
+    path(
+        "messagerie/",
+        views.messagerie,
+        name="messagerie"
+    ),
+
+    path(
+        "messagerie/nouvelle/",
+        views.nouvelle_conversation,
+        name="nouvelle_conversation"
+    ),
+
+    path(
+        "messagerie/<int:conversation_id>/",
+        views.conversation_detail,
+        name="conversation_detail"
     ),
 
 
@@ -78,6 +120,12 @@ urlpatterns = [
         "administration/",
         views.administration,
         name="administration"
+    ),
+
+    path(
+        "administration/personnel-sante/",
+        views.administration_personnel_sante,
+        name="administration_personnel_sante"
     ),
 
     path(
@@ -382,6 +430,17 @@ urlpatterns = [
         name="detail_enfant"
     ),
 
+    path(
+        "enfants/<int:enfant_id>/exporter/",
+        views.exporter_dossier_enfant,
+        name="exporter_dossier_enfant",
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/supprimer/",
+        views.supprimer_dossier_enfant,
+        name="supprimer_dossier_enfant",
+    ),
 
     # =========================================================
     # SYMPTÔMES — ESPACE PARENT
@@ -448,6 +507,12 @@ urlpatterns = [
         "enfant/<int:enfant_id>/vaccination/ajouter/",
         views.ajouter_vaccination,
         name="ajouter_vaccination"
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/vaccinations/<int:vaccination_id>/modifier/",
+        views.modifier_vaccination,
+        name="modifier_vaccination"
     ),
 
 
@@ -529,6 +594,12 @@ urlpatterns = [
         name="accepter_partage"
     ),
 
+    path(
+        "partage/<int:partage_id>/refuser/",
+        views.refuser_partage,
+        name="refuser_partage"
+    ),
+
 
     # =========================================================
     # MODE GARDE — ESPACE PARENT
@@ -554,9 +625,21 @@ urlpatterns = [
 
     # Accès public par token
     path(
-        "mode-garde/<uuid:token>/",
+        "mode-garde/consulter/<str:token>/",
         views.consulter_mode_garde,
         name="consulter_mode_garde"
+    ),
+
+    path(
+        "mode-garde/<uuid:token>/",
+        views.consulter_mode_garde,
+        name="consulter_mode_garde_legacy"
+    ),
+
+    path(
+        "enfants/<int:enfant_id>/mode-garde/<int:mode_garde_id>/revoquer/",
+        views.revoquer_lien_mode_garde,
+        name="revoquer_lien_mode_garde"
     ),
 
     path(

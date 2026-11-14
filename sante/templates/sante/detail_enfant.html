@@ -350,6 +350,36 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
     border-top: 1px solid #eee;
 }
 
+.agent-contact {
+    margin-top: 10px;
+}
+
+.btn-agent-contact {
+    width: 100%;
+    border: 1px solid #198754;
+    border-radius: 10px;
+    padding: 9px 12px;
+    background: #fff;
+    color: #146c43;
+    font-weight: 600;
+}
+
+.agent-contact-consent {
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    background: #f8f9fa;
+}
+
+.agent-contact-summary {
+    max-height: 160px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+}
+
 
 /* Zone input */
 
@@ -1230,6 +1260,21 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
         <div>
 
+             <!-- ========================================== -->
+             <!-- BOUTON CONSULTER L'ASSISTANT IA -->
+             <!-- ========================================== -->
+
+            <button
+               type="button"
+               id="btnConsulterIA"
+               class="btn btn-success btn-lg rounded-pill shadow-sm px-4 py-3"
+               title="Consulter l'assistant IA">
+               <i class="bi bi-stars me-2"></i>
+                Consulter l'IA pour tout soucis de santé de vos enfants
+            </button>
+        
+        <div class="flex-wrap gap-3 pt-3">
+
             <!-- Retour -->
 
             <a
@@ -1243,7 +1288,7 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
             </a>
 
-
+        </div>
             <h1 class="fw-bold mt-2">
 
                 Dossier de {{ enfant.prenom }}
@@ -1273,6 +1318,31 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
                 Modifier
 
             </a>
+
+            <a
+                href="{% url 'sante:exporter_dossier_enfant' enfant.id %}"
+                class="btn btn-outline-success rounded-pill px-4"
+            >
+                <i class="bi bi-download me-2"></i>
+                Exporter le dossier
+            </a>
+
+            {% if user == enfant.parent %}
+                <form
+                    method="post"
+                    action="{% url 'sante:supprimer_dossier_enfant' enfant.id %}"
+                    onsubmit="return confirm('La suppression du dossier de {{ enfant.prenom|escapejs }} est définitive. Continuer ?');"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="btn btn-outline-danger rounded-pill px-4"
+                    >
+                        <i class="bi bi-trash me-2"></i>
+                        Supprimer le dossier
+                    </button>
+                </form>
+            {% endif %}
 
 
             <a
@@ -2088,7 +2158,7 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
             <i class="bi bi-stars"></i>
 
             <div>
-                <strong>Assistant IA</strong>
+                <strong>Assistant santé TOUKPEDIO</strong>
                 <small>TOUKPEDIO</small>
             </div>
         </div>
@@ -2107,20 +2177,63 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
 
 
     <!-- ZONE DES MESSAGES -->
-    <div id="messagesGemini" class="gemini-messages">
+    <div
+        id="messagesGemini"
+        class="gemini-messages"
+        data-symptome-initial-id="{{ symptome_initial.pk|default:'' }}"
+        data-temperature-initial-id="{{ temperature_initiale.pk|default:'' }}">
 
         <div class="message-ia">
 
-            <strong>✨ Assistant IA</strong>
+            <strong>✨ Assistant santé TOUKPEDIO</strong>
 
-            <p class="mb-0 mt-2">
-                Bonjour 👋
-            </p>
+            {% if symptome_initial %}
+                <p class="mb-0 mt-2">
+                    J’ai bien pris en compte le symptôme
+                    « {{ symptome_initial.symptome }} » enregistré le
+                    {{ symptome_initial.date|date:"d/m/Y" }} pour
+                    <strong>{{ enfant.prenom }}</strong>.
+                </p>
+                <p class="mb-0 mt-2">
+                    Première orientation prudente à partir des données
+                    autorisées du dossier (hypothèses, pas un diagnostic confirmé) :
+                </p>
+                <p
+                    id="reponseInitialeGemini"
+                    class="mb-0 mt-2"
+                    aria-live="polite">
+                    Connexion à Gemini…
+                </p>
+            {% elif temperature_initiale %}
+                <p class="mb-0 mt-2">
+                    Température enregistrée pour
+                    <strong>{{ enfant.prenom }}</strong> :
+                    <strong>{{ temperature_initiale.valeur }} °C</strong>.
+                </p>
+                <p class="mb-0 mt-2">
+                    Vérification des informations utiles du dossier…
+                </p>
+                <p
+                    id="reponseInitialeGemini"
+                    class="mb-0 mt-2"
+                    aria-live="polite">
+                    Connexion à Gemini…
+                </p>
+            {% else %}
+                <p class="mb-0 mt-2">
+                    Bonjour 👋
+                </p>
 
-            <p class="mb-0">
-                Je suis votre assistant TOUKPEDIO.
-                Comment puis-je vous aider concernant
-                <strong>{{ enfant.prenom }}</strong> ?
+                <p class="mb-0">
+                    Je suis votre assistant TOUKPEDIO.
+                    Comment puis-je vous aider concernant
+                    <strong>{{ enfant.prenom }}</strong> ?
+                </p>
+            {% endif %}
+
+            <p class="mb-0 mt-2 small text-muted">
+                Je suis une IA, pas un professionnel de santé. Les informations
+                médicales utiles peuvent être envoyées à Gemini (Google).
             </p>
 
         </div>
@@ -2151,6 +2264,48 @@ Dossier de {{ enfant.prenom }} - TOUKPEDIO
             </div>
 
         </form>
+
+        <div class="agent-contact">
+            <button
+                type="button"
+                id="btnContactAgent"
+                class="btn-agent-contact">
+                <i class="bi bi-person-vcard me-2"></i>
+                Préparer une demande de rendez-vous
+            </button>
+
+            <a
+                class="btn btn-outline-success btn-sm w-100 mt-2"
+                href="{% url 'sante:nouvelle_conversation' %}?enfant={{ enfant.pk }}">
+                <i class="bi bi-chat-dots me-2"></i>
+                Discuter en direct avec un professionnel
+            </a>
+
+            <div
+                id="consentementContactAgent"
+                class="agent-contact-consent"
+                hidden>
+                <p id="etatContactAgent" class="small mb-2" aria-live="polite"></p>
+                <p id="divulgationContactAgent" class="small mb-2"></p>
+                <pre id="resumeContactAgent" class="agent-contact-summary"></pre>
+                <label class="small d-flex gap-2 align-items-start">
+                    <input id="autoriserResumeAgent" type="checkbox">
+                    <span>
+                        J'autorise l'ajout de ce résumé à ma demande de rendez-vous.
+                        Je comprends qu'il sera visible par les comptes
+                        professionnels enregistrés dans TOUKPEDIO. Aucun
+                        courriel ni aucune notification automatique n'est envoyé.
+                    </span>
+                </label>
+                <button
+                    type="button"
+                    id="confirmerContactAgent"
+                    class="btn btn-success btn-sm mt-2"
+                    disabled>
+                    Continuer vers le formulaire
+                </button>
+            </div>
+        </div>
 
     </div>
 
@@ -2185,22 +2340,189 @@ document.addEventListener("DOMContentLoaded", function () {
     const messagesGemini =
         document.getElementById("messagesGemini");
 
+    const btnConsulterIA =
+        document.getElementById("btnConsulterIA");
+
+    const btnContactAgent =
+        document.getElementById("btnContactAgent");
+
+    const consentementContactAgent =
+        document.getElementById("consentementContactAgent");
+
+    const etatContactAgent =
+        document.getElementById("etatContactAgent");
+
+    const divulgationContactAgent =
+        document.getElementById("divulgationContactAgent");
+
+    const resumeContactAgent =
+        document.getElementById("resumeContactAgent");
+
+    const autoriserResumeAgent =
+        document.getElementById("autoriserResumeAgent");
+
+    const confirmerContactAgent =
+        document.getElementById("confirmerContactAgent");
+
 
     /* ==========================================
        OUVRIR LA CARTE
     ========================================== */
 
-    btnGemini.addEventListener("click", function () {
+   function ouvrirGemini() {
 
-        fenetreGemini.classList.add("active");
+    fenetreGemini.classList.add("active");
 
-        setTimeout(function () {
+    setTimeout(function () {
 
-            inputGemini.focus();
+        inputGemini.focus();
 
-        }, 300);
+    }, 300);
+
+}
+
+async function demanderAnalyseSymptome(symptomeId, paragrapheReponse) {
+    const messageIA = paragrapheReponse.closest(".message-ia");
+    let boutonRelance = messageIA.querySelector(".btn-relancer-symptome");
+
+    if (boutonRelance) {
+        boutonRelance.remove();
+    }
+
+    paragrapheReponse.textContent = "Connexion à Gemini…";
+    inputGemini.disabled = true;
+    boutonGemini.disabled = true;
+
+    try {
+        const reponse = await fetch(
+            "{% url 'sante:assistant_gemini' enfant_id=enfant.id %}",
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ symptome_id: symptomeId })
+            }
+        );
+        const donnees = await reponse.json();
+
+        if (!reponse.ok || !donnees.reply) {
+            throw new Error("Gemini indisponible");
+        }
+
+        if (donnees.urgent) {
+            paragrapheReponse.classList.add("alert", "alert-danger");
+            paragrapheReponse.setAttribute("role", "alert");
+        }
+        paragrapheReponse.textContent = donnees.reply;
+    } catch (error) {
+        paragrapheReponse.textContent =
+            "Gemini est indisponible. Le symptôme reste enregistré. " +
+            "Vous pouvez réessayer sans remplir à nouveau le formulaire.";
+        boutonRelance = document.createElement("button");
+        boutonRelance.type = "button";
+        boutonRelance.className = "btn btn-outline-success btn-sm mt-2 btn-relancer-symptome";
+        boutonRelance.textContent = "Réessayer avec Gemini";
+        boutonRelance.addEventListener("click", function () {
+            demanderAnalyseSymptome(symptomeId, paragrapheReponse);
+        });
+        messageIA.appendChild(boutonRelance);
+    } finally {
+        inputGemini.disabled = false;
+        boutonGemini.disabled = false;
+        messagesGemini.scrollTop = messagesGemini.scrollHeight;
+    }
+}
+
+async function demanderAnalyseTemperature(temperatureId, paragrapheReponse) {
+    const messageIA = paragrapheReponse.closest(".message-ia");
+    let boutonRelance = messageIA.querySelector(".btn-relancer-temperature");
+
+    if (boutonRelance) {
+        boutonRelance.remove();
+    }
+
+    paragrapheReponse.textContent = "Analyse de la température et du dossier…";
+    inputGemini.disabled = true;
+    boutonGemini.disabled = true;
+
+    try {
+        const reponse = await fetch(
+            "{% url 'sante:assistant_gemini' enfant_id=enfant.id %}",
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ temperature_id: temperatureId })
+            }
+        );
+        const donnees = await reponse.json();
+
+        if (!reponse.ok || !donnees.reply) {
+            throw new Error(donnees.error || "Gemini indisponible");
+        }
+
+        if (donnees.urgent) {
+            paragrapheReponse.classList.add("alert", "alert-danger");
+            paragrapheReponse.setAttribute("role", "alert");
+        }
+        paragrapheReponse.textContent = donnees.reply;
+    } catch (error) {
+        paragrapheReponse.textContent =
+            "L'analyse est momentanément indisponible. La température reste enregistrée.";
+        boutonRelance = document.createElement("button");
+        boutonRelance.type = "button";
+        boutonRelance.className =
+            "btn btn-outline-success btn-sm mt-2 btn-relancer-temperature";
+        boutonRelance.textContent = "Réessayer l'analyse";
+        boutonRelance.addEventListener("click", function () {
+            demanderAnalyseTemperature(temperatureId, paragrapheReponse);
+        });
+        messageIA.appendChild(boutonRelance);
+    } finally {
+        inputGemini.disabled = false;
+        boutonGemini.disabled = false;
+        messagesGemini.scrollTop = messagesGemini.scrollHeight;
+    }
+}
+
+const symptomeInitialId = messagesGemini.dataset.symptomeInitialId;
+if (symptomeInitialId) {
+    const paragrapheReponse = document.getElementById("reponseInitialeGemini");
+    ouvrirGemini();
+    demanderAnalyseSymptome(symptomeInitialId, paragrapheReponse);
+}
+
+const temperatureInitialeId = messagesGemini.dataset.temperatureInitialId;
+if (temperatureInitialeId) {
+    const paragrapheReponse = document.getElementById("reponseInitialeGemini");
+    ouvrirGemini();
+    demanderAnalyseTemperature(temperatureInitialeId, paragrapheReponse);
+}
+
+/* Bouton flottant */
+
+btnGemini.addEventListener("click", function () {
+
+    ouvrirGemini();
+
+});
+
+
+/* Bouton "Consulter l'IA" */
+
+if (btnConsulterIA) {
+
+    btnConsulterIA.addEventListener("click", function () {
+
+        ouvrirGemini();
 
     });
+
+}
 
 
     /* ==========================================
@@ -2274,7 +2596,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "message-ia";
 
         messageIA.innerHTML = `
-            <strong>✨ Assistant IA</strong>
+            <strong>✨ Assistant santé TOUKPEDIO</strong>
 
             <p class="mb-0 mt-2 text-muted">
                 Je prépare votre réponse...
@@ -2297,7 +2619,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
             const reponse = await fetch(
-                "{% url 'sante:assistant_gemini' %}",
+                "{% url 'sante:assistant_gemini' enfant_id=enfant.id %}",
                 {
                     method: "POST",
                     headers: {
@@ -2321,6 +2643,79 @@ document.addEventListener("DOMContentLoaded", function () {
             messagesGemini.scrollTop = messagesGemini.scrollHeight;
         }
 
+    });
+
+    btnContactAgent.addEventListener("click", async function () {
+        consentementContactAgent.hidden = false;
+        etatContactAgent.textContent =
+            "Vérification du service et préparation du résumé…";
+        autoriserResumeAgent.checked = false;
+        confirmerContactAgent.disabled = true;
+
+        try {
+            const response = await fetch(
+                "{% url 'sante:assistant_contact_resume' enfant_id=enfant.id %}",
+                { headers: { "Accept": "application/json" } }
+            );
+            const data = await response.json();
+
+            if (!response.ok || !data.available) {
+                etatContactAgent.textContent =
+                    data.error || "Aucun professionnel de santé n'est disponible.";
+                divulgationContactAgent.textContent = "";
+                resumeContactAgent.textContent = "";
+                return;
+            }
+
+            etatContactAgent.textContent =
+                "Vérifiez les informations avant de donner votre accord.";
+            divulgationContactAgent.textContent = data.disclosure;
+            resumeContactAgent.textContent = data.summary;
+            confirmerContactAgent.disabled = false;
+        } catch (error) {
+            etatContactAgent.textContent =
+                "Impossible de vérifier le service. Aucun message n'a été envoyé.";
+        }
+    });
+
+    autoriserResumeAgent.addEventListener("change", function () {
+        confirmerContactAgent.disabled = !autoriserResumeAgent.checked;
+    });
+
+    confirmerContactAgent.addEventListener("click", async function () {
+        confirmerContactAgent.disabled = true;
+        etatContactAgent.textContent =
+            "Envoi du résumé au professionnel…";
+
+        try {
+            const response = await fetch(
+                "{% url 'sante:assistant_contact_agent' enfant_id=enfant.id %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Accept": "application/json"
+                    },
+                    body: new URLSearchParams({ consent: "yes" })
+                }
+            );
+            const data = await response.json();
+
+            if (!response.ok) {
+                etatContactAgent.textContent =
+                    data.error || "Le service de contact est indisponible.";
+                confirmerContactAgent.disabled = !autoriserResumeAgent.checked;
+                return;
+            }
+
+            etatContactAgent.textContent = data.message;
+            window.location.assign(data.redirect_url);
+        } catch (error) {
+            etatContactAgent.textContent =
+                "Impossible d'envoyer le résumé. Aucun professionnel n'a été contacté.";
+            confirmerContactAgent.disabled = !autoriserResumeAgent.checked;
+        }
     });
 
 

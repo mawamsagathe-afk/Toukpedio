@@ -11,7 +11,9 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
     <!-- Bootstrap Icons -->
+    <link rel="icon" type="image/png" href="{% static 'sante/images/copilot.png' %}">
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
@@ -29,15 +31,13 @@
 <!-- ===================================================== -->
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top shadow-sm">
-
+    
     <div class="container">
-
+        <a href="#"><img src="{% static 'sante/images/copilots.png' %}" alt="photo" style="height: 65px; width: 100px;"></a>
         <a
             class="navbar-brand"
             href="{% url 'sante:accueil' %}"
         >
-
-            <i class="bi bi-heart-pulse-fill me-2"></i>
 
             Toukpedio
 
@@ -140,6 +140,17 @@
 
                     </div>
 
+
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags|default:'danger' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
                     <!-- FORMULAIRE -->
 
@@ -277,7 +288,7 @@
 
                 <h5>
 
-                    <i class="bi bi-heart-pulse-fill me-2"></i>
+                    <a href="#"><img src="{% static 'sante/images/copilots.png' %}" alt="photo" style="height: 65px; width: 100px;"></a>
 
                     Toukpedio
 

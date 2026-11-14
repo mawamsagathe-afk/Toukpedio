@@ -1,0 +1,74 @@
+{% extends "sante/base.html" %}
+
+{% block title %}Nouvelle conversation - TOUKPEDIO{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 760px;">
+    <a class="text-decoration-none" href="{% url 'sante:messagerie' %}">
+        <i class="bi bi-arrow-left me-1"></i>Retour à la messagerie
+    </a>
+    <div class="card shadow-sm mt-3">
+        <div class="card-body p-4">
+            <h1 class="h3 fw-bold">Contacter un professionnel</h1>
+            <p class="text-muted">
+                Votre message sera visible uniquement par vous et le professionnel choisi.
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            {% if not professionnels %}
+                <div class="alert alert-warning" role="status">
+                    Aucun professionnel actif n'est disponible pour le moment.
+                </div>
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label" for="professionnel">Professionnel</label>
+                        <select class="form-select" id="professionnel" name="professionnel" required>
+                            <option value="">Choisir un professionnel</option>
+                            {% for professionnel in professionnels %}
+                                <option value="{{ professionnel.pk }}">
+                                    {{ professionnel.get_full_name|default:professionnel.username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="enfant">Dossier concerné (facultatif)</label>
+                        <select class="form-select" id="enfant" name="enfant">
+                            <option value="">Aucun dossier enfant</option>
+                            {% for enfant in enfants %}
+                                <option
+                                    value="{{ enfant.pk }}"
+                                    {% if enfant_preselectionne == enfant.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ enfant.prenom }} {{ enfant.nom }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="sujet">Sujet</label>
+                        <input class="form-control" id="sujet" name="sujet" maxlength="160" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="message">Votre message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" maxlength="4000" required></textarea>
+                        <div class="form-text">Maximum 4 000 caractères. Évitez les informations qui ne sont pas nécessaires.</div>
+                    </div>
+                    <div class="alert alert-info small">
+                        La messagerie ne remplace pas les urgences. En cas de danger immédiat, appelez le numéro d'urgence local.
+                    </div>
+                    <button class="btn btn-success" type="submit">
+                        <i class="bi bi-send me-1"></i>Envoyer le message
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
