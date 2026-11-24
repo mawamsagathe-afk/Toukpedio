@@ -1,5 +1,8 @@
 asgiref==3.12.1
 Django==6.1
+dj-database-url>=2.3,<4
+psycopg[binary]>=3.2,<4
+python-dotenv>=1.0,<2
 sqlparse==0.6.0
 tzdata==2026.3
 channels>=4.2,<5

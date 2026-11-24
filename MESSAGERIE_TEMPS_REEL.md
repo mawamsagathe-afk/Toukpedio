@@ -26,17 +26,23 @@ Configurer les variables d'environnement de production :
 
 ```text
 DJANGO_DEBUG=false
-DJANGO_SECRET_KEY=<clé secrète générée et conservée hors du dépôt>
-DJANGO_ALLOWED_HOSTS=app.example.com
+DJANGO_SECRET_KEY=<clé générée et configurée dans l'environnement de l'hébergeur>
+DJANGO_ALLOWED_HOSTS=*
 REDIS_URL=redis://redis.example.internal:6379/0
 ```
+
+Générer une clé avec `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`.
+Ne pas enregistrer cette clé dans le dépôt. `DJANGO_ALLOWED_HOSTS=*` autorise
+tous les noms d'hôte et facilite le déploiement sur différents hébergeurs ; pour
+restreindre l'accès, remplacer `*` par une liste séparée par des virgules
+(par exemple `app.example.com,www.example.com`).
 
 Utiliser un Redis privé, protégé par authentification et TLS lorsque le
 fournisseur le permet. Ne pas exposer Redis à Internet. En production, la
 configuration refuse de démarrer sans `DJANGO_SECRET_KEY` et `REDIS_URL`.
 
-L'application doit être servie par un serveur ASGI pour accepter les
-WebSockets, par exemple :
+Hors Vercel, l'application doit être servie par un serveur ASGI pour accepter
+les WebSockets, par exemple :
 
 ```powershell
 daphne -b 0.0.0.0 -p 8000 config.asgi:application
@@ -44,6 +50,9 @@ daphne -b 0.0.0.0 -p 8000 config.asgi:application
 
 Le proxy HTTPS doit transmettre les connexions `Upgrade: websocket` et servir
 le site en HTTPS afin que le navigateur utilise `wss://`.
+
+Pour le déploiement Vercel (runtime ASGI et variables Redis), voir
+[DEPLOIEMENT_VERCEL.md](./DEPLOIEMENT_VERCEL.md).
 
 ## Comptes, confidentialité et limites
 

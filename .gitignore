@@ -1,8 +1,11 @@
 .env
+.env.local
 *.env
 .venv/
 .pedio/
+.vercel/
 __pycache__/
 *.pyc
 db.sqlite3
+staticfiles/
 media/

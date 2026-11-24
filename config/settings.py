@@ -12,21 +12,27 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlsplit
+
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env.local")
 load_dotenv(BASE_DIR / ".env")
+IS_VERCEL = os.getenv("VERCEL") == "1"
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or (
-    'django-insecure-!1f1bb7y-3vbf(s+e!pq-@8@i)h=t^z2p$fwc^w@l!g&0x6hb)'
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "").strip()
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY must be configured in the environment."
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "false").strip().lower() == "true"
@@ -39,17 +45,23 @@ ALLOWED_HOSTS = [
     ).split(",")
     if host.strip()
 ]
+if IS_VERCEL:
+    ALLOWED_HOSTS.extend([".vercel.app", ".now.sh"])
+    vercel_url = os.getenv("VERCEL_URL", "").strip()
+    if vercel_url and vercel_url not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(vercel_url)
 
-if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
-    raise ImproperlyConfigured(
-        "DJANGO_SECRET_KEY must be configured for production."
-    )
-
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if IS_VERCEL:
+    CSRF_TRUSTED_ORIGINS.append("https://*.vercel.app")
 
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +71,8 @@ INSTALLED_APPS = [
     'sante',
     'Api',
 ]
+if not IS_VERCEL:
+    INSTALLED_APPS.insert(0, "daphne")
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,7 +105,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = "config.asgi.application"
 
 REDIS_URL = os.getenv("REDIS_URL", "").strip()
-if not DEBUG and not REDIS_URL:
+if not REDIS_URL and not DEBUG and not IS_VERCEL:
     raise ImproperlyConfigured(
         "REDIS_URL must be configured for production WebSocket messaging."
     )
@@ -114,12 +128,41 @@ else:
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+if DATABASE_URL:
+    database_url = urlsplit(DATABASE_URL)
+    if database_url.scheme not in {"postgres", "postgresql"}:
+        raise ImproperlyConfigured(
+            "DATABASE_URL must use the postgres:// or postgresql:// scheme."
+        )
+
+    database_options = dict(parse_qsl(database_url.query))
+    if not DEBUG:
+        database_options.setdefault("sslmode", "require")
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote(database_url.path.lstrip("/")),
+            "USER": unquote(database_url.username or ""),
+            "PASSWORD": unquote(database_url.password or ""),
+            "HOST": database_url.hostname or "",
+            "PORT": str(database_url.port or ""),
+            "CONN_MAX_AGE": 0,
+            "OPTIONS": database_options,
+        }
     }
-}
+elif IS_VERCEL:
+    raise ImproperlyConfigured(
+        "DATABASE_URL must be configured on Vercel for a persistent database."
+    )
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -156,7 +199,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Email
