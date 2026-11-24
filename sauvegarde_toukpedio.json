@@ -1,0 +1,750 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$nMqiSmOgpU7yOyo3SZcchH$PiA256w+NQ8Dipl+VPeTFKarG3molSo05eyr325iXXg=",
+    "last_login": "2026-11-14T19:39:02.222Z",
+    "is_superuser": true,
+    "username": "agathe",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-08-21T14:36:20.285Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$7YnOZ9RUOgqZtJKGsQDbex$VayWqSYbFWpDyxefAEo/m9eiLpHkOXezc3gM42aSREM=",
+    "last_login": "2026-11-24T08:20:24.463Z",
+    "is_superuser": false,
+    "username": "jeannaut",
+    "first_name": "",
+    "last_name": "",
+    "email": "jeannautclaudelsiwecheu@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-08-22T19:18:49.856Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$hVWoU9jfWBFdjDEQXxW8OB$LaDTiYvz+/eRAbAB3+m3gyK/lbuFoDwMbx8MPAVddvg=",
+    "last_login": "2026-10-19T09:43:31.187Z",
+    "is_superuser": false,
+    "username": "mawans",
+    "first_name": "",
+    "last_name": "",
+    "email": "mawansagathe@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-09T09:28:45.575Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$VtTA3GWLTeUnHJX2ucj09W$PcgtmNwc13maAY2mlKBHmZ/qRYlOj0v+WtwdfmGY4as=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "parent_test",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-17T14:57:00.404Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$rdLufkmgR8LFweWVmLaSsB$Ld47Def3aKDn9mrjvFVt9JNBgRmIPvWEzYPyynyzUDg=",
+    "last_login": "2026-10-20T18:50:32.868Z",
+    "is_superuser": false,
+    "username": "Junie",
+    "first_name": "",
+    "last_name": "",
+    "email": "juniemezil@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-20T18:30:26.006Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$BYuUa6S7va8O4TSFJ4Cbcx$32Ero3mN2Py2HTTM1Qly3b+A+hz9k4fdaOM+YiNtTas=",
+    "last_login": "2026-10-20T18:56:58.526Z",
+    "is_superuser": false,
+    "username": "Ghislain",
+    "first_name": "",
+    "last_name": "",
+    "email": "gkom97@yahoo.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-20T18:49:42.147Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$WxXHHQsFSazjJ9UpaHieyN$RXUHuyY5eqJpKXN/8vSMy7qPxcH2rYtRfMZ05/1eqkI=",
+    "last_login": "2026-11-07T12:34:04.653Z",
+    "is_superuser": false,
+    "username": "sibe",
+    "first_name": "",
+    "last_name": "",
+    "email": "sibengantchi@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-11-07T10:04:04.576Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$NZKEsN2zfquOMLDbMbLjn6$OBQKCe9cQx/8mm8NnNDf7qm4mUltE5wHhM0IySppUG4=",
+    "last_login": "2026-11-07T12:42:05.914Z",
+    "is_superuser": false,
+    "username": "zole",
+    "first_name": "",
+    "last_name": "",
+    "email": "zole@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-11-07T12:41:29.988Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "4yha0f3242jmsi0b73djpdt6aptnvakc",
+  "fields": {
+    "session_data": ".eJxVjLsKwzAMAP9FczHGiSQ7Y_d-Q5BtuUlbbMhjKv33EsjQrnfHvWGUfZvGfdVlnDMM4ODyy6Kkp9ZD5IfUezOp1W2ZozkSc9rV3FrW1_Vs_waTrBMMYCkSdcX3nRcMUlJEQma2zKVHT1kCeUsdarHqMahnq5ld4uRSEAefL8OvN0E:1x13br:e4pGpJ2bLAQhB0tsRHKPf-ZWkY9A1KKka1eqgiuj6U0",
+    "expire_date": "2026-09-14T15:07:43.950Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "76uovmgzdrr6pduguhqdrh1hqa4yvxem",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQAP9lz4bwWpAevfcbmoUFqRpI-jgZ_9006UGvM5N5w0T7Vqd9zcs0Mwxg4fLLIqVnbofgB7V7F6m3bZmjOBJx2lWMnfPrdrZ_g0prhQECUnJRl6yTDB6dDTmgyuxR2eKv6BwX8k6htwFTkcZq6V0wTIY0k4LPF9EjNys:1x4GLB:CWHwEpefgW6IQEC06t2mBWXBrdOxmI499Zunqh7gNpc",
+    "expire_date": "2026-09-23T11:19:45.742Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "86gfw7mzox31ta9vgo57a83togearp9b",
+  "fields": {
+    "session_data": ".eJxVjstqwzAQRX_FzNoYRX57125DCBS6aosZe8axWkdKpBEUgv-9GNLX9j7OvTfoMcrcx8C-NwQdFJD-1QYcP9huBr2jPblsdFa8GbItkt3dkB0c8fJ4z_4DzBhm6KBuG0JSw1RSkeekq1yzaolU1VBVTlPT1ENb1y0VSGrU004p0ho1l7wb1bi9whBMELTSzyaI8-YaGbqXG3i3MHTwLGYxAYWjhxSEPwU6eHqNSnF7cZZCEu3WObOV5II-WTg5O0mO-wzW9Afz8D3zCznuYX1bvwDDKWSg:1x4GLe:6DKgl7A00HWWC5xPgVq1h97zTDI_CnHNdCZSCi1EpzI",
+    "expire_date": "2026-09-23T11:20:14.937Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8xcbbeflrdwgq2ly4cuade404f5fyozd",
+  "fields": {
+    "session_data": ".eJxVjMsKwyAURP_lrotYa0Sz7L7fIPehNW1RiMmq9N-LkEW7GBjmHOYNEfetxL2nNS4CMxg4_W6E_Ex1AHlgvTfFrW7rQmoo6qBd3Zqk1_Vw_w4K9gIzZBsMTSOsjRZhLxNfbEAhQxbZW28zOhSTtdNBzjK6Zc46OfIePl_5mji3:1xIB5l:FwnH7MC7loXan1RWjm2BJu0Sj21hQ-kSPQufyXxu9p4",
+    "expire_date": "2026-10-31T20:33:21.897Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "97a1wzyg2qjl1aeet45cqjbb849mqm2j",
+  "fields": {
+    "session_data": ".eJxVjEsOwiAUAO_y1oYIPH5duu8ZCJ-HVA0kpV0Z726adKHbmcm8wYd9q34ftPolwwQIl18WQ3pSO0R-hHbvLPW2rUtkR8JOO9jcM71uZ_s3qGFUmEA4Ms4JLBKlltwkmUIyZKO1NmltxDUqxSXHrAoJJ0gVw5FHh6TJ5gCfL75ONzI:1x4GL1:9edC9Ad8HKNB_678POqZGUMx25BTCGLD5QZHPk6orY8",
+    "expire_date": "2026-09-23T11:19:35.739Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "9wsb1qsvcif7oogcf16bcgga9dpk8n6g",
+  "fields": {
+    "session_data": ".eJxVjEsOwiAUAO_y1obwKb8u3XsG8oCHVA0kpV0Z726adKHbmcm8IeC-1bAPWsOSYQYBl18WMT2pHSI_sN07S71t6xLZkbDTDnbrmV7Xs_0bVBwVZqDosqNSipFCmWKmiTsvPfc2iuKFVTlhoqSK4w6FNllbLYzjKMmg5Ak-X-f_N68:1wxQgN:pP5qRmqDkV-P7sAtvgs01Imsq4EKYSWdaMUOwr_Sebg",
+    "expire_date": "2026-09-04T14:57:23.504Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "g58cjhkbjyo3q84xg5zfb2fs36e1ehcw",
+  "fields": {
+    "session_data": ".eJxVjLsKwzAMAP9FczHGiSQ7Y_d-Q5BtuUlbbMhjKv33EsjQrnfHvWGUfZvGfdVlnDMM4ODyy6Kkp9ZD5IfUezOp1W2ZozkSc9rV3FrW1_Vs_waTrBMMYCkSdcX3nRcMUlJEQma2zKVHT1kCeUsdarHqMahnq5ld4uRSEAefL8OvN0E:1x3W0o:sIVUDjRsGKFVderRFcvWPX4gr-sF5ymDQ8_O_EJuHBo",
+    "expire_date": "2026-09-21T09:51:38.861Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "in6dqps18yxwxbt871pluhwcs866mmhc",
+  "fields": {
+    "session_data": ".eJxVjMsKwyAURP_lrotYa0Sz7L7fIPehNW1RiMmq9N-LkEW7GBjmHOYNEfetxL2nNS4CMxg4_W6E_Ex1AHlgvTfFrW7rQmoo6qBd3Zqk1_Vw_w4K9gIzZBsMTSOsjRZhLxNfbEAhQxbZW28zOhSTtdNBzjK6Zc46OfIePl_5mji3:1xEPh6:plKmymk_FIi-y8x1zcwqijkVdRlakZKOF4eovf6AH50",
+    "expire_date": "2026-10-21T11:20:20.899Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "soxtzl3qhap1mowy04f7e2edtp7vggsu",
+  "fields": {
+    "session_data": ".eJxVjEsOwiAUAO_y1obwKb8u3XsG8oCHVA0kpV0Z726adKHbmcm8IeC-1bAPWsOSYQYBl18WMT2pHSI_sN07S71t6xLZkbDTDnbrmV7Xs_0bVBwVZqDosqNSipFCmWKmiTsvPfc2iuKFVTlhoqSK4w6FNllbLYzjKMmg5Ak-X-f_N68:1wxQgQ:sOVKwEU-N8_JSnYBWScmeX4GJ-etzsDSdnsf486mbbU",
+    "expire_date": "2026-09-04T14:57:26.995Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "upml9bnwn269q728j738ww9qkzykaiv2",
+  "fields": {
+    "session_data": ".eJxVjLsKwzAMAP9FczHGiSQ7Y_d-Q5BtuUlbbMhjKv33EsjQrnfHvWGUfZvGfdVlnDMM4ODyy6Kkp9ZD5IfUezOp1W2ZozkSc9rV3FrW1_Vs_waTrBMMYCkSdcX3nRcMUlJEQma2zKVHT1kCeUsdarHqMahnq5ld4uRSEAefL8OvN0E:1wyW29:9btRxHeqepyYtT7yM7xwxrUydn7LaFyTYRv8X9EuEcQ",
+    "expire_date": "2026-09-07T14:52:21.075Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "wpdo738ied76gg5r8g3zeo3sj8u8oim9",
+  "fields": {
+    "session_data": ".eJxVjMsKwyAURP_lrotYa0Sz7L7fIPehNW1RiMmq9N-LkEW7GBjmHOYNEfetxL2nNS4CMxg4_W6E_Ex1AHlgvTfFrW7rQmoo6qBd3Zqk1_Vw_w4K9gIzZBsMTSOsjRZhLxNfbEAhQxbZW28zOhSTtdNBzjK6Zc46OfIePl_5mji3:1xJFXU:IJtKk9Inewpqwh7lyde6sfhTQoNrsgPcRx9qwHJaIR4",
+    "expire_date": "2026-11-03T19:30:24.336Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "xwurqzdkm59w713ttm2laqtrht2wvxwk",
+  "fields": {
+    "session_data": ".eJxVjMsKwjAQAP9lzxJiEtZNj979hrKP1FQlhT5O4r9LoQe9zgzzhp63tfbbUuZ-NOggwOmXCeuztF3Yg9t9cjq1dR7F7Yk77OJuk5XX9Wj_BpWXCh0gRc-a0WNOdvGWomhR4oCI5CUEjzYQqQWOKnKmlLIOYoE4xswKny_VEDf-:1xVllI:-7EIOAm4VxhEBiZHjeBRKrmHbsJ-sJ7vPCPrk2ideDc",
+    "expire_date": "2026-12-08T08:20:24.485Z"
+  }
+},
+{
+  "model": "sante.enfant",
+  "pk": 1,
+  "fields": {
+    "nom": "Ngantchi",
+    "prenom": "ayana",
+    "date_naissance": "2020-12-21",
+    "sexe": "F",
+    "photo": "enfants/DSC_6213_-_Copie.jpg",
+    "parent": [
+      "jeannaut"
+    ],
+    "telephone_parent": "676784229",
+    "whatsapp_consent": true,
+    "adresse": "douala",
+    "groupe_sanguin": "o+",
+    "allergies": "a la poussière et moisissure",
+    "traitement": "",
+    "antecedents": "",
+    "observations": "problème de peau",
+    "date_creation": "2026-08-22T20:50:11.100Z"
+  }
+},
+{
+  "model": "sante.enfant",
+  "pk": 2,
+  "fields": {
+    "nom": "Ngantchi",
+    "prenom": "Nathanaél",
+    "date_naissance": "2026-08-29",
+    "sexe": "M",
+    "photo": "enfants/Nathanael.jpeg",
+    "parent": [
+      "jeannaut"
+    ],
+    "telephone_parent": "676784229",
+    "whatsapp_consent": true,
+    "adresse": "douala",
+    "groupe_sanguin": "A+",
+    "allergies": "a la moisissure",
+    "traitement": "",
+    "antecedents": "",
+    "observations": "",
+    "date_creation": "2026-10-07T13:43:46.350Z"
+  }
+},
+{
+  "model": "sante.enfant",
+  "pk": 3,
+  "fields": {
+    "nom": "Kom",
+    "prenom": "Layon",
+    "date_naissance": "2024-10-09",
+    "sexe": "M",
+    "photo": "",
+    "parent": [
+      "Junie"
+    ],
+    "telephone_parent": "+237671468962",
+    "whatsapp_consent": true,
+    "adresse": "Logbaba, Douala",
+    "groupe_sanguin": "A+",
+    "allergies": "",
+    "traitement": "Traitement du paludisme",
+    "antecedents": "Abcès\r\nPaludisme à 7mois\r\nA pris tout ses vaccins enfants",
+    "observations": "Peau très sensible",
+    "date_creation": "2026-10-20T18:45:54.912Z"
+  }
+},
+{
+  "model": "sante.enfant",
+  "pk": 5,
+  "fields": {
+    "nom": "NANA",
+    "prenom": "JEAN",
+    "date_naissance": "2020-10-29",
+    "sexe": "M",
+    "photo": "",
+    "parent": [
+      "sibe"
+    ],
+    "telephone_parent": "697202558",
+    "whatsapp_consent": false,
+    "adresse": "",
+    "groupe_sanguin": "A+",
+    "allergies": "QUININNE",
+    "traitement": "",
+    "antecedents": "DEBUT DASME",
+    "observations": "",
+    "date_creation": "2026-11-07T10:21:32.012Z"
+  }
+},
+{
+  "model": "sante.enfant",
+  "pk": 6,
+  "fields": {
+    "nom": "farma",
+    "prenom": "nathan",
+    "date_naissance": "2020-01-02",
+    "sexe": "F",
+    "photo": "enfants/parures.jfif",
+    "parent": [
+      "zole"
+    ],
+    "telephone_parent": "+237671468962",
+    "whatsapp_consent": false,
+    "adresse": "",
+    "groupe_sanguin": "A+",
+    "allergies": "allergie au haricot et a la quinnine",
+    "traitement": "antibio therapie",
+    "antecedents": "parent sideneen",
+    "observations": "",
+    "date_creation": "2026-11-07T12:46:24.817Z"
+  }
+},
+{
+  "model": "sante.journalsymptome",
+  "pk": 18,
+  "fields": {
+    "enfant": 1,
+    "date": "2026-09-08",
+    "symptome": "douleur",
+    "intensite": "moderee",
+    "description": "Le ventre est ballonnée",
+    "temperature": "38.0",
+    "traitement_pris": "",
+    "evolution": "",
+    "observations": "Les yeux palle",
+    "created_at": "2026-09-08T10:30:07.525Z",
+    "updated_at": "2026-09-08T10:30:07.525Z"
+  }
+},
+{
+  "model": "sante.journalsymptome",
+  "pk": 19,
+  "fields": {
+    "enfant": 2,
+    "date": "2026-10-16",
+    "symptome": "humeur",
+    "intensite": "moderee",
+    "description": "l'enfant vomit chaque 3 H  de temps et jaunâtre et très clouant",
+    "temperature": null,
+    "traitement_pris": "",
+    "evolution": "",
+    "observations": "pleure beaucoup",
+    "created_at": "2026-10-16T16:28:46.147Z",
+    "updated_at": "2026-10-16T16:28:46.147Z"
+  }
+},
+{
+  "model": "sante.journalsymptome",
+  "pk": 20,
+  "fields": {
+    "enfant": 2,
+    "date": "2026-10-16",
+    "symptome": "vomissement",
+    "intensite": "forte",
+    "description": "vomissement  jaunatre",
+    "temperature": "38.0",
+    "traitement_pris": "",
+    "evolution": "",
+    "observations": "il pleure bcp",
+    "created_at": "2026-10-16T17:55:27.761Z",
+    "updated_at": "2026-10-16T17:55:27.761Z"
+  }
+},
+{
+  "model": "sante.journalsymptome",
+  "pk": 23,
+  "fields": {
+    "enfant": 1,
+    "date": "2026-10-16",
+    "symptome": "vomissement",
+    "intensite": "moderee",
+    "description": "vomissement , mal de vendre , maux de tete",
+    "temperature": null,
+    "traitement_pris": "paracetamol",
+    "evolution": "aggrave",
+    "observations": "accune",
+    "created_at": "2026-10-16T20:16:57.847Z",
+    "updated_at": "2026-11-04T11:54:45.875Z"
+  }
+},
+{
+  "model": "sante.journalsymptome",
+  "pk": 25,
+  "fields": {
+    "enfant": 1,
+    "date": "2026-11-04",
+    "symptome": "vomissement",
+    "intensite": "forte",
+    "description": "",
+    "temperature": "40.0",
+    "traitement_pris": "",
+    "evolution": "",
+    "observations": "",
+    "created_at": "2026-11-04T22:26:57.232Z",
+    "updated_at": "2026-11-04T22:26:57.232Z"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "jeannaut"
+    ],
+    "telephone": "676784229",
+    "adresse": "Saint-nicolas"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "mawans"
+    ],
+    "telephone": "677319450",
+    "adresse": "Saint-nicolas"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Junie"
+    ],
+    "telephone": "+237671468962",
+    "adresse": "Logbaba, Douala"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "Ghislain"
+    ],
+    "telephone": "+237674309998",
+    "adresse": "banalia"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "sibe"
+    ],
+    "telephone": "697202558",
+    "adresse": "pk14"
+  }
+},
+{
+  "model": "sante.parent",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "zole"
+    ],
+    "telephone": "677881225",
+    "adresse": "14eme ndopassi"
+  }
+},
+{
+  "model": "sante.consultation",
+  "pk": 1,
+  "fields": {
+    "enfant": 1,
+    "date_consultation": "2026-08-31T15:01:27.952Z",
+    "motif": "palu",
+    "symptomes": "tempeture",
+    "temperature": null,
+    "poids": null,
+    "taille": null,
+    "diagnostic": "aaaaa",
+    "traitement": "paracetamol",
+    "recommandations": "",
+    "prochaine_visite": null
+  }
+},
+{
+  "model": "sante.vaccination",
+  "pk": 3,
+  "fields": {
+    "enfant": 2,
+    "age": "Naissance",
+    "nom_vaccin": "BCG et Pollomyelite",
+    "dose": "1er  dose",
+    "date_prevue": "2026-09-09",
+    "date_effectuee": "2026-09-09",
+    "prochaine_dose": null,
+    "observations": ""
+  }
+},
+{
+  "model": "sante.vaccination",
+  "pk": 4,
+  "fields": {
+    "enfant": 2,
+    "age": "6 semaines",
+    "nom_vaccin": "DTCoq-HepB-Hib",
+    "dose": "1er  dose",
+    "date_prevue": "2026-10-10",
+    "date_effectuee": "2026-10-10",
+    "prochaine_dose": null,
+    "observations": ""
+  }
+},
+{
+  "model": "sante.rendezvous",
+  "pk": 1,
+  "fields": {
+    "enfant": 2,
+    "date_rendez_vous": "2026-10-21",
+    "heure": "10:30:00",
+    "motif": "pour la prochain vaccin",
+    "professionnel": null,
+    "statut": "planifie",
+    "notes": "",
+    "date_creation": "2026-10-07T14:36:18.979Z"
+  }
+},
+{
+  "model": "sante.temperature",
+  "pk": 1,
+  "fields": {
+    "enfant": 1,
+    "valeur": "38.0",
+    "date_prise": "2026-08-26T15:43:09.209Z",
+    "observation": ""
+  }
+},
+{
+  "model": "sante.photosymptome",
+  "pk": 9,
+  "fields": {
+    "journal": 18,
+    "photo": "symptomes/DSC_6212_-_Copie.jpg",
+    "date_ajout": "2026-09-08T10:30:07.534Z",
+    "description": ""
+  }
+},
+{
+  "model": "sante.partageenfant",
+  "pk": 1,
+  "fields": {
+    "enfant": 1,
+    "parent": [
+      "mawans"
+    ],
+    "date_invitation": "2026-09-09T09:30:28.858Z",
+    "accepte": true,
+    "refusee": false
+  }
+},
+{
+  "model": "sante.partageenfant",
+  "pk": 2,
+  "fields": {
+    "enfant": 2,
+    "parent": [
+      "mawans"
+    ],
+    "date_invitation": "2026-10-19T09:22:30.379Z",
+    "accepte": true,
+    "refusee": false
+  }
+},
+{
+  "model": "sante.partageenfant",
+  "pk": 3,
+  "fields": {
+    "enfant": 3,
+    "parent": [
+      "Ghislain"
+    ],
+    "date_invitation": "2026-10-20T18:53:22.773Z",
+    "accepte": true,
+    "refusee": false
+  }
+},
+{
+  "model": "sante.modegarde",
+  "pk": 1,
+  "fields": {
+    "enfant": 1,
+    "parent": [
+      "jeannaut"
+    ],
+    "nom_gardien": "Junie",
+    "telephone_gardien": "697394936",
+    "email_gardien": "",
+    "type_gardien": "baby_sitter",
+    "date_debut": "2026-08-28",
+    "date_fin": "2026-08-31",
+    "heure_debut": null,
+    "heure_fin": null,
+    "partager_allergies": true,
+    "partager_traitement": true,
+    "partager_alimentation": true,
+    "partager_sommeil": true,
+    "partager_hydratation": false,
+    "partager_antecedents": false,
+    "partager_vaccinations": false,
+    "partager_consultations": false,
+    "partager_temperature": false,
+    "partager_contact_parent": true,
+    "consignes": "Elle prend son repas à12h et sieste à 14h",
+    "contact_urgence": "677319450",
+    "token": "791be1da-c00c-40d1-8a30-9a5e3cecf4b5",
+    "token_expires_at": "2026-10-26T10:47:36.131Z",
+    "token_revoked_at": null,
+    "actif": true,
+    "date_creation": "2026-08-28T20:35:40.021Z"
+  }
+},
+{
+  "model": "sante.modegarde",
+  "pk": 2,
+  "fields": {
+    "enfant": 1,
+    "parent": [
+      "jeannaut"
+    ],
+    "nom_gardien": "erika",
+    "telephone_gardien": "697394936",
+    "email_gardien": "mawambaagathe2026@gmail.com",
+    "type_gardien": "autre",
+    "date_debut": "2026-10-19",
+    "date_fin": "2026-10-25",
+    "heure_debut": "14:00:00",
+    "heure_fin": "12:30:00",
+    "partager_allergies": false,
+    "partager_traitement": false,
+    "partager_alimentation": true,
+    "partager_sommeil": true,
+    "partager_hydratation": true,
+    "partager_antecedents": false,
+    "partager_vaccinations": false,
+    "partager_consultations": false,
+    "partager_temperature": false,
+    "partager_contact_parent": true,
+    "consignes": "Ele prend son repat a 12H30 Et dors vers 14h",
+    "contact_urgence": "677319450",
+    "token": "44fc8cf9-fb67-4362-b6b7-823351b77678",
+    "token_expires_at": "2026-10-26T11:45:10.362Z",
+    "token_revoked_at": null,
+    "actif": true,
+    "date_creation": "2026-10-19T11:45:10.458Z"
+  }
+},
+{
+  "model": "sante.conversation",
+  "pk": 1,
+  "fields": {
+    "parent": [
+      "jeannaut"
+    ],
+    "professionnel": [
+      "agathe"
+    ],
+    "enfant": 1,
+    "sujet": "CONSULTATON",
+    "ouverte": true,
+    "creee_le": "2026-11-06T13:51:45.686Z",
+    "mise_a_jour": "2026-11-06T13:51:45.689Z",
+    "dernier_message_le": "2026-11-06T13:51:45.689Z"
+  }
+},
+{
+  "model": "sante.conversation",
+  "pk": 2,
+  "fields": {
+    "parent": [
+      "jeannaut"
+    ],
+    "professionnel": [
+      "agathe"
+    ],
+    "enfant": 1,
+    "sujet": "CONSULTATON",
+    "ouverte": true,
+    "creee_le": "2026-11-06T13:53:49.129Z",
+    "mise_a_jour": "2026-11-06T13:53:49.133Z",
+    "dernier_message_le": "2026-11-06T13:53:49.132Z"
+  }
+},
+{
+  "model": "sante.message",
+  "pk": 1,
+  "fields": {
+    "conversation": 1,
+    "expediteur": [
+      "jeannaut"
+    ],
+    "texte": "haute temperature vommissement et convulsion",
+    "envoye_le": "2026-11-06T13:51:45.689Z",
+    "lu_le": null
+  }
+},
+{
+  "model": "sante.message",
+  "pk": 2,
+  "fields": {
+    "conversation": 2,
+    "expediteur": [
+      "jeannaut"
+    ],
+    "texte": "haute temperature vommissement et convulsion",
+    "envoye_le": "2026-11-06T13:53:49.132Z",
+    "lu_le": null
+  }
+}
+]
