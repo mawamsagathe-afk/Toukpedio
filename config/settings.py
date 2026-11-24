@@ -201,14 +201,73 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+
+OBJECT_STORAGE_ENABLED = os.getenv(
+    "OBJECT_STORAGE_ENABLED",
+    "true" if IS_VERCEL else "false",
+).strip().lower() == "true"
+
+if IS_VERCEL and not OBJECT_STORAGE_ENABLED:
+    raise ImproperlyConfigured(
+        "OBJECT_STORAGE_ENABLED must be true on Vercel because its filesystem "
+        "is not persistent."
+    )
+
+if OBJECT_STORAGE_ENABLED:
+    R2_ACCOUNT_ID = os.getenv("R2_ACCOUNT_ID", "").strip()
+    R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "").strip()
+    R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID", "").strip()
+    R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY", "").strip()
+    missing_r2_settings = [
+        name
+        for name, value in (
+            ("R2_ACCOUNT_ID", R2_ACCOUNT_ID),
+            ("R2_BUCKET_NAME", R2_BUCKET_NAME),
+            ("R2_ACCESS_KEY_ID", R2_ACCESS_KEY_ID),
+            ("R2_SECRET_ACCESS_KEY", R2_SECRET_ACCESS_KEY),
+        )
+        if not value
+    ]
+    if missing_r2_settings:
+        raise ImproperlyConfigured(
+            "Object storage is enabled, but these settings are missing: "
+            + ", ".join(missing_r2_settings)
+        )
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {
+                "access_key": R2_ACCESS_KEY_ID,
+                "secret_key": R2_SECRET_ACCESS_KEY,
+                "bucket_name": R2_BUCKET_NAME,
+                "endpoint_url": (
+                    f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+                ),
+                "region_name": "auto",
+                "signature_version": "s3v4",
+                "addressing_style": "path",
+                "querystring_auth": True,
+                "querystring_expire": 300,
+                "file_overwrite": True,
+                "object_parameters": {
+                    "CacheControl": "private, no-store",
+                },
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
